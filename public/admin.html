@@ -87,6 +87,7 @@
   <div class="topbar">
     <h2>⚙️ Painel Administrativo</h2>
     <div style="display:flex;align-items:center;gap:12px">
+      <span id="dbStatusBadge" class="badge" style="display:none"></span>
       <span id="adminUserLabel"></span>
       <button class="btn-logout" onclick="doLogout()">Sair</button>
     </div>
@@ -255,6 +256,19 @@ async function carregarConfig(){
     if(cfg.pagamento){
       document.getElementById('cfg_pk').value=cfg.pagamento.pk||'';
       document.getElementById('cfg_sk').placeholder=cfg.pagamento.sk_masked||'sk_... (deixe em branco para manter)';
+    }
+    // Badge de status do banco
+    var badge = document.getElementById('dbStatusBadge');
+    if(badge){
+      if(cfg._db){
+        badge.textContent='🗄️ MongoDB ativo';
+        badge.className='badge';
+        badge.style.display='inline-block';
+      } else {
+        badge.textContent='⚠️ Memória (sem banco)';
+        badge.className='badge warn';
+        badge.style.display='inline-block';
+      }
     }
     // Marketing
     if(cfg.marketing){
