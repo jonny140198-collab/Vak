@@ -362,16 +362,6 @@
       <div id="confirmValorTexto" style="font-size:36px;font-weight:900;color:#24ca68;margin-bottom:20px;">R$ 25,00</div>
       <p style="font-size:14px;color:#888;margin-bottom:16px;">Deseja confirmar e prosseguir com o pagamento?</p>
 
-      <!-- Sugestão +R$3,99 sempre visível -->
-      <div id="upsellConfirmBox" style="background:#fffbe6;border:1px solid #f5d02a;border-radius:12px;padding:14px;margin-bottom:20px;text-align:center;">
-        <p style="font-size:13px;color:#7a5f00;margin-bottom:10px;">💛 Adicionar <strong>+R$3,99</strong> ao valor? Cada centavo faz diferença para a Ester!</p>
-        <div style="display:flex;gap:8px;justify-content:center;">
-          <button id="upsellConfirmSim" onclick="toggleUpsellConfirm(true)" style="background:#f5d02a;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;color:#5a4000;cursor:pointer;">✅ Sim, quero!</button>
-          <button id="upsellConfirmNao" onclick="toggleUpsellConfirm(false)" style="background:#fff;border:1px solid #ddd;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;color:#888;cursor:pointer;">Não, obrigado</button>
-        </div>
-        <p id="upsellConfirmLabel" style="font-size:12px;color:#1a6e2e;font-weight:600;margin-top:8px;display:none;">✅ +R$3,99 adicionado!</p>
-      </div>
-
       <div style="display:flex;gap:12px;justify-content:center;">
         <button onclick="backToSelect()" style="padding:14px 28px;border-radius:10px;border:2px solid #e0e0e0;background:#fff;font-size:15px;font-weight:600;color:#666;cursor:pointer;">← Alterar</button>
         <button onclick="confirmarValor()" style="padding:14px 28px;border-radius:10px;border:none;background:#24ca68;font-size:15px;font-weight:700;color:#fff;cursor:pointer;">Confirmar ✓</button>
@@ -768,7 +758,7 @@ function irParaQR(){
 }
 
 // Alias mantido para compatibilidade
-function confirmAndGenerateQR(){ irParaQR(); }
+function confirmAndGenerateQR(){ confirmarValor(); }
 
 function backToSelect(){
   esconderTodosSteps();
