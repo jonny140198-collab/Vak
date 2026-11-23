@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel Admin — Campanha</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',sans-serif;background:#0f1117;color:#e0e0e0;min-height:100vh}
+
+  /* LOGIN */
+  #loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f1117}
+  .login-box{background:#1a1d2e;border:1px solid #2a2d3e;border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center}
+  .login-box h1{font-size:22px;margin-bottom:6px;color:#fff}
+  .login-box p{font-size:13px;color:#888;margin-bottom:28px}
+  .login-box .lock{font-size:40px;margin-bottom:16px}
+
+  /* ADMIN */
+  #adminScreen{display:none}
+  .topbar{background:#1a1d2e;border-bottom:1px solid #2a2d3e;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+  .topbar h2{font-size:16px;color:#fff;font-weight:600}
+  .topbar span{font-size:13px;color:#888}
+
+  .container{max-width:800px;margin:32px auto;padding:0 20px}
+
+  .card{background:#1a1d2e;border:1px solid #2a2d3e;border-radius:14px;margin-bottom:24px;overflow:hidden}
+  .card-header{padding:16px 24px;border-bottom:1px solid #2a2d3e;display:flex;align-items:center;gap:10px}
+  .card-header .icon{font-size:20px}
+  .card-header h3{font-size:15px;font-weight:600;color:#fff}
+  .card-body{padding:24px}
+
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .form-row.single{grid-template-columns:1fr}
+  .form-group{display:flex;flex-direction:column;gap:6px}
+  .form-group label{font-size:12px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+  .form-group input,.form-group textarea,.form-group select{
+    background:#0f1117;border:1px solid #2a2d3e;border-radius:8px;
+    padding:11px 14px;font-size:14px;color:#e0e0e0;outline:none;
+    transition:border-color .2s;width:100%
+  }
+  .form-group input:focus,.form-group textarea:focus{border-color:#24ca68}
+  .form-group textarea{resize:vertical;min-height:90px}
+
+  .btn-save{background:#24ca68;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
+  .btn-save:hover{background:#1daa55}
+  .btn-logout{background:transparent;color:#888;border:1px solid #2a2d3e;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;transition:all .2s}
+  .btn-logout:hover{color:#fff;border-color:#555}
+
+  .badge{display:inline-block;background:#24ca6820;color:#24ca68;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600}
+  .badge.warn{background:#ff980020;color:#ff9800}
+
+  .toast{position:fixed;bottom:24px;right:24px;background:#24ca68;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;z-index:9999;animation:slideIn .3s ease;display:none}
+  .toast.error{background:#e53935}
+  @keyframes slideIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+  .input-hint{font-size:11px;color:#555;margin-top:4px}
+  .sk-row{position:relative}
+  .sk-row input{padding-right:90px}
+  .sk-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#2a2d3e;border:none;color:#888;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer}
+
+  @media(max-width:600px){.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="lock">🔐</div>
+    <h1>Painel Administrativo</h1>
+    <p>Acesso restrito — insira suas credenciais</p>
+    <div class="form-group" style="margin-bottom:14px;text-align:left">
+      <label>Usuário</label>
+      <input type="text" id="loginUser" placeholder="Usuário" autocomplete="username">
+    </div>
+    <div class="form-group" style="margin-bottom:20px;text-align:left">
+      <label>Senha</label>
+      <input type="password" id="loginPass" placeholder="Senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-save" style="width:100%" onclick="doLogin()">Entrar</button>
+    <p id="loginErr" style="color:#e53935;font-size:13px;margin-top:12px;display:none"></p>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="adminScreen">
+  <div class="topbar">
+    <h2>⚙️ Painel Administrativo</h2>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="adminUserLabel"></span>
+      <button class="btn-logout" onclick="doLogout()">Sair</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Campanha -->
+    <div class="card">
+      <div class="card-header">
+        <span class="icon">📢</span>
+        <h3>Dados da Campanha</h3>
+      </div>
+      <div class="card-body">
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Nome da Campanha</label>
+            <input type="text" id="cfg_nome" placeholder="Ex: Ajude a Pequena Ester">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Descrição / História</label>
+            <textarea id="cfg_descricao" placeholder="Conta a história da campanha..."></textarea>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Meta de Arrecadação (R$)</label>
+            <input type="number" id="cfg_meta" placeholder="140000" min="1">
+          </div>
+          <div class="form-group">
+            <label>Chave Pix (fallback)</label>
+            <input type="text" id="cfg_chavePix" placeholder="email@exemplo.com ou CPF">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>URL da Foto Principal</label>
+            <input type="text" id="cfg_fotoUrl" placeholder="https://... (link de imagem)">
+            <span class="input-hint">Cole o link direto de uma imagem (ex: do Google Drive, Imgur, etc)</span>
+          </div>
+        </div>
+        <button class="btn-save" onclick="salvarSecao('campanha')">💾 Salvar Campanha</button>
+      </div>
+    </div>
+
+    <!-- Pagamento -->
+    <div class="card">
+      <div class="card-header">
+        <span class="icon">💳</span>
+        <h3>Credenciais de Pagamento</h3>
+        <span class="badge warn">Sensível</span>
+      </div>
+      <div class="card-body">
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Chave Pública (PK)</label>
+            <input type="text" id="cfg_pk" placeholder="pk_...">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Chave Secreta (SK)</label>
+            <div class="sk-row" style="position:relative">
+              <input type="password" id="cfg_sk" placeholder="sk_... (deixe em branco para manter a atual)">
+              <button class="sk-toggle" onclick="toggleSK()">👁 Ver</button>
+            </div>
+            <span class="input-hint">Deixe em branco para não alterar a chave secreta atual</span>
+          </div>
+        </div>
+        <button class="btn-save" onclick="salvarSecao('pagamento')">💾 Salvar Credenciais</button>
+      </div>
+    </div>
+
+    <!-- Marketing -->
+    <div class="card">
+      <div class="card-header">
+        <span class="icon">📊</span>
+        <h3>Rastreamento & Marketing</h3>
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Pixel do Facebook (ID)</label>
+            <input type="text" id="cfg_pixelFb" placeholder="Ex: 1234567890123">
+            <span class="input-hint">Apenas o número do ID do Pixel</span>
+          </div>
+          <div class="form-group">
+            <label>Google Analytics (ID)</label>
+            <input type="text" id="cfg_ga" placeholder="Ex: G-XXXXXXXXXX">
+          </div>
+        </div>
+        <button class="btn-save" onclick="salvarSecao('marketing')">💾 Salvar Marketing</button>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var TOKEN = localStorage.getItem('adminToken') || '';
+var BASE = '';
+
+function showToast(msg, err){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast'+(err?' error':'');
+  t.style.display='block';
+  setTimeout(function(){t.style.display='none';},3000);
+}
+
+async function doLogin(){
+  var u=document.getElementById('loginUser').value.trim();
+  var p=document.getElementById('loginPass').value;
+  var err=document.getElementById('loginErr');
+  err.style.display='none';
+  try{
+    var r=await fetch(BASE+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u,senha:p})});
+    var d=await r.json();
+    if(d.token){
+      TOKEN=d.token;
+      localStorage.setItem('adminToken',TOKEN);
+      entrarAdmin(u);
+    } else {
+      err.textContent=d.error||'Erro ao fazer login';
+      err.style.display='block';
+    }
+  }catch(e){
+    err.textContent='Erro de conexão com o servidor';
+    err.style.display='block';
+  }
+}
+
+async function doLogout(){
+  await fetch(BASE+'/admin/logout',{method:'POST',headers:{'x-admin-token':TOKEN}}).catch(()=>{});
+  TOKEN='';
+  localStorage.removeItem('adminToken');
+  document.getElementById('adminScreen').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+}
+
+function entrarAdmin(user){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('adminScreen').style.display='block';
+  document.getElementById('adminUserLabel').textContent='👤 '+user;
+  carregarConfig();
+}
+
+async function carregarConfig(){
+  try{
+    var r=await fetch(BASE+'/admin/config',{headers:{'x-admin-token':TOKEN}});
+    if(r.status===401){doLogout();return;}
+    var cfg=await r.json();
+    // Campanha
+    if(cfg.campanha){
+      document.getElementById('cfg_nome').value=cfg.campanha.nome||'';
+      document.getElementById('cfg_descricao').value=cfg.campanha.descricao||'';
+      document.getElementById('cfg_meta').value=cfg.campanha.meta||'';
+      document.getElementById('cfg_chavePix').value=cfg.campanha.chavePix||'';
+      document.getElementById('cfg_fotoUrl').value=cfg.campanha.fotoUrl||'';
+    }
+    // Pagamento
+    if(cfg.pagamento){
+      document.getElementById('cfg_pk').value=cfg.pagamento.pk||'';
+      document.getElementById('cfg_sk').placeholder=cfg.pagamento.sk_masked||'sk_... (deixe em branco para manter)';
+    }
+    // Marketing
+    if(cfg.marketing){
+      document.getElementById('cfg_pixelFb').value=cfg.marketing.pixelFacebook||'';
+      document.getElementById('cfg_ga').value=cfg.marketing.googleAnalytics||'';
+    }
+  }catch(e){showToast('Erro ao carregar configurações',true);}
+}
+
+async function salvarSecao(secao){
+  var body={};
+  if(secao==='campanha'){
+    body.campanha={
+      nome:document.getElementById('cfg_nome').value.trim(),
+      descricao:document.getElementById('cfg_descricao').value.trim(),
+      meta:parseFloat(document.getElementById('cfg_meta').value)||140000,
+      chavePix:document.getElementById('cfg_chavePix').value.trim(),
+      fotoUrl:document.getElementById('cfg_fotoUrl').value.trim()
+    };
+  } else if(secao==='pagamento'){
+    body.pagamento={
+      pk:document.getElementById('cfg_pk').value.trim(),
+      sk:document.getElementById('cfg_sk').value.trim()
+    };
+  } else if(secao==='marketing'){
+    body.marketing={
+      pixelFacebook:document.getElementById('cfg_pixelFb').value.trim(),
+      googleAnalytics:document.getElementById('cfg_ga').value.trim()
+    };
+  }
+  try{
+    var r=await fetch(BASE+'/admin/config',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-token':TOKEN},
+      body:JSON.stringify(body)
+    });
+    var d=await r.json();
+    if(d.ok){
+      showToast('✅ Salvo com sucesso!');
+      if(secao==='pagamento') document.getElementById('cfg_sk').value='';
+      carregarConfig();
+    } else {
+      showToast(d.error||'Erro ao salvar',true);
+    }
+  }catch(e){showToast('Erro de conexão',true);}
+}
+
+function toggleSK(){
+  var i=document.getElementById('cfg_sk');
+  i.type=i.type==='password'?'text':'password';
+}
+
+// Auto-login se tiver token salvo
+window.onload=function(){
+  if(TOKEN){
+    fetch(BASE+'/admin/config',{headers:{'x-admin-token':TOKEN}})
+      .then(function(r){
+        if(r.ok) entrarAdmin(localStorage.getItem('adminUser')||'Admin');
+        else { TOKEN=''; localStorage.removeItem('adminToken'); }
+      }).catch(function(){});
+  }
+};
+</script>
+</body>
+</html>
