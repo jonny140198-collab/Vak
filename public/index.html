@@ -427,7 +427,7 @@
     </div>
 
 
-  <div class="success-screen" id="successScreen">
+  <div class="success-screen" id="successScreen" style="display:none;">
     <div style="font-size:72px;margin-bottom:16px;">💚</div>
     <h2>Obrigado pela sua doação!</h2>
     <p>Sua contribuição chegou e vai fazer uma grande diferença na vida da pequena Ester e do Robson. Que Deus abençoe você!</p>
@@ -566,14 +566,15 @@ var selectedMethod='pix';
 function openPayment(){
   document.getElementById('payment-page').style.display='block';
   document.getElementById('pay-form-screen').style.display='block';
+  // Resetar todos os steps — mostrar só seleção de valor
+  ['payStepConfirm','payStepUpsell','payStepQR'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+  document.getElementById('successScreen').style.display='none';
   document.getElementById('successScreen').classList.remove('show');
-  // Reset to step1
   var step1=document.getElementById('payStepSelect');
-  var step2=document.getElementById('payStepQR');
-  if(step1&&step2){
-    step1.style.display='block';step1.style.opacity='1';step1.style.pointerEvents='';
-    step2.style.display='none';
-  }
+  if(step1){step1.style.display='block';step1.style.opacity='1';step1.style.pointerEvents='';}
   currentChargeId='';currentCopyPaste='';
   updatePayBtn();
 }
@@ -624,66 +625,69 @@ function selectMethod(m){
 var currentChargeId='';
 var currentCopyPaste='';
 
-// Passo 1: mostrar confirmação do valor
-function mostrarConfirmacao(){
-  if(!selectedValue||selectedValue<1)return;
-  document.getElementById('confirmValorTexto').textContent=fmtBRL(selectedValue*100);
-  document.getElementById('payStepConfirm').style.display='block';
-  document.getElementById('payStepConfirm').style.opacity='1';
+// ── Utilitário: esconde todos os steps ──
+function esconderTodosSteps(){
+  ['payStepSelect','payStepConfirm','payStepUpsell','payStepQR'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){el.style.display='none';el.style.opacity='1';el.style.pointerEvents='';}
+  });
+  document.getElementById('successScreen').style.display='none';
+  document.getElementById('successScreen').classList.remove('show');
 }
 
-// Passo 2: confirmou → mostrar upsell R$3,99
+// Passo 1 → confirmação do valor
+function mostrarConfirmacao(){
+  if(!selectedValue||selectedValue<1)return;
+  esconderTodosSteps();
+  document.getElementById('confirmValorTexto').textContent=fmtBRL(selectedValue*100);
+  document.getElementById('payStepConfirm').style.display='block';
+}
+
+// Passo 2 → upsell R$3,99
 function confirmarValor(){
-  document.getElementById('payStepConfirm').style.display='none';
+  esconderTodosSteps();
   document.getElementById('upsellValorTexto').textContent=fmtBRL((selectedValue+3.99)*100);
   document.getElementById('payStepUpsell').style.display='block';
 }
 
-// Upsell: sim → adiciona R$3,99
+// Upsell: sim → adiciona R$3,99 e vai para QR
 function upsellSim(){
   selectedValue=Math.round((selectedValue+3.99)*100)/100;
-  document.getElementById('payStepUpsell').style.display='none';
-  confirmAndGenerateQR();
+  irParaQR();
 }
 
-// Upsell: não → segue sem adicionar
+// Upsell: não → vai direto para QR
 function upsellNao(){
-  document.getElementById('payStepUpsell').style.display='none';
-  confirmAndGenerateQR();
+  irParaQR();
 }
 
-// Passo 3: gerar QR
-function confirmAndGenerateQR(){
-  if(!selectedValue||selectedValue<1)return;
-  var step1=document.getElementById('payStepSelect');
+// Passo 3 → tela de pagamento QR
+function irParaQR(){
+  esconderTodosSteps();
   var step2=document.getElementById('payStepQR');
-  step1.style.opacity='0';
-  step1.style.pointerEvents='none';
-  setTimeout(function(){
-    step1.style.display='none';
-    step2.style.display='block';
-    document.getElementById('qrAmountDisplay').textContent=fmtBRL(selectedValue*100);
-    document.getElementById('qrInstAmount').textContent=fmtBRL(selectedValue*100);
-    document.getElementById('payment-page').scrollTop=0;
-    generatePixQR(selectedValue);
-  },300);
+  step2.style.display='block';
+  document.getElementById('qrAmountDisplay').textContent=fmtBRL(selectedValue*100);
+  document.getElementById('qrInstAmount').textContent=fmtBRL(selectedValue*100);
+  document.getElementById('payment-page').scrollTop=0;
+  generatePixQR(selectedValue);
 }
+
+// Alias mantido para compatibilidade
+function confirmAndGenerateQR(){ irParaQR(); }
 
 function backToSelect(){
-  var step1=document.getElementById('payStepSelect');
-  var step2=document.getElementById('payStepQR');
-  step2.style.display='none';
-  step1.style.display='block';
-  step1.style.opacity='1';
-  step1.style.pointerEvents='';
+  esconderTodosSteps();
+  // Limpar QR
   document.getElementById('qrImage').style.display='none';
   document.getElementById('qrLoading').style.display='flex';
   document.getElementById('qrError').style.display='none';
   document.getElementById('qrCopyBox').style.display='none';
   document.getElementById('btnCopyPix').style.display='none';
+  // Voltar ao step 1
+  var step1=document.getElementById('payStepSelect');
+  if(step1){step1.style.display='block';step1.style.opacity='1';step1.style.pointerEvents='';}
   currentChargeId='';currentCopyPaste='';
 }
-
 function generatePixQR(value){
   var amountCents=Math.round(value*100);
   document.getElementById('qrImage').style.display='none';
@@ -760,6 +764,7 @@ function submitPayment(){confirmAndGenerateQR();}
 
 // Botão "Compartilhar" → copia link automaticamente + toast
 function confirmarPagamentoFeito(){
+  esconderTodosSteps();
   document.getElementById('pay-form-screen').style.display='none';
   var sc=document.getElementById('successScreen');
   sc.style.display='block';
