@@ -91,6 +91,7 @@
   #payStepSelect{transition:opacity 0.3s ease;}
   #payStepQR{display:none;animation:fadeUp 0.4s ease;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
   .qr-screen{padding:8px 0 24px;text-align:center;}
   .qr-amount-label{font-size:13px;color:#8a8a8a;margin-bottom:4px;}
   .qr-amount-value{font-size:38px;font-weight:900;color:#24ca68;margin-bottom:18px;}
@@ -418,6 +419,9 @@
         <button class="btn-copy-pix" id="btnCopyPix" onclick="copyPixCode()" style="display:none;">
           📋 Copiar código Pix Copia e Cola
         </button>
+        <!-- Status do polling automático -->
+        <div id="pollingStatus" style="text-align:center;font-size:13px;color:#1a6e2e;font-weight:600;margin-bottom:10px;min-height:20px;animation:pulse 2s infinite;">⏳ Aguardando pagamento...</div>
+
         <button onclick="confirmarPagamentoFeito()" style="width:100%;padding:14px;background:#1a6e2e;color:#fff;font-size:15px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-bottom:10px;">✅ Já realizei o pagamento</button>
         <div style="background:#f0fdf4;border:1px solid #bbf0d0;border-radius:12px;padding:14px;margin-bottom:10px;text-align:center;">
           <p style="font-size:13px;color:#1a6e2e;font-weight:700;margin-bottom:10px;">💚 Compartilhe e salve mais vidas!</p>
@@ -723,7 +727,46 @@ function toggleUpsellConfirm(aceitar){
   }
 }
 
-// Compartilhar direto da tela de QR (antes de confirmar)
+// ─── Polling automático de pagamento ────────────────────────────
+var _pollingTimer = null;
+var _pollingAttempts = 0;
+var _pollingMaxAttempts = 80; // ~4 minutos (80 × 3s)
+var BACKEND_URL_POLL = 'https://vak-led3.onrender.com';
+
+function iniciarPollingPagamento(chargeId){
+  pararPollingPagamento(); // limpa qualquer timer anterior
+  if(!chargeId){ return; }
+  _pollingAttempts = 0;
+  mostrarStatusPolling('⏳ Aguardando pagamento...');
+  _pollingTimer = setInterval(function(){
+    _pollingAttempts++;
+    if(_pollingAttempts > _pollingMaxAttempts){
+      pararPollingPagamento();
+      mostrarStatusPolling('⏱ Tempo esgotado. Clique em "Já realizei o pagamento" se já pagou.');
+      return;
+    }
+    fetch(BACKEND_URL_POLL+'/status-cobranca/'+chargeId)
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if(data.pago){
+          pararPollingPagamento();
+          confirmarPagamentoFeito();
+        }
+      })
+      .catch(function(){}); // silencia erros de rede
+  }, 3000);
+}
+
+function pararPollingPagamento(){
+  if(_pollingTimer){ clearInterval(_pollingTimer); _pollingTimer=null; }
+}
+
+function mostrarStatusPolling(msg){
+  var el = document.getElementById('pollingStatus');
+  if(el) el.textContent = msg;
+}
+
+// ─── Compartilhar direto da tela de QR (antes de confirmar)
 function compartilharWhatsAppQR(){
   var txt=encodeURIComponent('💚 Ajude a Pequena Ester! Ela tem leucemia e precisa de tratamento urgente. Cada doação salva uma vida! '+window.location.href);
   window.open('https://wa.me/?text='+txt,'_blank');
@@ -761,6 +804,7 @@ function irParaQR(){
 function confirmAndGenerateQR(){ confirmarValor(); }
 
 function backToSelect(){
+  pararPollingPagamento();
   esconderTodosSteps();
   // Limpar QR
   document.getElementById('qrImage').style.display='none';
@@ -801,6 +845,8 @@ function generatePixQR(value){
     if(data.qrCodeBase64){
       currentChargeId=data.id||'';
       currentCopyPaste=data.copyPaste||'';
+      // Inicia polling automático de pagamento
+      iniciarPollingPagamento(currentChargeId);
       document.getElementById('qrLoading').style.display='none';
       var img=document.getElementById('qrImage');
       img.src=data.qrCodeBase64;

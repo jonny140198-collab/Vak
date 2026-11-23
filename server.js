@@ -209,6 +209,34 @@ app.post('/criar-cobranca', async (req, res) => {
   }
 });
 
+// ─── Rota consulta status do pagamento ───────────────────────────
+app.get('/status-cobranca/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const PK = CONFIG.pagamento.pk;
+    const SK = CONFIG.pagamento.sk;
+    if (!PK || !SK)
+      return res.status(500).json({ error: 'Credenciais não configuradas' });
+
+    const creds = Buffer.from(`${PK}:${SK}`).toString('base64');
+    const response = await fetch(`https://app.xflowpayments.com/api/v1/charges/${id}`, {
+      headers: { 'Authorization': `Basic ${creds}` }
+    });
+    const data = await response.json();
+    if (!response.ok)
+      return res.status(response.status).json({ error: data.message || 'Erro ao consultar' });
+
+    // Retorna status simplificado
+    const pago = data.status === 'paid' || data.status === 'completed' ||
+                 data.status === 'approved' || data.pix?.status === 'paid' ||
+                 data.pix?.status === 'completed';
+    res.json({ id: data.id, status: data.status, pago });
+  } catch (err) {
+    console.error('Erro /status-cobranca:', err);
+    res.status(500).json({ error: 'Erro interno' });
+  }
+});
+
 // ─── Painel Admin e Site ─────────────────────────────────────────
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
