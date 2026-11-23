@@ -92,6 +92,7 @@
   #payStepQR{display:none;animation:fadeUp 0.4s ease;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+@keyframes heartbeat{0%,100%{transform:scale(1);}15%{transform:scale(1.15);}30%{transform:scale(1);}45%{transform:scale(1.08);}60%{transform:scale(1);}}
   .qr-screen{padding:8px 0 24px;text-align:center;}
   .qr-amount-label{font-size:13px;color:#8a8a8a;margin-bottom:4px;}
   .qr-amount-value{font-size:38px;font-weight:900;color:#24ca68;margin-bottom:18px;}
@@ -447,25 +448,61 @@
       </div>
     </div>
 
+  </div><!-- /pay-form-screen -->
+</div><!-- /payment-page -->
 
-  <div class="success-screen" id="successScreen" style="display:none;">
-    <div style="font-size:72px;margin-bottom:16px;">💚</div>
-    <h2>Obrigado pela sua doação!</h2>
-    <p>Sua contribuição chegou e vai fazer uma grande diferença na vida da pequena Ester e do Robson. Que Deus abençoe você!</p>
-    <div style="background:#e8f5e9;border-radius:12px;padding:16px;margin-bottom:24px;text-align:left;">
-      <div style="font-size:13px;color:#4a4a4a;margin-bottom:4px;">Valor doado:</div>
-      <div style="font-size:24px;font-weight:900;color:#24ca68;" id="successAmount">R$ 25,00</div>
+<!-- TELA DE SUCESSO — fora do payment-page para não ser escondida -->
+<div class="success-overlay" id="successScreen" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;z-index:9999;overflow-y:auto;padding:0;">
+  <div style="max-width:480px;margin:0 auto;padding:40px 24px;text-align:center;">
+
+    <!-- Animação de coração -->
+    <div style="font-size:80px;margin-bottom:8px;animation:heartbeat 1s ease infinite;">💚</div>
+
+    <h2 style="font-size:26px;font-weight:900;color:#1a6e2e;margin-bottom:16px;">Que Deus abençoe você!</h2>
+
+    <div style="background:#f0fdf4;border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid #24ca6840;">
+      <p style="font-size:16px;color:#282828;line-height:1.6;margin-bottom:12px;">
+        Você acabou de fazer muito mais do que uma doação.<br>
+        <strong>Você deu esperança.</strong>
+      </p>
+      <p style="font-size:14px;color:#555;line-height:1.6;margin-bottom:12px;">
+        A pequena Ester tem apenas alguns anos de vida pela frente — e cada centavo doado por você é um passo a mais no tratamento dela. Sua família agradece com lágrimas nos olhos.
+      </p>
+      <p style="font-size:14px;color:#555;line-height:1.6;">
+        Obrigado por não ignorar. Obrigado por escolher ajudar. <strong>Você faz parte desta história.</strong>
+      </p>
     </div>
-    <div style="margin:20px 0 16px;padding:16px;background:#f0fdf4;border-radius:12px;border:1px solid #24ca6840;">
-      <p style="font-size:15px;font-weight:700;color:#1a6e2e;margin-bottom:12px;">🔗 Compartilhe e salve mais vidas!</p>
-      <p style="font-size:13px;color:#555;margin-bottom:14px;">Cada compartilhamento pode trazer um novo doador. Ajude a Ester chegando a mais pessoas!</p>
+
+    <div style="background:#e8f5e9;border-radius:12px;padding:14px;margin-bottom:24px;">
+      <div style="font-size:12px;color:#888;margin-bottom:4px;">Valor doado:</div>
+      <div style="font-size:28px;font-weight:900;color:#24ca68;" id="successAmount">R$ 25,00</div>
+    </div>
+
+    <!-- Compartilhamento -->
+    <div style="background:#1a6e2e;border-radius:16px;padding:20px;margin-bottom:20px;">
+      <p style="font-size:16px;font-weight:800;color:#fff;margin-bottom:6px;">🙏 Agora, compartilhe!</p>
+      <p style="font-size:13px;color:#a8e6c0;margin-bottom:16px;line-height:1.5;">
+        Cada compartilhamento pode salvar mais uma vida.<br>Seja a corrente do bem!
+      </p>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-        <a id="successWhatsApp" href="#" target="_blank" style="background:#25D366;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;">📱 WhatsApp</a>
-        <a id="successFacebook" href="#" target="_blank" style="background:#1877F2;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;">👍 Facebook</a>
-        <button onclick="copiarLinkSucesso()" style="background:#282828;color:#fff;padding:10px 18px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;">🔗 Copiar link</button>
+        <a id="successWhatsApp" href="#" target="_blank" style="display:flex;align-items:center;gap:6px;background:#25D366;color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.734.44 3.368 1.213 4.792L2.077 21.5l4.816-1.264A9.952 9.952 0 0012 22c5.523 0 10-4.477 10-10S17.522 2 11.999 2z"/></svg>
+          WhatsApp
+        </a>
+        <a id="successFacebook" href="#" target="_blank" style="display:flex;align-items:center;gap:6px;background:#1877F2;color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </a>
+        <button onclick="copiarLinkSucesso()" style="display:flex;align-items:center;gap:6px;background:#fff;color:#282828;padding:12px 20px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;font-weight:700;cursor:pointer;">
+          🔗 Copiar link
+        </button>
       </div>
     </div>
-    <button class="btn-back-main" onclick="closePayment()">Voltar para a campanha</button>
+
+    <button class="btn-back-main" onclick="fecharSucesso()" style="width:100%;padding:14px;border-radius:12px;border:2px solid #e0e0e0;background:#fff;font-size:15px;font-weight:600;color:#666;cursor:pointer;">
+      Voltar para a campanha
+    </button>
+
   </div>
 </div>
 
@@ -895,12 +932,20 @@ function submitPayment(){confirmAndGenerateQR();}
 
 // Botão "Compartilhar" → copia link automaticamente + toast
 function confirmarPagamentoFeito(){
-  esconderTodosSteps();
-  document.getElementById('pay-form-screen').style.display='none';
-  var sc=document.getElementById('successScreen');
-  sc.style.display='block';
-  sc.classList.add('show');
+  pararPollingPagamento();
+  // Atualiza valor na tela de sucesso
+  var amtEl = document.getElementById('successAmount');
+  if(amtEl && selectedValue) amtEl.textContent = fmtBRL(Math.round(selectedValue*100));
+  // Mostra tela de sucesso (overlay fixed, não depende do payment-page)
+  var sc = document.getElementById('successScreen');
+  sc.style.display = 'block';
+  sc.scrollTop = 0;
   iniciarLinksCompartilharSucesso();
+}
+
+function fecharSucesso(){
+  document.getElementById('successScreen').style.display='none';
+  closePayment();
 }
 
 function copiarLinkSucesso(){
