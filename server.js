@@ -10,21 +10,25 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ─── Configurações ───────────────────────────────────────────────
-const CONFIG_PATH = path.join(__dirname, 'data', 'config.json');
-
-function readConfig() {
-  try {
-    return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
-  } catch {
-    return {};
+// ─── Config em memória (Render Free não tem disco persistente) ───
+// Inicializa com variáveis de ambiente — admin pode sobrescrever em runtime
+let CONFIG = {
+  campanha: {
+    nome: process.env.CAMP_NOME || 'Ajude a Pequena Ester',
+    descricao: process.env.CAMP_DESC || 'Ester tem leucemia e precisa de tratamento urgente.',
+    meta: parseFloat(process.env.CAMP_META) || 140000,
+    chavePix: process.env.CAMP_PIX || '',
+    fotoUrl: process.env.CAMP_FOTO || ''
+  },
+  pagamento: {
+    pk: process.env.PAYMENT_PK || '',
+    sk: process.env.PAYMENT_SK || ''
+  },
+  marketing: {
+    pixelFacebook: process.env.PIXEL_FB || '',
+    googleAnalytics: process.env.GA_ID || ''
   }
-}
-
-function saveConfig(cfg) {
-  fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true });
-  fs.writeFileSync(CONFIG_PATH, JSON.stringify(cfg, null, 2));
-}
+};
 
 // ─── Autenticação Admin ──────────────────────────────────────────
 const ADMIN_USER = process.env.ADMIN_USER || 'garciaST';
@@ -41,11 +45,8 @@ function makeToken() {
 
 function authMiddleware(req, res, next) {
   const token = req.headers['x-admin-token'] || req.query.token;
-  if (token && sessions.has(token)) {
-    next();
-  } else {
-    res.status(401).json({ error: 'Não autorizado' });
-  }
+  if (token && sessions.has(token)) return next();
+  res.status(401).json({ error: 'Não autorizado' });
 }
 
 // ─── Rotas Admin ─────────────────────────────────────────────────
@@ -62,14 +63,13 @@ app.post('/admin/login', (req, res) => {
 });
 
 app.post('/admin/logout', authMiddleware, (req, res) => {
-  const token = req.headers['x-admin-token'];
-  sessions.delete(token);
+  sessions.delete(req.headers['x-admin-token']);
   res.json({ ok: true });
 });
 
 app.get('/admin/config', authMiddleware, (req, res) => {
-  const cfg = readConfig();
-  // Nunca expor SK completa — mascarar
+  // Nunca expor SK completa
+  const cfg = JSON.parse(JSON.stringify(CONFIG));
   if (cfg.pagamento?.sk) {
     cfg.pagamento.sk_masked = cfg.pagamento.sk.slice(0, 10) + '••••••••••••••••';
     delete cfg.pagamento.sk;
@@ -78,36 +78,21 @@ app.get('/admin/config', authMiddleware, (req, res) => {
 });
 
 app.post('/admin/config', authMiddleware, (req, res) => {
-  const cfg = readConfig();
   const body = req.body;
-
-  // Campanha
-  if (body.campanha) {
-    cfg.campanha = { ...cfg.campanha, ...body.campanha };
-  }
-  // Pagamento — só atualiza SK se vier preenchida (não mascarada)
+  if (body.campanha) CONFIG.campanha = { ...CONFIG.campanha, ...body.campanha };
   if (body.pagamento) {
-    if (body.pagamento.pk) cfg.pagamento.pk = body.pagamento.pk;
+    if (body.pagamento.pk) CONFIG.pagamento.pk = body.pagamento.pk;
     if (body.pagamento.sk && !body.pagamento.sk.includes('•')) {
-      cfg.pagamento.sk = body.pagamento.sk;
+      CONFIG.pagamento.sk = body.pagamento.sk;
     }
   }
-  // Marketing
-  if (body.marketing) {
-    cfg.marketing = { ...cfg.marketing, ...body.marketing };
-  }
-
-  saveConfig(cfg);
+  if (body.marketing) CONFIG.marketing = { ...CONFIG.marketing, ...body.marketing };
   res.json({ ok: true });
 });
 
-// Config pública (sem credenciais sensíveis) — usada pelo site
+// Config pública (sem credenciais)
 app.get('/config-publica', (req, res) => {
-  const cfg = readConfig();
-  res.json({
-    campanha: cfg.campanha || {},
-    marketing: cfg.marketing || {}
-  });
+  res.json({ campanha: CONFIG.campanha, marketing: CONFIG.marketing });
 });
 
 // ─── Rota Pix ────────────────────────────────────────────────────
@@ -117,11 +102,11 @@ app.post('/criar-cobranca', async (req, res) => {
     if (!amountCents || amountCents < 100)
       return res.status(400).json({ error: 'Valor mínimo: R$ 1,00' });
 
-    const cfg = readConfig();
-    const PK = cfg.pagamento?.pk || process.env.PAYMENT_PK;
-    const SK = cfg.pagamento?.sk || process.env.PAYMENT_SK;
+    const PK = CONFIG.pagamento.pk;
+    const SK = CONFIG.pagamento.sk;
 
-    if (!PK || !SK) return res.status(500).json({ error: 'Credenciais de pagamento não configuradas' });
+    if (!PK || !SK)
+      return res.status(500).json({ error: 'Credenciais de pagamento não configuradas no servidor' });
 
     const creds = Buffer.from(`${PK}:${SK}`).toString('base64');
 
@@ -130,7 +115,7 @@ app.post('/criar-cobranca', async (req, res) => {
       headers: { 'Authorization': `Basic ${creds}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         amountCents,
-        description: `Doação — ${cfg.campanha?.nome || 'Campanha'}`,
+        description: `Doação — ${CONFIG.campanha.nome}`,
         customer: {
           name: donorName || 'Doador Anônimo',
           email: 'doador@vakinha.com.br',
@@ -141,7 +126,8 @@ app.post('/criar-cobranca', async (req, res) => {
     });
 
     const data = await response.json();
-    if (!response.ok) return res.status(response.status).json({ error: data.message || 'Erro na API' });
+    if (!response.ok)
+      return res.status(response.status).json({ error: data.message || 'Erro na API de pagamento' });
 
     res.json({
       id: data.id,
@@ -149,22 +135,21 @@ app.post('/criar-cobranca', async (req, res) => {
       copyPaste: data.pix?.copyPaste
     });
   } catch (err) {
-    console.error(err);
+    console.error('Erro /criar-cobranca:', err);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
 
-// ─── Painel Admin (HTML) ─────────────────────────────────────────
+// ─── Painel Admin e Site ─────────────────────────────────────────
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// ─── Site principal ───────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/health', (req, res) => res.json({ status: 'ok', pk_set: !!CONFIG.pagamento.pk }));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Servidor rodando na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor na porta ${PORT} | PK: ${CONFIG.pagamento.pk ? 'configurada' : 'AUSENTE'}`));
