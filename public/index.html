@@ -344,6 +344,10 @@
             <label style="font-size:13px;color:#8a8a8a;display:block;margin-bottom:6px;">Seu nome (como aparecerá na doação):</label>
             <input type="text" id="donorName" placeholder="Opcional — Ex: Maria Silva" style="width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;color:#282828;outline:none;">
           </div>
+          <div style="background:#fffbe6;border:1px solid #f5d02a;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#7a5f00;text-align:center;">
+            💛 Adicionar <strong>+R$3,99</strong> ao valor? Cada centavo faz diferença para a Ester!
+            <br><button onclick="adicionarUpsellCustom()" style="margin-top:8px;background:#f5d02a;border:none;border-radius:6px;padding:6px 16px;font-size:13px;font-weight:700;color:#5a4000;cursor:pointer;">✅ Sim, quero ajudar mais!</button>
+          </div>
           <button class="pay-submit" id="payConfirmBtn" onclick="confirmAndGenerateQR()">
             Confirmar e Pagar — <span id="payBtnAmount">R$ 25,00</span>
           </button>
@@ -362,7 +366,7 @@
       <div id="confirmValorTexto" style="font-size:36px;font-weight:900;color:#24ca68;margin-bottom:20px;">R$ 25,00</div>
       <p style="font-size:14px;color:#888;margin-bottom:24px;">Deseja confirmar e prosseguir com o pagamento?</p>
       <div style="display:flex;gap:12px;justify-content:center;">
-        <button onclick="document.getElementById('payStepConfirm').style.display='none'" style="padding:14px 28px;border-radius:10px;border:2px solid #e0e0e0;background:#fff;font-size:15px;font-weight:600;color:#666;cursor:pointer;">← Alterar</button>
+        <button onclick="backToSelect()" style="padding:14px 28px;border-radius:10px;border:2px solid #e0e0e0;background:#fff;font-size:15px;font-weight:600;color:#666;cursor:pointer;">← Alterar</button>
         <button onclick="confirmarValor()" style="padding:14px 28px;border-radius:10px;border:none;background:#24ca68;font-size:15px;font-weight:700;color:#fff;cursor:pointer;">Confirmar ✓</button>
       </div>
     </div>
@@ -418,6 +422,22 @@
           📋 Copiar código Pix Copia e Cola
         </button>
         <button onclick="confirmarPagamentoFeito()" style="width:100%;padding:14px;background:#1a6e2e;color:#fff;font-size:15px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-bottom:10px;">✅ Já realizei o pagamento</button>
+        <div style="background:#f0fdf4;border:1px solid #bbf0d0;border-radius:12px;padding:14px;margin-bottom:10px;text-align:center;">
+          <p style="font-size:13px;color:#1a6e2e;font-weight:700;margin-bottom:10px;">💚 Compartilhe e salve mais vidas!</p>
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+            <button onclick="compartilharWhatsAppQR()" style="display:flex;align-items:center;gap:6px;background:#25d366;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.734.44 3.368 1.213 4.792L2.077 21.5l4.816-1.264A9.952 9.952 0 0012 22c5.523 0 10-4.477 10-10S17.522 2 11.999 2z"/></svg>
+              WhatsApp
+            </button>
+            <button onclick="compartilharFacebookQR()" style="display:flex;align-items:center;gap:6px;background:#1877f2;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              Facebook
+            </button>
+            <button onclick="copiarLinkQR()" style="display:flex;align-items:center;gap:6px;background:#fff;color:#282828;border:1px solid #ddd;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;">
+              🔗 Copiar Link
+            </button>
+          </div>
+        </div>
         <button class="btn-change-value" onclick="backToSelect()">← Alterar valor</button>
         <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:#4a4a4a;">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="#1a6e2e" style="flex-shrink:0"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
@@ -659,6 +679,39 @@ function upsellSim(){
 // Upsell: não → vai direto para QR
 function upsellNao(){
   irParaQR();
+}
+
+// Upsell +R$3,99 no campo "outro valor"
+function adicionarUpsellCustom(){
+  if(selectedValue && selectedValue>=1){
+    selectedValue=Math.round((selectedValue+3.99)*100)/100;
+    document.getElementById('payBtnAmount').textContent=fmtBRL(selectedValue*100);
+    var hint=document.querySelector('[data-upsell-hint]');
+    if(hint) hint.style.display='none';
+  }
+}
+
+// Compartilhar direto da tela de QR (antes de confirmar)
+function compartilharWhatsAppQR(){
+  var txt=encodeURIComponent('💚 Ajude a Pequena Ester! Ela tem leucemia e precisa de tratamento urgente. Cada doação salva uma vida! '+window.location.href);
+  window.open('https://wa.me/?text='+txt,'_blank');
+}
+function compartilharFacebookQR(){
+  var url=encodeURIComponent(window.location.href);
+  window.open('https://www.facebook.com/sharer/sharer.php?u='+url,'_blank');
+}
+function copiarLinkQR(){
+  navigator.clipboard.writeText(window.location.href).then(function(){
+    mostrarToastShare('🔗 Link copiado!');
+  }).catch(function(){
+    var ta=document.createElement('textarea');
+    ta.value=window.location.href;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    mostrarToastShare('🔗 Link copiado!');
+  });
 }
 
 // Passo 3 → tela de pagamento QR
