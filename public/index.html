@@ -1075,7 +1075,7 @@ window._campanhaId = null; // ID da campanha ativa (usado no /criar-cobranca)
       // Foto
       if(c.fotoBase64 || c.fotoUrl){
         var src = c.fotoBase64 || c.fotoUrl;
-        var imgs = document.querySelectorAll('.campaign-photo, .campaign-img, img.foto-campanha');
+        var imgs = document.querySelectorAll('.campaign-photo, .campaign-img, img.foto-campanha, .campaign-image img');
         imgs.forEach(function(img){ img.src = src; });
       }
 

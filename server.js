@@ -256,13 +256,28 @@ app.delete('/admin/campanhas/:id', authMiddleware, async (req, res) => {
 // Campanha ativa pública (site principal usa a 1ª campanha ativa)
 app.get('/campanha-ativa', async (req, res) => {
   try {
+    const { c } = req.query; // ID específico de campanha via ?c=ID
     if (!dbConectado) {
-      const ativa = CAMPANHAS_MEM.find(c => c.status === 'ativa') || CAMPANHAS_MEM[0];
+      let ativa;
+      if (c) {
+        ativa = CAMPANHAS_MEM.find(x => x._id == c || x.id == c);
+      }
+      ativa = ativa || CAMPANHAS_MEM.find(x => x.status === 'ativa') || CAMPANHAS_MEM[0];
       return res.json({ campanha: ativa, marketing: CONFIG.marketing });
     }
-    const c = await CampanhaModel.findOne({ status: 'ativa' }).sort({ ordemExibicao: 1, createdAt: 1 });
-    if (!c) return res.json({ campanha: null, marketing: CONFIG.marketing });
-    res.json({ campanha: c, marketing: CONFIG.marketing });
+    let campanha;
+    if (c) {
+      // Busca campanha específica pelo ID
+      try {
+        campanha = await CampanhaModel.findById(c);
+      } catch(e) { campanha = null; }
+    }
+    // Fallback: primeira campanha ativa
+    if (!campanha) {
+      campanha = await CampanhaModel.findOne({ status: 'ativa' }).sort({ ordemExibicao: 1, createdAt: 1 });
+    }
+    if (!campanha) return res.json({ campanha: null, marketing: CONFIG.marketing });
+    res.json({ campanha, marketing: CONFIG.marketing });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao buscar campanha' });
   }
