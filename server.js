@@ -45,6 +45,15 @@ const campanhaSchema = new mongoose.Schema({
   valores:      { type: [Number], default: [10, 25, 50, 100, 200] },
   upsell:       { type: Boolean, default: false },
   upsellTexto:  { type: String, default: 'Adicione mais e ajude ainda mais!' },
+  upsellValor:  { type: Number, default: 3.99 },
+  // Textos editáveis do checkout
+  checkoutNome:         { type: String, default: '' },  // nome no mini-card do checkout
+  textoAgradecimento:   { type: String, default: '' },  // título "Que Deus abençoe você!"
+  textoAgradecimentoP1: { type: String, default: '' },  // 1º parágrafo da tela de sucesso
+  textoAgradecimentoP2: { type: String, default: '' },  // 2º parágrafo
+  textoAgradecimentoP3: { type: String, default: '' },  // 3º parágrafo
+  textoUpsellTitulo:    { type: String, default: '' },  // "Deseja adicionar R$..."
+  textoUpsellSub:       { type: String, default: '' },  // subtexto do upsell
   arrecadado:   { type: Number, default: 0 },
   ordemExibicao: { type: Number, default: 0 },
   vakinhaPremiada: { type: String, default: '' },

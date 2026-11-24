@@ -345,6 +345,7 @@ tr:hover td{background:var(--surface2)}
             <button class="tab-editor-btn active" onclick="showEditorTab('info',this)">📋 Informações</button>
             <button class="tab-editor-btn" onclick="showEditorTab('midia',this)">🖼️ Mídia</button>
             <button class="tab-editor-btn" onclick="showEditorTab('descricao',this)">📝 Descrição</button>
+            <button class="tab-editor-btn" onclick="showEditorTab('textos',this)">✍️ Textos</button>
             <button class="tab-editor-btn" onclick="showEditorTab('atualizacoes',this)">📢 Atualizações</button>
             <button class="tab-editor-btn" onclick="showEditorTab('perguntas',this)">❓ Q&amp;A</button>
             <button class="tab-editor-btn" onclick="showEditorTab('valores',this)">💲 Valores</button>
@@ -457,6 +458,73 @@ tr:hover td{background:var(--surface2)}
                 <textarea id="ce-vakinhaPremiada" rows="5" placeholder="Ex: Esta vaquinha concorre ao prêmio de R$ 10.000..."></textarea>
                 <span class="hint">Aparece na aba "Vakinha Premiada".</span>
               </div>
+            </div></div>
+          </div>
+
+          <!-- ABA: TEXTOS (checkout, upsell, agradecimento) -->
+          <div class="tab-editor-pane" id="ceditor-textos">
+            <div class="editor-wrap"><div class="editor-body">
+
+              <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)">🛒 Mini-card no Checkout (tela de doação)</div>
+              <div class="form-row single">
+                <div class="form-group">
+                  <label>Nome exibido no checkout</label>
+                  <input type="text" id="ce-checkoutNome" placeholder="Ex: Ajude o Robson e a pequena Ester">
+                  <span class="hint">Aparece no mini-card no topo da tela "Fazer uma doação". Se vazio, usa o título da campanha.</span>
+                </div>
+              </div>
+
+              <div class="section-divider"></div>
+              <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)">💚 Tela de Upsell ("Deseja adicionar mais?")</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Valor do upsell (R$)</label>
+                  <input type="number" id="ce-upsellValor" placeholder="Ex: 3.99" min="0.5" step="0.5">
+                  <span class="hint">Valor adicional sugerido. Padrão: R$ 3,99</span>
+                </div>
+                <div class="form-group">
+                  <label>Título do upsell</label>
+                  <input type="text" id="ce-textoUpsellTitulo" placeholder="Ex: Deseja adicionar R$ 3,99 a mais?">
+                  <span class="hint">Se vazio, gerado automaticamente com o valor acima.</span>
+                </div>
+              </div>
+              <div class="form-row single">
+                <div class="form-group">
+                  <label>Texto explicativo do upsell</label>
+                  <textarea id="ce-textoUpsellSub" rows="3" placeholder="Ex: Esse valor extra ajuda nosso projeto a continuar&#10;ajudando mais vidas como a da Ester 🙏"></textarea>
+                  <span class="hint">Texto abaixo do título na tela de upsell.</span>
+                </div>
+              </div>
+
+              <div class="section-divider"></div>
+              <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)">🙏 Tela de Agradecimento (após pagamento)</div>
+              <div class="form-row single">
+                <div class="form-group">
+                  <label>Título principal</label>
+                  <input type="text" id="ce-textoAgradecimento" placeholder="Ex: Que Deus abençoe você!">
+                  <span class="hint">Título grande verde no topo da tela de sucesso.</span>
+                </div>
+              </div>
+              <div class="form-row single">
+                <div class="form-group">
+                  <label>Parágrafo 1 (destaque)</label>
+                  <textarea id="ce-textoAgradecimentoP1" rows="3" placeholder="Ex: Você acabou de fazer muito mais do que uma doação. Você deu esperança."></textarea>
+                  <span class="hint">Texto em destaque, pode usar &lt;strong&gt; para negrito. Ex: Você deu &lt;strong&gt;esperança&lt;/strong&gt;.</span>
+                </div>
+              </div>
+              <div class="form-row single">
+                <div class="form-group">
+                  <label>Parágrafo 2</label>
+                  <textarea id="ce-textoAgradecimentoP2" rows="3" placeholder="Ex: A pequena Ester tem apenas alguns anos de vida pela frente…"></textarea>
+                </div>
+              </div>
+              <div class="form-row single">
+                <div class="form-group">
+                  <label>Parágrafo 3</label>
+                  <textarea id="ce-textoAgradecimentoP3" rows="3" placeholder="Ex: Obrigado por não ignorar. Você faz parte desta história."></textarea>
+                </div>
+              </div>
+
             </div></div>
           </div>
 
@@ -829,6 +897,15 @@ function popularEditor(c){
   if(!catSel.value && c.categoria){ var op=document.createElement('option'); op.value=c.categoria; op.textContent=c.categoria; catSel.appendChild(op); catSel.value=c.categoria; }
   document.getElementById('ce-status').value = c.status || 'ativa';
   document.getElementById('ce-chavePix').value = c.chavePix || '';
+  // Textos do checkout / upsell / agradecimento
+  document.getElementById('ce-checkoutNome').value = c.checkoutNome || '';
+  document.getElementById('ce-upsellValor').value = c.upsellValor != null ? c.upsellValor : 3.99;
+  document.getElementById('ce-textoUpsellTitulo').value = c.textoUpsellTitulo || '';
+  document.getElementById('ce-textoUpsellSub').value = c.textoUpsellSub || '';
+  document.getElementById('ce-textoAgradecimento').value = c.textoAgradecimento || '';
+  document.getElementById('ce-textoAgradecimentoP1').value = c.textoAgradecimentoP1 || '';
+  document.getElementById('ce-textoAgradecimentoP2').value = c.textoAgradecimentoP2 || '';
+  document.getElementById('ce-textoAgradecimentoP3').value = c.textoAgradecimentoP3 || '';
   // Mídia
   document.getElementById('ce-fotoUrl').value = c.fotoUrl || '';
   var prev = document.getElementById('ce-fotoPreview');
@@ -1146,8 +1223,16 @@ async function salvarCampanha(){
       vakinhaPremiada: document.getElementById('ce-vakinhaPremiada').value.trim(),
       chavePix: document.getElementById('ce-chavePix').value.trim(),
       videoUrl: (document.getElementById('ce-videoUrl').value || '').trim(),
+      checkoutNome: document.getElementById('ce-checkoutNome').value.trim(),
       upsell: document.getElementById('ce-upsell').value === 'true',
       upsellTexto: document.getElementById('ce-upsellTexto').value.trim(),
+      upsellValor: parseFloat(document.getElementById('ce-upsellValor').value) || 3.99,
+      textoUpsellTitulo: document.getElementById('ce-textoUpsellTitulo').value.trim(),
+      textoUpsellSub: document.getElementById('ce-textoUpsellSub').value.trim(),
+      textoAgradecimento: document.getElementById('ce-textoAgradecimento').value.trim(),
+      textoAgradecimentoP1: document.getElementById('ce-textoAgradecimentoP1').value.trim(),
+      textoAgradecimentoP2: document.getElementById('ce-textoAgradecimentoP2').value.trim(),
+      textoAgradecimentoP3: document.getElementById('ce-textoAgradecimentoP3').value.trim(),
       valores: valoresData,
       atualizacoes: atualizacoesData,
       perguntas: perguntasData,

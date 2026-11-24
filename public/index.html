@@ -460,7 +460,7 @@
 
     <h2 style="font-size:26px;font-weight:900;color:#1a6e2e;margin-bottom:16px;">Que Deus abençoe você!</h2>
 
-    <div style="background:#f0fdf4;border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid #24ca6840;">
+    <div class="success-msg-box" style="background:#f0fdf4;border-radius:16px;padding:20px;margin-bottom:20px;border:1px solid #24ca6840;">
       <p style="font-size:16px;color:#282828;line-height:1.6;margin-bottom:12px;">
         Você acabou de fazer muito mais do que uma doação.<br>
         <strong>Você deu esperança.</strong>
@@ -1189,6 +1189,38 @@ window._campanhaId = null; // ID da campanha ativa (usado no /criar-cobranca)
         var shareUrl = c.slug ? (window.location.origin+'/c/'+c.slug) : window.location.href;
         shareInput.value = shareUrl;
       }
+
+      // ── Textos dinâmicos do checkout e sucesso ──────────────────
+
+      // Mini-card do checkout: nome e localização
+      var miniNome = document.querySelector('.pay-mini-text strong');
+      var miniLoc  = document.querySelector('.pay-mini-text span');
+      if(miniNome) miniNome.textContent = c.checkoutNome || c.nome || miniNome.textContent;
+      if(miniLoc)  miniLoc.textContent  = c.localizacao  || miniLoc.textContent;
+
+      // Mini-foto do checkout
+      var miniImg = document.querySelector('.pay-campaign-mini img');
+      if(miniImg && (c.fotoBase64 || c.fotoUrl)) miniImg.src = c.fotoBase64 || c.fotoUrl;
+
+      // Upsell: título, subtexto e valor
+      if(c.upsell){
+        var upsellValor = c.upsellValor || 3.99;
+        window._upsellValor = upsellValor; // usado no cálculo do total
+        var upsellTit = document.querySelector('#payStepUpsell p:nth-of-type(1)');
+        var upsellSub = document.querySelector('#payStepUpsell p:nth-of-type(2)');
+        if(upsellTit && c.textoUpsellTitulo) upsellTit.textContent = c.textoUpsellTitulo;
+        else if(upsellTit) upsellTit.textContent = 'Deseja adicionar R$ '+upsellValor.toFixed(2).replace('.',',') + ' a mais?';
+        if(upsellSub && c.textoUpsellSub) upsellSub.innerHTML = c.textoUpsellSub;
+      }
+
+      // Tela de agradecimento (sucesso)
+      var agrTitulo = document.querySelector('#successScreen h2');
+      var agrP = document.querySelectorAll('#successScreen .success-msg-box p');
+      if(agrTitulo && c.textoAgradecimento) agrTitulo.textContent = c.textoAgradecimento;
+      if(agrP && agrP.length >= 1 && c.textoAgradecimentoP1) agrP[0].innerHTML = c.textoAgradecimentoP1;
+      if(agrP && agrP.length >= 2 && c.textoAgradecimentoP2) agrP[1].textContent = c.textoAgradecimentoP2;
+      if(agrP && agrP.length >= 3 && c.textoAgradecimentoP3) agrP[2].innerHTML = c.textoAgradecimentoP3;
+
     })
     .catch(function(){ /* mantém dados estáticos */ });
 })();
