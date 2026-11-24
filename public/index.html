@@ -327,7 +327,7 @@
         </div>
 
         <div class="pay-section-title">Escolha ou digite um valor para doar:</div>
-        <div class="value-options">
+        <div class="value-options" id="valueOptions">
           <button class="value-btn" onclick="selectValue(10)">R$ 10</button>
           <button class="value-btn selected" onclick="selectValue(25)">R$ 25</button>
           <button class="value-btn" onclick="selectValue(50)">R$ 50</button>
@@ -713,13 +713,15 @@ function mostrarConfirmacao(){
 // Passo 2 → upsell R$3,99
 function confirmarValor(){
   esconderTodosSteps();
-  document.getElementById('upsellValorTexto').textContent=fmtBRL((selectedValue+3.99)*100);
+  var _uv=window._upsellValor||3.99;
+  document.getElementById('upsellValorTexto').textContent=fmtBRL((selectedValue+_uv)*100);
   document.getElementById('payStepUpsell').style.display='block';
 }
 
 // Upsell: sim → adiciona R$3,99 e vai para QR
 function upsellSim(){
-  selectedValue=Math.round((selectedValue+3.99)*100)/100;
+  var _uv=window._upsellValor||3.99;
+  selectedValue=Math.round((selectedValue+_uv)*100)/100;
   irParaQR();
 }
 
@@ -731,7 +733,8 @@ function upsellNao(){
 // Upsell +R$3,99 no campo "outro valor"
 function adicionarUpsellCustom(){
   if(selectedValue && selectedValue>=1){
-    selectedValue=Math.round((selectedValue+3.99)*100)/100;
+    var _uv=window._upsellValor||3.99;
+    selectedValue=Math.round((selectedValue+_uv)*100)/100;
     document.getElementById('payBtnAmount').textContent=fmtBRL(selectedValue*100);
     var hint=document.querySelector('[data-upsell-hint]');
     if(hint) hint.style.display='none';
@@ -747,7 +750,7 @@ function toggleUpsellConfirm(aceitar){
   var btnNao = document.getElementById('upsellConfirmNao');
   if(aceitar && !_upsellConfirmAtivo){
     _upsellConfirmAtivo = true;
-    selectedValue = Math.round((_valorOriginalConfirm + 3.99)*100)/100;
+    selectedValue = Math.round((_valorOriginalConfirm + (window._upsellValor||3.99))*100)/100;
     document.getElementById('confirmValorTexto').textContent = fmtBRL(selectedValue*100);
     label.style.display='block';
     btnSim.style.background='#1a6e2e';
@@ -872,7 +875,7 @@ function generatePixQR(value){
   fetch(BACKEND_URL+'/criar-cobranca',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({amountCents:amountCents,donorName:donorName})
+    body:JSON.stringify({amountCents:amountCents,donorName:donorName,campanhaId:window._campanhaId||null})
   })
   .then(function(r){
     if(!r.ok)return r.json().then(function(e){throw new Error(e.message||'Erro '+r.status);});
@@ -1011,6 +1014,97 @@ function copyShareLink(){
     });
   } else {document.execCommand('copy');}
 }
+
+// ── Carregamento dinâmico da campanha ativa ──────────────────────
+window._campanhaId = null; // ID da campanha ativa (usado no /criar-cobranca)
+
+(function carregarCampanhaAtiva(){
+  var BACKEND = 'https://vak-led3.onrender.com';
+  // Suporte a ?c=ID para campanhas específicas
+  var params = new URLSearchParams(window.location.search);
+  var cId = params.get('c');
+  var url = cId ? (BACKEND+'/campanha-ativa?c='+encodeURIComponent(cId)) : (BACKEND+'/campanha-ativa');
+
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var c = data.campanha;
+      if(!c) return;
+      window._campanhaId = c._id || null;
+
+      // Título
+      if(c.nome){
+        var titleEls = document.querySelectorAll('.campaign-title');
+        titleEls.forEach(function(el){ el.textContent = c.nome; });
+        document.title = c.nome;
+      }
+
+      // Descrição (substitui o bloco .description)
+      if(c.descricao){
+        var descEl = document.querySelector('.description');
+        if(descEl){
+          // Converte quebras de linha em parágrafos
+          var paragrafos = c.descricao.split(/\n{2,}/).filter(function(p){ return p.trim(); });
+          if(paragrafos.length > 1){
+            descEl.innerHTML = paragrafos.map(function(p){
+              return '<p>'+p.trim().replace(/\n/g,'<br>')+'</p>';
+            }).join('');
+          } else {
+            // Mantém o conteúdo existente se descrição for curta (< 50 chars)
+            if(c.descricao.length > 50){
+              descEl.innerHTML = '<p>'+c.descricao.replace(/\n/g,'<br>')+'</p>';
+            }
+          }
+        }
+      }
+
+      // Meta
+      if(c.meta && c.meta > 0){
+        totalGoal = Math.round(c.meta * 100);
+        // Atualiza arrecadado se vier do banco
+        if(c.arrecadado && c.arrecadado > 0){
+          totalCollected = Math.round(c.arrecadado * 100);
+        }
+        var metaFmt = 'de '+fmtBRL(totalGoal)+' meta';
+        document.getElementById('collectedVal').innerHTML =
+          fmtBRL(totalCollected)+' <span class="collected-goal">'+metaFmt+'</span>';
+        var pct = Math.min(100, (totalCollected/totalGoal*100));
+        document.getElementById('progressFill').style.width = pct+'%';
+      }
+
+      // Foto
+      if(c.fotoBase64 || c.fotoUrl){
+        var src = c.fotoBase64 || c.fotoUrl;
+        var imgs = document.querySelectorAll('.campaign-photo, .campaign-img, img.foto-campanha');
+        imgs.forEach(function(img){ img.src = src; });
+      }
+
+      // Botões de valor
+      if(c.valores && c.valores.length > 0){
+        var wrap = document.getElementById('valueOptions');
+        if(wrap){
+          wrap.innerHTML = '';
+          c.valores.forEach(function(v, i){
+            var btn = document.createElement('button');
+            btn.className = 'value-btn' + (i===1 ? ' selected' : '');
+            btn.textContent = 'R$ '+parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:2});
+            btn.onclick = function(){ selectValue(v); };
+            wrap.appendChild(btn);
+          });
+          // Seleciona o 2º valor por padrão (ou 1º se só tiver 1)
+          var defaultVal = c.valores[1] || c.valores[0];
+          if(defaultVal) selectValue(defaultVal);
+        }
+      }
+
+      // Upsell
+      if(c.upsell && c.upsell > 0){
+        // Atualiza a variável global de upsell para ser usada nas telas de confirmação
+        window._upsellValor = c.upsell;
+      }
+    })
+    .catch(function(){ /* mantém dados estáticos se backend offline */ });
+})();
 
 // Init progress bar
 (function(){
