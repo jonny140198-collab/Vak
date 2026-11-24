@@ -249,7 +249,7 @@ tr:hover td{background:var(--surface2)}
       <div style="font-size:15px;font-weight:600" id="topbarTitle">📢 Campanhas</div>
       <div style="display:flex;align-items:center;gap:10px">
         <span style="font-size:12px;color:var(--fg2)" id="topbarUser"></span>
-        <button class="btn btn-primary btn-sm" id="topbarNewBtn" onclick="showNewCampaign()">+ Nova campanha</button>
+        <span id="topbarNewBtn" style="display:none"></span>
       </div>
     </div>
 
@@ -263,7 +263,6 @@ tr:hover td{background:var(--surface2)}
       </div>
       <div class="section-header">
         <div class="section-title">Suas campanhas</div>
-        <button class="btn btn-primary btn-sm" onclick="showNewCampaign()">+ Nova campanha</button>
       </div>
       <div class="campaign-grid" id="campaignGrid">
         <div style="text-align:center;color:var(--fg2);padding:40px;grid-column:1/-1">Carregando campanhas…</div>
@@ -648,12 +647,7 @@ function renderCampanhas(){
     grid.appendChild(card);
   });
 
-  // Add card
-  var addCard = document.createElement('div');
-  addCard.className = 'add-card';
-  addCard.innerHTML = '<div style="font-size:28px">➕</div><div style="font-size:13px;font-weight:600">Nova campanha</div><div style="font-size:12px">Crie mais de uma simultaneamente</div>';
-  addCard.onclick = showNewCampaign;
-  grid.appendChild(addCard);
+  // card de nova campanha removido
 }
 
 function atualizarStats(){
