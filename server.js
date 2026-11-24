@@ -28,18 +28,34 @@ const ConfigModel = mongoose.model('Config', configSchema);
 // ─── Schema: Campanha ─────────────────────────────────────────────
 const campanhaSchema = new mongoose.Schema({
   nome:        { type: String, default: 'Nova Campanha' },
-  descricao:   { type: String, default: '' },
+  resumoCurto: { type: String, default: '' },   // texto breve abaixo do título
+  descricao:   { type: String, default: '' },   // aba "Sobre" completo
+  localizacao: { type: String, default: '' },   // ex: "Barcarena / PA"
+  categoria:   { type: String, default: 'SOLIDARIEDADE / SAÚDE' },
+  dataCriacao: { type: String, default: '' },   // ex: "20/08/2026"
   meta:        { type: Number, default: 140000 },
   status:      { type: String, default: 'ativa', enum: ['ativa','pausada','rascunho'] },
   chavePix:    { type: String, default: '' },
   fotoUrl:     { type: String, default: '' },
-  fotoBase64:  { type: String, default: '' },  // data:image/...;base64,...
+  fotoBase64:  { type: String, default: '' },
   fotoMime:    { type: String, default: '' },
   valores:     { type: [Number], default: [10, 25, 50, 100, 200] },
   upsell:      { type: Number, default: 3.99 },
   upsellTexto: { type: String, default: 'Adicione mais e ajude ainda mais!' },
   arrecadado:  { type: Number, default: 0 },
-  ordemExibicao: { type: Number, default: 0 }
+  ordemExibicao: { type: Number, default: 0 },
+  // Perguntas & Respostas
+  perguntas: [{
+    pergunta: { type: String, default: '' },
+    resposta:  { type: String, default: '' },
+    autor:     { type: String, default: '' }
+  }],
+  // Atualizações
+  atualizacoes: [{
+    titulo:    { type: String, default: '' },
+    texto:     { type: String, default: '' },
+    data:      { type: String, default: '' }
+  }]
 }, { timestamps: true, versionKey: false });
 
 const CampanhaModel = mongoose.model('Campanha', campanhaSchema);

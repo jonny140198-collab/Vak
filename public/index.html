@@ -165,10 +165,10 @@
   </div>
 
   <div class="tags-row">
-    <span>Solidariedade / Saúde</span>
+    <span class="categoria-text">Solidariedade / Saúde</span>
     <span class="location">
       <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7m0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5S13.38 11.5 12 11.5"/></svg>
-      Barcarena / PA
+      <span class="location-text">Barcarena / PA</span>
     </span>
   </div>
 
@@ -244,6 +244,7 @@
 
   <!-- TAB 4: Q&A -->
   <div class="tab-content" id="tab4">
+    <div id="qa-list">
     <div class="qa-item">
       <div class="qa-question">❓ O dinheiro arrecadado vai realmente para o tratamento da Ester?</div>
       <div class="qa-answer">Sim! Todas as doações são destinadas diretamente ao custeio do tratamento da Ester, incluindo transporte de Barcarena para Belém, hospedagem durante os ciclos de quimioterapia, alimentação e medicamentos não fornecidos pelo SUS.</div>
@@ -274,6 +275,7 @@
       <div class="qa-answer">O Robson trabalha como autônomo em pequenos serviços de manutenção em Barcarena, mas as viagens constantes para Belém (cerca de 3x por semana) tornaram quase impossível manter uma rotina de trabalho. A renda da família caiu muito desde o início do tratamento, e a vaquinha tem sido essencial para cobrir os custos básicos.</div>
       <div class="qa-meta">Perguntado por Roberto Alves — Respondido pelo organizador</div>
     </div>
+    </div><!-- /qa-list -->
   </div>
 </div>
 
@@ -1032,36 +1034,50 @@ window._campanhaId = null; // ID da campanha ativa (usado no /criar-cobranca)
       if(!c) return;
       window._campanhaId = c._id || null;
 
-      // Título
+      // ── Título ──────────────────────────────────────────────────
       if(c.nome){
-        var titleEls = document.querySelectorAll('.campaign-title');
-        titleEls.forEach(function(el){ el.textContent = c.nome; });
+        document.querySelectorAll('.campaign-title').forEach(function(el){ el.textContent = c.nome; });
         document.title = c.nome;
       }
 
-      // Descrição (substitui o bloco .description)
+      // ── Resumo curto (short-desc) ────────────────────────────────
+      if(c.resumoCurto){
+        var sd = document.querySelector('.short-desc');
+        if(sd) sd.innerHTML = c.resumoCurto + ' <span>ver tudo</span>';
+      }
+
+      // ── Localização ──────────────────────────────────────────────
+      if(c.localizacao){
+        document.querySelectorAll('.location-text').forEach(function(el){ el.textContent = c.localizacao; });
+      }
+
+      // ── Categoria ────────────────────────────────────────────────
+      if(c.categoria){
+        document.querySelectorAll('.categoria-text').forEach(function(el){ el.textContent = c.categoria; });
+      }
+
+      // ── Data de criação ──────────────────────────────────────────
+      if(c.dataCriacao){
+        var dc = document.querySelector('.created-date');
+        if(dc) dc.innerHTML = '<strong>Vaquinha criada em:</strong> ' + c.dataCriacao;
+      }
+
+      // ── Descrição completa (aba Sobre) ───────────────────────────
       if(c.descricao){
         var descEl = document.querySelector('.description');
         if(descEl){
-          // Converte quebras de linha em parágrafos
           var paragrafos = c.descricao.split(/\n{2,}/).filter(function(p){ return p.trim(); });
-          if(paragrafos.length > 1){
+          if(paragrafos.length > 0){
             descEl.innerHTML = paragrafos.map(function(p){
               return '<p>'+p.trim().replace(/\n/g,'<br>')+'</p>';
             }).join('');
-          } else {
-            // Mantém o conteúdo existente se descrição for curta (< 50 chars)
-            if(c.descricao.length > 50){
-              descEl.innerHTML = '<p>'+c.descricao.replace(/\n/g,'<br>')+'</p>';
-            }
           }
         }
       }
 
-      // Meta
+      // ── Meta e arrecadado ────────────────────────────────────────
       if(c.meta && c.meta > 0){
         totalGoal = Math.round(c.meta * 100);
-        // Atualiza arrecadado se vier do banco
         if(c.arrecadado && c.arrecadado > 0){
           totalCollected = Math.round(c.arrecadado * 100);
         }
@@ -1072,14 +1088,14 @@ window._campanhaId = null; // ID da campanha ativa (usado no /criar-cobranca)
         document.getElementById('progressFill').style.width = pct+'%';
       }
 
-      // Foto
+      // ── Foto ─────────────────────────────────────────────────────
       if(c.fotoBase64 || c.fotoUrl){
         var src = c.fotoBase64 || c.fotoUrl;
-        var imgs = document.querySelectorAll('.campaign-photo, .campaign-img, img.foto-campanha, .campaign-image img');
-        imgs.forEach(function(img){ img.src = src; });
+        document.querySelectorAll('.campaign-photo, .campaign-img, img.foto-campanha, .campaign-image img')
+          .forEach(function(img){ img.src = src; });
       }
 
-      // Botões de valor
+      // ── Botões de valor ──────────────────────────────────────────
       if(c.valores && c.valores.length > 0){
         var wrap = document.getElementById('valueOptions');
         if(wrap){
@@ -1091,19 +1107,45 @@ window._campanhaId = null; // ID da campanha ativa (usado no /criar-cobranca)
             btn.onclick = function(){ selectValue(v); };
             wrap.appendChild(btn);
           });
-          // Seleciona o 2º valor por padrão (ou 1º se só tiver 1)
           var defaultVal = c.valores[1] || c.valores[0];
           if(defaultVal) selectValue(defaultVal);
         }
       }
 
-      // Upsell
-      if(c.upsell && c.upsell > 0){
-        // Atualiza a variável global de upsell para ser usada nas telas de confirmação
-        window._upsellValor = c.upsell;
+      // ── Upsell ───────────────────────────────────────────────────
+      if(c.upsell && c.upsell > 0){ window._upsellValor = c.upsell; }
+
+      // ── Perguntas & Respostas ────────────────────────────────────
+      if(c.perguntas && c.perguntas.length > 0){
+        var qaWrap = document.getElementById('qa-list');
+        if(qaWrap){
+          qaWrap.innerHTML = c.perguntas.map(function(q){
+            return '<div class="qa-item">'
+              + '<div class="qa-question">❓ '+escHtml(q.pergunta)+'</div>'
+              + '<div class="qa-answer">'+escHtml(q.resposta)+'</div>'
+              + (q.autor ? '<div class="qa-meta">Perguntado por '+escHtml(q.autor)+'</div>' : '')
+              + '</div>';
+          }).join('');
+        }
+      }
+
+      // ── Atualizações ─────────────────────────────────────────────
+      if(c.atualizacoes && c.atualizacoes.length > 0){
+        var updWrap = document.getElementById('updates-list');
+        if(updWrap){
+          updWrap.innerHTML = c.atualizacoes.map(function(u){
+            return '<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f1f0f0;">'
+              + '<p style="font-size:12px;color:#8a8a8a;margin-bottom:4px;">'+escHtml(u.data||'')+'</p>'
+              + '<h4 style="font-size:15px;font-weight:700;margin-bottom:6px;">'+escHtml(u.titulo||'')+'</h4>'
+              + '<p style="font-size:14px;line-height:1.6;">'+escHtml(u.texto||'').replace(/\n/g,'<br>')+'</p>'
+              + '</div>';
+          }).join('');
+        }
       }
     })
     .catch(function(){ /* mantém dados estáticos se backend offline */ });
+
+  function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 })();
 
 // Init progress bar
