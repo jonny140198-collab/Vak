@@ -40,6 +40,8 @@ const campanhaSchema = new mongoose.Schema({
   fotoBase64:   { type: String, default: '' },
   fotoMime:     { type: String, default: '' },
   idPublico:    { type: String, default: '' },
+  slug:         { type: String, default: '', unique: false },
+  videoUrl:     { type: String, default: '' },
   valores:      { type: [Number], default: [10, 25, 50, 100, 200] },
   upsell:       { type: Boolean, default: false },
   upsellTexto:  { type: String, default: 'Adicione mais e ajude ainda mais!' },
@@ -282,14 +284,19 @@ app.post('/admin/campanhas', authMiddleware, async (req, res) => {
     if (!dbConectado) {
       const nova = { _id: 'mem-'+Date.now(), nome, resumoCurto, descricao, localizacao, categoria, dataCriacao,
                      meta, status, chavePix, fotoUrl, fotoBase64, fotoMime,
+                     slug: req.body.slug || '', videoUrl: req.body.videoUrl || '', selos: req.body.selos || [],
                      valores, upsell, upsellTexto, perguntas, atualizacoes, arrecadado: 0 };
       CAMPANHAS_MEM.push(nova);
-      return res.json({ ok: true, _id: nova._id });
+      return res.json({ ok: true, _id: nova._id, campanha: nova });
     }
+    const slug = req.body.slug || '';
+    const videoUrl = req.body.videoUrl || '';
+    const selos = req.body.selos || [];
     const c = await CampanhaModel.create({ nome, resumoCurto, descricao, localizacao, categoria, dataCriacao,
                                            meta, status, chavePix, fotoUrl, fotoBase64, fotoMime,
+                                           slug, videoUrl, selos,
                                            valores, upsell, upsellTexto, perguntas, atualizacoes });
-    res.json({ ok: true, _id: c._id });
+    res.json({ ok: true, _id: c._id, campanha: c });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao criar campanha' });
   }
@@ -329,7 +336,7 @@ app.delete('/admin/campanhas/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// Campanha ativa pública (site principal usa a 1ª campanha ativa)
+// Campanha ativa pública (site principal — 1ª ativa por ordem)
 app.get('/campanha-ativa', async (req, res) => {
   try {
     if (!dbConectado) {
@@ -342,6 +349,26 @@ app.get('/campanha-ativa', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Erro ao buscar campanha' });
   }
+});
+
+// Busca campanha por slug (para links /c/:slug)
+app.get('/campanha-por-slug/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    if (!dbConectado) {
+      const c = CAMPANHAS_MEM.find(x => x.slug === slug) || null;
+      return res.json({ campanha: c, marketing: CONFIG.marketing });
+    }
+    const c = await CampanhaModel.findOne({ slug });
+    res.json({ campanha: c || null, marketing: CONFIG.marketing });
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao buscar campanha' });
+  }
+});
+
+// Rota /c/:slug → serve o index.html (o JS detecta o slug e carrega a campanha certa)
+app.get('/c/:slug', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Config pública legada (compatibilidade com index.html antigo)
@@ -491,13 +518,17 @@ app.get('/status-cobranca/:id', async (req, res) => {
                  data.status === 'approved' || data.pix?.status === 'paid' ||
                  data.pix?.status === 'completed';
 
-    // Atualizar status no histórico
-    if (dbConectado && pago) {
-      await PagamentoModel.findOneAndUpdate({ chargeId: id }, { $set: { status: data.status } });
-      // Incrementar arrecadado na campanha
+    // Atualizar status no histórico (evita dupla contagem)
+    if (dbConectado) {
       const pag = await PagamentoModel.findOne({ chargeId: id });
-      if (pag && pag.campanhaId) {
-        await CampanhaModel.findByIdAndUpdate(pag.campanhaId, { $inc: { arrecadado: pag.amountCents / 100 } });
+      if (pag) {
+        const statusAnterior = pag.status;
+        const jaFoiPago = ['paid','completed','approved'].includes(statusAnterior);
+        await PagamentoModel.findOneAndUpdate({ chargeId: id }, { $set: { status: data.status } });
+        // Incrementa arrecadado APENAS se ainda não estava pago antes
+        if (pago && !jaFoiPago && pag.campanhaId) {
+          await CampanhaModel.findByIdAndUpdate(pag.campanhaId, { $inc: { arrecadado: pag.amountCents / 100 } });
+        }
       }
     }
 

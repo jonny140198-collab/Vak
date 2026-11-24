@@ -224,218 +224,339 @@ tr:hover td{background:var(--surface2)}
     </div>
 
     <!-- ══ CAMPANHA EDITOR ══ -->
+    <!-- ══ CAMPANHAS: LISTA ══ -->
     <div class="content" id="sec-campanha" style="display:none">
-      <div class="section-header">
-        <div class="section-title">🎗️ Editor de Campanha</div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost btn-sm" onclick="carregarCampanhaEditor()">🔄 Recarregar</button>
-          <button class="btn btn-primary btn-sm" onclick="salvarCampanha()">💾 Salvar tudo</button>
+
+      <!-- TELA: LISTA DE CAMPANHAS -->
+      <div id="camp-lista-view">
+        <div class="section-header">
+          <div class="section-title">🎗️ Campanhas</div>
+          <button class="btn btn-primary btn-sm" onclick="abrirCriarCampanha()">＋ Nova campanha</button>
         </div>
+        <div id="camp-lista-loading" style="text-align:center;padding:40px;color:var(--fg2)">Carregando…</div>
+        <div id="camp-lista-cards" style="display:none"></div>
       </div>
 
-      <div id="campanha-loading" style="text-align:center;padding:40px;color:var(--fg2)">Carregando campanha…</div>
-      <div id="campanha-editor" style="display:none">
-
-        <!-- ── ABAS DO EDITOR ── -->
-        <div class="tab-editor-nav">
-          <button class="tab-editor-btn active" onclick="showEditorTab('info')">📋 Informações</button>
-          <button class="tab-editor-btn" onclick="showEditorTab('descricao')">📝 Descrição</button>
-          <button class="tab-editor-btn" onclick="showEditorTab('atualizacoes')">📢 Atualizações</button>
-          <button class="tab-editor-btn" onclick="showEditorTab('perguntas')">❓ Q &amp; A</button>
-          <button class="tab-editor-btn" onclick="showEditorTab('valores')">💲 Valores</button>
-          <button class="tab-editor-btn" onclick="showEditorTab('extras')">⭐ Extras</button>
+      <!-- TELA: CRIAR NOVA CAMPANHA -->
+      <div id="camp-criar-view" style="display:none">
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:10px">
+            <button class="btn btn-ghost btn-sm" onclick="voltarLista()">← Voltar</button>
+            <div class="section-title">➕ Nova Campanha</div>
+          </div>
         </div>
-
-        <!-- ABA: INFORMAÇÕES -->
-        <div class="tab-editor-pane active" id="ceditor-info">
-          <div class="editor-wrap"><div class="editor-body">
-            <div class="form-row">
-              <div class="form-group">
-                <label>Título / Cabeçalho ✏️</label>
-                <input type="text" id="ce-nome" placeholder="Ex: Ajude o Robson a cuidar da pequena Ester">
-              </div>
-              <div class="form-group">
-                <label>Resumo curto</label>
-                <input type="text" id="ce-resumoCurto" placeholder="Texto de destaque abaixo do título">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Localização / Estado ✏️</label>
-                <input type="text" id="ce-localizacao" placeholder="Ex: Barcarena / PA">
-              </div>
-              <div class="form-group">
-                <label>Categoria ✏️</label>
-                <select id="ce-categoria">
-                  <option value="Solidariedade">Solidariedade</option>
-                  <option value="Saúde">Saúde</option>
-                  <option value="Solidariedade / Saúde">Solidariedade / Saúde</option>
-                  <option value="Educação">Educação</option>
-                  <option value="Animal">Animal</option>
-                  <option value="Outros">Outros</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Data de criação</label>
-                <input type="text" id="ce-dataCriacao" placeholder="Ex: 15 de Janeiro de 2024">
-              </div>
-              <div class="form-group">
-                <label>Meta (R$)</label>
-                <input type="number" id="ce-meta" placeholder="Ex: 140000" min="0" step="100">
-                <span class="hint">Valor total a arrecadar em reais (ex: 140000 = R$140.000)</span>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>ID da Campanha (exibido no site)</label>
-                <input type="text" id="ce-idPublico" placeholder="Ex: 5333124">
-              </div>
-              <div class="form-group">
-                <label>Status</label>
-                <select id="ce-status">
-                  <option value="ativa">Ativa</option>
-                  <option value="pausada">Pausada</option>
-                  <option value="encerrada">Encerrada</option>
-                </select>
-              </div>
-            </div>
-            <div class="section-divider"></div>
-            <div class="form-row single">
-              <div class="form-group">
-                <label>Foto da campanha</label>
-                <input type="url" id="ce-fotoUrl" placeholder="URL da imagem (https://...)">
-                <span class="hint">Cole a URL da imagem ou envie em base64 abaixo</span>
-                <img id="ce-fotoPreview" class="img-preview" alt="Preview">
-              </div>
-            </div>
-            <div class="form-row single">
-              <div class="form-group">
-                <label>Ou envie uma imagem</label>
-                <input type="file" id="ce-fotoFile" accept="image/*" onchange="previewFoto(this)" style="padding:8px">
-                <span class="hint">Aceita JPG, PNG, WebP — máx 2MB</span>
-              </div>
-            </div>
-          </div></div>
-        </div>
-
-        <!-- ABA: DESCRIÇÃO -->
-        <div class="tab-editor-pane" id="ceditor-descricao">
-          <div class="editor-wrap"><div class="editor-body">
-            <div class="form-group" style="margin-bottom:16px">
-              <label>Descrição completa (Aba "Sobre") ✏️</label>
-              <textarea id="ce-descricao" rows="18" placeholder="Texto completo da campanha. Use duas quebras de linha para separar parágrafos.&#10;&#10;Parágrafo 1...&#10;&#10;Parágrafo 2..." oninput="updateCharCount(this,'desc-count')"></textarea>
-              <div class="char-count" id="desc-count">0 caracteres</div>
-              <span class="hint">Separe parágrafos com linha em branco (Enter duas vezes). Os parágrafos aparecem em sequência na aba Sobre.</span>
+        <div class="editor-wrap"><div class="editor-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Título da campanha *</label>
+              <input type="text" id="nova-nome" placeholder="Ex: Ajude o João a se recuperar">
             </div>
             <div class="form-group">
-              <label>Texto — Vakinha Premiada (Aba "Vakinha Premiada") ✏️</label>
-              <textarea id="ce-vakinhaPremiada" rows="5" placeholder="Texto sobre o prêmio da vakinha..."></textarea>
-              <span class="hint">Aparece na aba "Vakinha Premiada" do site</span>
+              <label>Slug / URL única *</label>
+              <input type="text" id="nova-slug" placeholder="Ex: joao-recuperacao" oninput="sanitizeSlug(this)">
+              <span class="hint" id="nova-slug-preview">Link: /c/<em>seu-slug</em></span>
             </div>
-          </div></div>
-        </div>
-
-        <!-- ABA: ATUALIZAÇÕES -->
-        <div class="tab-editor-pane" id="ceditor-atualizacoes">
-          <div class="editor-wrap"><div class="editor-body">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-              <div style="font-size:14px;font-weight:600">Atualizações da campanha</div>
-              <button class="btn btn-ghost btn-sm" onclick="toggleAddAtualizacao()">+ Nova atualização</button>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Localização</label>
+              <input type="text" id="nova-localizacao" placeholder="Ex: São Paulo / SP">
             </div>
-            <div id="add-atualizacao-box" class="add-item-box" style="display:none;margin-bottom:16px">
-              <div class="form-group"><label>Título</label><input type="text" id="new-atu-titulo" placeholder="Ex: Atualização do tratamento"></div>
-              <div class="form-group"><label>Data</label><input type="text" id="new-atu-data" placeholder="Ex: 10/06/2024"></div>
-              <div class="form-group"><label>Texto</label><textarea id="new-atu-texto" rows="4" placeholder="Texto da atualização…"></textarea></div>
-              <div style="display:flex;gap:8px;margin-top:8px">
-                <button class="btn btn-primary btn-sm" onclick="adicionarAtualizacao()">✅ Adicionar</button>
-                <button class="btn btn-ghost btn-sm" onclick="toggleAddAtualizacao()">Cancelar</button>
-              </div>
+            <div class="form-group">
+              <label>Categoria</label>
+              <select id="nova-categoria">
+                <option value="Solidariedade">Solidariedade</option>
+                <option value="Saúde">Saúde</option>
+                <option value="Solidariedade / Saúde">Solidariedade / Saúde</option>
+                <option value="Educação">Educação</option>
+                <option value="Animal">Animal</option>
+                <option value="Outros">Outros</option>
+              </select>
             </div>
-            <div id="atualizacoes-list"></div>
-            <div id="atualizacoes-vazio" style="text-align:center;padding:30px;color:var(--fg2);display:none">Nenhuma atualização ainda</div>
-          </div></div>
-        </div>
-
-        <!-- ABA: PERGUNTAS & RESPOSTAS -->
-        <div class="tab-editor-pane" id="ceditor-perguntas">
-          <div class="editor-wrap"><div class="editor-body">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-              <div style="font-size:14px;font-weight:600">Perguntas &amp; Respostas</div>
-              <button class="btn btn-ghost btn-sm" onclick="toggleAddPergunta()">+ Nova pergunta</button>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Meta (R$) *</label>
+              <input type="number" id="nova-meta" placeholder="Ex: 50000" min="1">
             </div>
-            <div id="add-pergunta-box" class="add-item-box" style="display:none;margin-bottom:16px">
-              <div class="form-group"><label>Pergunta</label><input type="text" id="new-perg-pergunta" placeholder="Ex: Como posso acompanhar o tratamento?"></div>
-              <div class="form-group"><label>Resposta</label><textarea id="new-perg-resposta" rows="3" placeholder="Resposta completa…"></textarea></div>
-              <div class="form-group"><label>Autor (opcional)</label><input type="text" id="new-perg-autor" placeholder="Ex: Maria Silva"></div>
-              <div style="display:flex;gap:8px;margin-top:8px">
-                <button class="btn btn-primary btn-sm" onclick="adicionarPergunta()">✅ Adicionar</button>
-                <button class="btn btn-ghost btn-sm" onclick="toggleAddPergunta()">Cancelar</button>
-              </div>
+            <div class="form-group">
+              <label>Data de criação</label>
+              <input type="text" id="nova-dataCriacao" placeholder="Ex: 24/11/2026">
             </div>
-            <div id="perguntas-list"></div>
-            <div id="perguntas-vazio" style="text-align:center;padding:30px;color:var(--fg2);display:none">Nenhuma pergunta ainda</div>
-          </div></div>
-        </div>
-
-        <!-- ABA: VALORES DOS BOTÕES -->
-        <div class="tab-editor-pane" id="ceditor-valores">
-          <div class="editor-wrap"><div class="editor-body">
-            <div style="font-size:14px;font-weight:600;margin-bottom:4px">Valores dos botões de doação</div>
-            <div style="font-size:12px;color:var(--fg2);margin-bottom:16px">Estes são os valores pré-definidos que o doador pode escolher. Mínimo 1, máximo 8.</div>
-            <div id="valores-chips" class="valores-grid"></div>
-            <div style="display:flex;gap:8px;margin-top:14px;align-items:flex-end">
-              <div class="form-group" style="margin:0;flex:1">
-                <label>Novo valor (R$)</label>
-                <input type="number" id="new-valor" placeholder="Ex: 50" min="1" step="1">
-              </div>
-              <button class="btn btn-ghost btn-sm" style="margin-bottom:1px" onclick="adicionarValor()">+ Adicionar</button>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Resumo curto</label>
+              <input type="text" id="nova-resumoCurto" placeholder="Frase de impacto exibida abaixo do título">
             </div>
-            <div class="section-divider"></div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Upsell ativo?</label>
-                <select id="ce-upsell">
-                  <option value="false">Não</option>
-                  <option value="true">Sim</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Texto do upsell</label>
-                <input type="text" id="ce-upsellTexto" placeholder="Ex: Contribua um pouco mais e ajude mais!">
-              </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Descrição completa</label>
+              <textarea id="nova-descricao" rows="8" placeholder="Conte a história completa da campanha…&#10;&#10;Use linha em branco para separar parágrafos."></textarea>
             </div>
-          </div></div>
-        </div>
-
-        <!-- ABA: EXTRAS (selos, chave pix) -->
-        <div class="tab-editor-pane" id="ceditor-extras">
-          <div class="editor-wrap"><div class="editor-body">
-            <div class="form-group" style="margin-bottom:16px">
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Foto (URL)</label>
+              <input type="url" id="nova-fotoUrl" placeholder="https://...">
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Vídeo (YouTube, Vimeo ou URL direta)</label>
+              <input type="url" id="nova-videoUrl" placeholder="https://youtube.com/watch?v=... ou https://vimeo.com/...">
+              <span class="hint">Suporta YouTube, Vimeo e links diretos de vídeo (mp4)</span>
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
               <label>Chave Pix</label>
-              <input type="text" id="ce-chavePix" placeholder="CPF, CNPJ, e-mail ou chave aleatória">
+              <input type="text" id="nova-chavePix" placeholder="CPF, CNPJ, e-mail ou chave aleatória">
             </div>
-            <div class="section-divider"></div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:4px">Selos recebidos ✏️</div>
-            <div style="font-size:12px;color:var(--fg2);margin-bottom:12px">Selos de verificação e conquistas que aparecem no site</div>
-            <div id="selos-list"></div>
-            <div style="display:flex;gap:8px;margin-top:10px;align-items:flex-end">
-              <div class="form-group" style="margin:0;flex:1">
-                <label>Novo selo</label>
-                <input type="text" id="new-selo" placeholder="Ex: ✅ Campanha Verificada">
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+            <button class="btn btn-ghost" onclick="voltarLista()">Cancelar</button>
+            <button class="btn btn-primary" onclick="criarCampanha()">🚀 Criar campanha</button>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- TELA: EDITOR DA CAMPANHA SELECIONADA -->
+      <div id="camp-editor-view" style="display:none">
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="voltarLista()">← Campanhas</button>
+            <div class="section-title" id="ce-titulo-header">Editor</div>
+            <span id="ce-status-badge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--accent-bg);color:var(--accent)"></span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <a id="ce-link-ver" href="#" target="_blank" class="btn btn-ghost btn-sm">🔗 Ver site</a>
+            <button class="btn btn-ghost btn-sm" onclick="confirmarExcluirCampanha()" style="color:var(--danger);border-color:var(--danger)">🗑️ Excluir</button>
+            <button class="btn btn-primary btn-sm" onclick="salvarCampanha()">💾 Salvar</button>
+          </div>
+        </div>
+
+        <div id="campanha-loading" style="text-align:center;padding:40px;color:var(--fg2);display:none">Salvando…</div>
+        <div id="campanha-editor">
+
+          <!-- ABAS DO EDITOR -->
+          <div class="tab-editor-nav">
+            <button class="tab-editor-btn active" onclick="showEditorTab('info',this)">📋 Informações</button>
+            <button class="tab-editor-btn" onclick="showEditorTab('midia',this)">🖼️ Mídia</button>
+            <button class="tab-editor-btn" onclick="showEditorTab('descricao',this)">📝 Descrição</button>
+            <button class="tab-editor-btn" onclick="showEditorTab('atualizacoes',this)">📢 Atualizações</button>
+            <button class="tab-editor-btn" onclick="showEditorTab('perguntas',this)">❓ Q&amp;A</button>
+            <button class="tab-editor-btn" onclick="showEditorTab('valores',this)">💲 Valores</button>
+            <button class="tab-editor-btn" onclick="showEditorTab('extras',this)">⭐ Extras</button>
+          </div>
+
+          <!-- ABA: INFORMAÇÕES -->
+          <div class="tab-editor-pane active" id="ceditor-info">
+            <div class="editor-wrap"><div class="editor-body">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Título / Cabeçalho ✏️</label>
+                  <input type="text" id="ce-nome" placeholder="Ex: Ajude o Robson a cuidar da pequena Ester">
+                </div>
+                <div class="form-group">
+                  <label>Resumo curto</label>
+                  <input type="text" id="ce-resumoCurto" placeholder="Texto de destaque abaixo do título">
+                </div>
               </div>
-              <button class="btn btn-ghost btn-sm" style="margin-bottom:1px" onclick="adicionarSelo()">+ Adicionar</button>
-            </div>
-          </div></div>
-        </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Slug / URL ✏️</label>
+                  <input type="text" id="ce-slug" placeholder="Ex: ester-leucemia" oninput="sanitizeSlug(this)">
+                  <span class="hint" id="ce-slug-preview">Link gerado: —</span>
+                </div>
+                <div class="form-group">
+                  <label>ID público (exibido no site)</label>
+                  <input type="text" id="ce-idPublico" placeholder="Ex: 5333124">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Localização / Estado ✏️</label>
+                  <input type="text" id="ce-localizacao" placeholder="Ex: Barcarena / PA">
+                </div>
+                <div class="form-group">
+                  <label>Categoria ✏️</label>
+                  <select id="ce-categoria">
+                    <option value="Solidariedade">Solidariedade</option>
+                    <option value="Saúde">Saúde</option>
+                    <option value="Solidariedade / Saúde">Solidariedade / Saúde</option>
+                    <option value="Educação">Educação</option>
+                    <option value="Animal">Animal</option>
+                    <option value="Outros">Outros</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Data de criação</label>
+                  <input type="text" id="ce-dataCriacao" placeholder="Ex: 24/11/2026">
+                </div>
+                <div class="form-group">
+                  <label>Meta (R$)</label>
+                  <input type="number" id="ce-meta" placeholder="Ex: 140000" min="0" step="100">
+                  <span class="hint">Ex: 140000 = R$ 140.000</span>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Status</label>
+                  <select id="ce-status">
+                    <option value="ativa">Ativa</option>
+                    <option value="pausada">Pausada</option>
+                    <option value="encerrada">Encerrada</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Chave Pix</label>
+                  <input type="text" id="ce-chavePix" placeholder="CPF, CNPJ, e-mail ou chave aleatória">
+                </div>
+              </div>
+            </div></div>
+          </div>
 
-        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding:4px 0">
-          <button class="btn btn-ghost" onclick="carregarCampanhaEditor()">🔄 Descartar alterações</button>
-          <button class="btn btn-primary" onclick="salvarCampanha()">💾 Salvar campanha</button>
-        </div>
+          <!-- ABA: MÍDIA (foto + vídeo) -->
+          <div class="tab-editor-pane" id="ceditor-midia">
+            <div class="editor-wrap"><div class="editor-body">
+              <div class="form-group" style="margin-bottom:20px">
+                <label>Foto da campanha — URL</label>
+                <input type="url" id="ce-fotoUrl" placeholder="https://..." oninput="onFotoUrlChange()">
+                <img id="ce-fotoPreview" class="img-preview" alt="Preview da foto">
+              </div>
+              <div class="form-group" style="margin-bottom:20px">
+                <label>Ou envie uma imagem do seu dispositivo</label>
+                <input type="file" id="ce-fotoFile" accept="image/*" onchange="previewFoto(this)" style="padding:8px">
+                <span class="hint">JPG, PNG, WebP — máx 2 MB. Substitui a URL acima.</span>
+              </div>
+              <div class="section-divider"></div>
+              <div class="form-group">
+                <label>🎬 Vídeo da campanha</label>
+                <input type="url" id="ce-videoUrl" placeholder="https://youtube.com/watch?v=... ou https://vimeo.com/..." oninput="onVideoUrlChange()">
+                <span class="hint">Suporta YouTube, Vimeo e URL direta de vídeo (mp4). Aparece abaixo da foto no site.</span>
+                <div id="ce-videoPreview" style="margin-top:10px;border-radius:8px;overflow:hidden;display:none"></div>
+              </div>
+            </div></div>
+          </div>
 
-      </div><!-- /campanha-editor -->
+          <!-- ABA: DESCRIÇÃO -->
+          <div class="tab-editor-pane" id="ceditor-descricao">
+            <div class="editor-wrap"><div class="editor-body">
+              <div class="form-group" style="margin-bottom:20px">
+                <label>Descrição completa — Aba "Sobre" ✏️</label>
+                <textarea id="ce-descricao" rows="18" placeholder="Texto completo da campanha.&#10;&#10;Use linha em branco para separar parágrafos." oninput="updateCharCount(this,'desc-count')"></textarea>
+                <div class="char-count" id="desc-count">0 caracteres</div>
+                <span class="hint">Linha em branco = novo parágrafo. Aparece na aba "Sobre" do site.</span>
+              </div>
+              <div class="form-group">
+                <label>Texto — Aba "Vakinha Premiada" ✏️</label>
+                <textarea id="ce-vakinhaPremiada" rows="5" placeholder="Ex: Esta vaquinha concorre ao prêmio de R$ 10.000..."></textarea>
+                <span class="hint">Aparece na aba "Vakinha Premiada".</span>
+              </div>
+            </div></div>
+          </div>
+
+          <!-- ABA: ATUALIZAÇÕES -->
+          <div class="tab-editor-pane" id="ceditor-atualizacoes">
+            <div class="editor-wrap"><div class="editor-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                <div style="font-size:14px;font-weight:600">Atualizações da campanha</div>
+                <button class="btn btn-ghost btn-sm" onclick="toggleAddAtualizacao()">+ Nova</button>
+              </div>
+              <div id="add-atualizacao-box" class="add-item-box" style="display:none;margin-bottom:16px">
+                <div class="form-group"><label>Título</label><input type="text" id="new-atu-titulo" placeholder="Ex: Resultado do exame desta semana"></div>
+                <div class="form-group"><label>Data</label><input type="text" id="new-atu-data" placeholder="Ex: 24/11/2026"></div>
+                <div class="form-group"><label>Texto</label><textarea id="new-atu-texto" rows="4" placeholder="Descreva a atualização…"></textarea></div>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button class="btn btn-primary btn-sm" onclick="adicionarAtualizacao()">✅ Adicionar</button>
+                  <button class="btn btn-ghost btn-sm" onclick="toggleAddAtualizacao()">Cancelar</button>
+                </div>
+              </div>
+              <div id="atualizacoes-list"></div>
+              <div id="atualizacoes-vazio" style="text-align:center;padding:30px;color:var(--fg2)">Nenhuma atualização ainda</div>
+            </div></div>
+          </div>
+
+          <!-- ABA: Q&A -->
+          <div class="tab-editor-pane" id="ceditor-perguntas">
+            <div class="editor-wrap"><div class="editor-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                <div style="font-size:14px;font-weight:600">Perguntas &amp; Respostas</div>
+                <button class="btn btn-ghost btn-sm" onclick="toggleAddPergunta()">+ Nova</button>
+              </div>
+              <div id="add-pergunta-box" class="add-item-box" style="display:none;margin-bottom:16px">
+                <div class="form-group"><label>Pergunta</label><input type="text" id="new-perg-pergunta" placeholder="Ex: O dinheiro vai realmente para o tratamento?"></div>
+                <div class="form-group"><label>Resposta</label><textarea id="new-perg-resposta" rows="3" placeholder="Resposta completa…"></textarea></div>
+                <div class="form-group"><label>Autor (opcional)</label><input type="text" id="new-perg-autor" placeholder="Ex: Ana Lima"></div>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button class="btn btn-primary btn-sm" onclick="adicionarPergunta()">✅ Adicionar</button>
+                  <button class="btn btn-ghost btn-sm" onclick="toggleAddPergunta()">Cancelar</button>
+                </div>
+              </div>
+              <div id="perguntas-list"></div>
+              <div id="perguntas-vazio" style="text-align:center;padding:30px;color:var(--fg2)">Nenhuma pergunta ainda</div>
+            </div></div>
+          </div>
+
+          <!-- ABA: VALORES -->
+          <div class="tab-editor-pane" id="ceditor-valores">
+            <div class="editor-wrap"><div class="editor-body">
+              <div style="font-size:14px;font-weight:600;margin-bottom:4px">Botões de valor para doação</div>
+              <div style="font-size:12px;color:var(--fg2);margin-bottom:16px">Valores pré-definidos que o doador pode selecionar. Máximo 8.</div>
+              <div id="valores-chips" class="valores-grid"></div>
+              <div style="display:flex;gap:8px;margin-top:14px;align-items:flex-end">
+                <div class="form-group" style="margin:0;flex:1">
+                  <label>Novo valor (R$)</label>
+                  <input type="number" id="new-valor" placeholder="Ex: 50" min="1" step="1" onkeydown="if(event.key==='Enter')adicionarValor()">
+                </div>
+                <button class="btn btn-ghost btn-sm" style="margin-bottom:1px" onclick="adicionarValor()">+ Adicionar</button>
+              </div>
+              <div class="section-divider"></div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Upsell ativo?</label>
+                  <select id="ce-upsell">
+                    <option value="false">Não</option>
+                    <option value="true">Sim</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Texto do upsell</label>
+                  <input type="text" id="ce-upsellTexto" placeholder="Ex: Contribua mais e ajude ainda mais!">
+                </div>
+              </div>
+            </div></div>
+          </div>
+
+          <!-- ABA: EXTRAS -->
+          <div class="tab-editor-pane" id="ceditor-extras">
+            <div class="editor-wrap"><div class="editor-body">
+              <div style="font-size:14px;font-weight:600;margin-bottom:4px">Selos recebidos ✏️</div>
+              <div style="font-size:12px;color:var(--fg2);margin-bottom:12px">Conquistas e verificações exibidas no site</div>
+              <div id="selos-list"></div>
+              <div style="display:flex;gap:8px;margin-top:10px;align-items:flex-end">
+                <div class="form-group" style="margin:0;flex:1">
+                  <label>Novo selo</label>
+                  <input type="text" id="new-selo" placeholder="Ex: ✅ Campanha Verificada" onkeydown="if(event.key==='Enter')adicionarSelo()">
+                </div>
+                <button class="btn btn-ghost btn-sm" style="margin-bottom:1px" onclick="adicionarSelo()">+ Adicionar</button>
+              </div>
+            </div></div>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+            <button class="btn btn-ghost" onclick="confirmarExcluirCampanha()" style="color:var(--danger);border-color:var(--danger)">🗑️ Excluir campanha</button>
+            <button class="btn btn-ghost" onclick="carregarCampanhaEditor(campanhaAtual._id)">🔄 Descartar</button>
+            <button class="btn btn-primary" onclick="salvarCampanha()">💾 Salvar campanha</button>
+          </div>
+
+        </div><!-- /campanha-editor -->
+      </div><!-- /camp-editor-view -->
+
     </div><!-- /sec-campanha -->
 
   </div>
@@ -496,7 +617,7 @@ function iniciarApp(user){
   carregarPagamentos();
 }
 
-var secTitles = {pagamentos:'💰 Pagamentos', credenciais:'🔑 Credenciais Pix', marketing:'📊 Marketing', campanha:'🎗️ Campanha'};
+var secTitles = {pagamentos:'💰 Pagamentos', credenciais:'🔑 Credenciais Pix', marketing:'📊 Marketing', campanha:'🎗️ Campanhas'};
 
 function showSection(id){
   ['pagamentos','credenciais','marketing','campanha'].forEach(function(s){
@@ -508,11 +629,11 @@ function showSection(id){
   var navEl = document.getElementById('nav-'+id);
   if(navEl) navEl.classList.add('active');
   if(id==='pagamentos') carregarPagamentos();
-  if(id==='campanha') carregarCampanhaEditor();
+  if(id==='campanha') carregarListaCampanhas();
 }
 
 // ═══════════════════════════════════════════
-// CAMPANHA EDITOR
+// MULTI-CAMPANHA
 // ═══════════════════════════════════════════
 var campanhaAtual = null;
 var atualizacoesData = [];
@@ -520,34 +641,180 @@ var perguntasData = [];
 var valoresData = [];
 var selosData = [];
 
-function showEditorTab(tab) {
-  document.querySelectorAll('.tab-editor-btn').forEach(function(b){ b.classList.remove('active'); });
-  document.querySelectorAll('.tab-editor-pane').forEach(function(p){ p.classList.remove('active'); });
-  document.getElementById('ceditor-'+tab).classList.add('active');
-  event.target.classList.add('active');
+// ── Navegação entre telas ──
+function mostrarVistaLista(){
+  document.getElementById('camp-lista-view').style.display = 'block';
+  document.getElementById('camp-criar-view').style.display = 'none';
+  document.getElementById('camp-editor-view').style.display = 'none';
+}
+function mostrarVistaCriar(){
+  document.getElementById('camp-lista-view').style.display = 'none';
+  document.getElementById('camp-criar-view').style.display = 'block';
+  document.getElementById('camp-editor-view').style.display = 'none';
+}
+function mostrarVistaEditor(){
+  document.getElementById('camp-lista-view').style.display = 'none';
+  document.getElementById('camp-criar-view').style.display = 'none';
+  document.getElementById('camp-editor-view').style.display = 'block';
+}
+function voltarLista(){
+  campanhaAtual = null;
+  mostrarVistaLista();
+  carregarListaCampanhas();
 }
 
-async function carregarCampanhaEditor(){
+// ── Lista de campanhas ──
+async function carregarListaCampanhas(){
+  mostrarVistaLista();
+  var loading = document.getElementById('camp-lista-loading');
+  var cards = document.getElementById('camp-lista-cards');
+  loading.style.display = 'block';
+  cards.style.display = 'none';
+  try {
+    var r = await fetch(BASE+'/admin/campanhas', {headers:{'x-admin-token':TOKEN}});
+    if(r.status===401){ doLogout(); return; }
+    var d = await r.json();
+    var campanhas = (d.campanhas || []);
+    loading.style.display = 'none';
+    cards.style.display = 'block';
+    if(!campanhas.length){
+      cards.innerHTML = '<div style="text-align:center;padding:50px;color:var(--fg2)"><div style="font-size:40px;margin-bottom:12px">🎗️</div><div style="font-size:15px;font-weight:600;margin-bottom:8px">Nenhuma campanha criada</div><div style="font-size:13px">Clique em <strong>+ Nova campanha</strong> para começar</div></div>';
+      return;
+    }
+    cards.innerHTML = '';
+    campanhas.forEach(function(c){
+      var link = c.slug ? (window.location.origin+'/c/'+c.slug) : '(sem slug)';
+      var pct = c.meta > 0 ? Math.min(100, Math.round((c.arrecadado||0)/c.meta*100)) : 0;
+      var statusColor = c.status==='ativa' ? '#22c55e' : c.status==='pausada' ? '#f59e0b' : '#94a3b8';
+      var card = document.createElement('div');
+      card.className = 'editor-wrap';
+      card.style.marginBottom = '12px';
+      card.innerHTML = '<div class="editor-body" style="padding:16px">'
+        +'<div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">'
+        +(c.fotoBase64||c.fotoUrl ? '<img src="'+(c.fotoBase64||c.fotoUrl)+'" style="width:60px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display=\'none\'">' : '<div style="width:60px;height:60px;border-radius:8px;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🎗️</div>')
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">'
+        +'<strong style="font-size:15px">'+esc(c.nome||'Sem nome')+'</strong>'
+        +'<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:'+statusColor+'22;color:'+statusColor+'">'+esc(c.status||'ativa')+'</span>'
+        +'</div>'
+        +'<div style="font-size:12px;color:var(--fg2);margin-bottom:6px">'+esc(c.localizacao||'')+(c.categoria?' · '+esc(c.categoria):'')+'</div>'
+        +'<div style="font-size:12px;margin-bottom:6px"><strong>'+fmtBRL(c.arrecadado||0)+'</strong> <span style="color:var(--fg2)">de '+fmtBRL(c.meta||0)+' ('+pct+'%)</span></div>'
+        +'<div style="background:var(--border);border-radius:4px;height:4px;margin-bottom:8px"><div style="background:var(--accent);height:4px;border-radius:4px;width:'+pct+'%"></div></div>'
+        +(c.slug ? '<div style="font-size:11px;color:var(--fg2);word-break:break-all">🔗 <a href="'+link+'" target="_blank" style="color:var(--accent)">'+link+'</a></div>' : '<div style="font-size:11px;color:var(--fg2)">⚠️ Sem slug — defina um para ter link próprio</div>')
+        +'</div>'
+        +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
+        +'<button class="btn btn-primary btn-sm" onclick="abrirEditorCampanha(\''+c._id+'\')">✏️ Editar</button>'
+        +'<button class="btn btn-ghost btn-sm" onclick="confirmarExcluirCampanhaId(\''+c._id+'\',\''+esc(c.nome||'esta campanha')+'\')" style="color:var(--danger);border-color:var(--danger)">🗑️ Excluir</button>'
+        +'</div>'
+        +'</div>'
+        +'</div>';
+      cards.appendChild(card);
+    });
+  } catch(e){
+    loading.textContent = 'Erro ao carregar campanhas: '+e.message;
+    loading.style.display = 'block';
+    cards.style.display = 'none';
+  }
+}
+
+// ── Criar nova campanha ──
+function abrirCriarCampanha(){
+  // limpar form
+  ['nova-nome','nova-slug','nova-localizacao','nova-dataCriacao','nova-resumoCurto','nova-descricao','nova-fotoUrl','nova-videoUrl','nova-chavePix'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.getElementById('nova-meta').value = '';
+  document.getElementById('nova-categoria').value = 'Solidariedade';
+  document.getElementById('nova-slug-preview').innerHTML = 'Link: /c/<em>seu-slug</em>';
+  mostrarVistaCriar();
+}
+
+async function criarCampanha(){
+  var nome = document.getElementById('nova-nome').value.trim();
+  var slug = document.getElementById('nova-slug').value.trim();
+  var meta = parseFloat(document.getElementById('nova-meta').value) || 0;
+  if(!nome) return toast('Informe o título da campanha', true);
+  if(!slug) return toast('Informe o slug (URL única)', true);
+  if(meta < 1) return toast('Informe uma meta válida', true);
+  var body = {
+    nome: nome,
+    slug: slug,
+    localizacao: document.getElementById('nova-localizacao').value.trim(),
+    categoria: document.getElementById('nova-categoria').value,
+    dataCriacao: document.getElementById('nova-dataCriacao').value.trim(),
+    resumoCurto: document.getElementById('nova-resumoCurto').value.trim(),
+    descricao: document.getElementById('nova-descricao').value.trim(),
+    fotoUrl: document.getElementById('nova-fotoUrl').value.trim() || '',
+    videoUrl: document.getElementById('nova-videoUrl').value.trim() || '',
+    chavePix: document.getElementById('nova-chavePix').value.trim() || '',
+    meta: meta,
+    status: 'ativa',
+    valores: [10,25,50,100,200],
+    arrecadado: 0
+  };
+  var btn = document.querySelector('#camp-criar-view .btn-primary');
+  if(btn){ btn.disabled=true; btn.textContent='Criando…'; }
+  try {
+    var r = await fetch(BASE+'/admin/campanhas', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','x-admin-token':TOKEN},
+      body: JSON.stringify(body)
+    });
+    var d = await r.json();
+    if(d.ok && d.campanha){
+      toast('✅ Campanha criada! Link: /c/'+slug);
+      campanhaAtual = d.campanha;
+      mostrarVistaLista();
+      carregarListaCampanhas();
+    } else {
+      toast(d.error || 'Erro ao criar campanha', true);
+    }
+  } catch(e){
+    toast('Erro: '+e.message, true);
+  } finally {
+    if(btn){ btn.disabled=false; btn.textContent='🚀 Criar campanha'; }
+  }
+}
+
+// ── Abrir editor de campanha existente ──
+async function abrirEditorCampanha(id){
+  mostrarVistaEditor();
   document.getElementById('campanha-loading').style.display = 'block';
   document.getElementById('campanha-editor').style.display = 'none';
   try {
     var r = await fetch(BASE+'/admin/campanhas', {headers:{'x-admin-token':TOKEN}});
     if(r.status===401){ doLogout(); return; }
     var d = await r.json();
-    var campanhas = d.campanhas || [];
-    // pega a ativa ou a primeira
-    campanhaAtual = campanhas.find(function(c){ return c.status==='ativa'; }) || campanhas[0] || null;
-    if(!campanhaAtual){
-      document.getElementById('campanha-loading').textContent = 'Nenhuma campanha encontrada. Crie uma via API ou banco.';
-      return;
-    }
-    popularEditor(campanhaAtual);
+    var c = (d.campanhas||[]).find(function(x){ return x._id===id; });
+    if(!c){ toast('Campanha não encontrada', true); voltarLista(); return; }
+    campanhaAtual = c;
+    popularEditor(c);
   } catch(e){
-    document.getElementById('campanha-loading').textContent = 'Erro ao carregar campanha: '+e.message;
+    toast('Erro ao carregar: '+e.message, true);
+    voltarLista();
   }
 }
 
+// ── Tab editor ──
+function showEditorTab(tab, btn){
+  document.querySelectorAll('#camp-editor-view .tab-editor-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('#camp-editor-view .tab-editor-pane').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('ceditor-'+tab).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+// ── Popular editor ──
 function popularEditor(c){
+  campanhaAtual = c;
+  // Header
+  document.getElementById('ce-titulo-header').textContent = c.nome || 'Campanha';
+  var badge = document.getElementById('ce-status-badge');
+  badge.textContent = c.status || 'ativa';
+  badge.style.background = c.status==='ativa' ? '#22c55e22' : c.status==='pausada' ? '#f59e0b22' : '#94a3b822';
+  badge.style.color = c.status==='ativa' ? '#22c55e' : c.status==='pausada' ? '#f59e0b' : '#94a3b8';
+  var linkVer = document.getElementById('ce-link-ver');
+  if(c.slug){ linkVer.href = '/c/'+c.slug; linkVer.style.display=''; }
+  else linkVer.style.display = 'none';
   // Informações
   document.getElementById('ce-nome').value = c.nome || '';
   document.getElementById('ce-resumoCurto').value = c.resumoCurto || '';
@@ -555,35 +822,123 @@ function popularEditor(c){
   document.getElementById('ce-dataCriacao').value = c.dataCriacao || '';
   document.getElementById('ce-meta').value = c.meta || '';
   document.getElementById('ce-idPublico').value = c.idPublico || '';
+  document.getElementById('ce-slug').value = c.slug || '';
+  atualizarPreviewSlug();
   var catSel = document.getElementById('ce-categoria');
-  if(c.categoria){ catSel.value = c.categoria; if(!catSel.value){ var op=document.createElement('option'); op.value=c.categoria; op.textContent=c.categoria; catSel.appendChild(op); catSel.value=c.categoria; } }
-  var stSel = document.getElementById('ce-status');
-  stSel.value = c.status || 'ativa';
-  // Foto
-  if(c.fotoUrl) document.getElementById('ce-fotoUrl').value = c.fotoUrl;
-  if(c.fotoBase64 || c.fotoUrl){ var prev=document.getElementById('ce-fotoPreview'); prev.src=c.fotoBase64||c.fotoUrl; prev.style.display='block'; }
-  document.getElementById('ce-fotoUrl').oninput = function(){ var prev=document.getElementById('ce-fotoPreview'); if(this.value){ prev.src=this.value; prev.style.display='block'; } else prev.style.display='none'; };
+  catSel.value = c.categoria || 'Solidariedade';
+  if(!catSel.value && c.categoria){ var op=document.createElement('option'); op.value=c.categoria; op.textContent=c.categoria; catSel.appendChild(op); catSel.value=c.categoria; }
+  document.getElementById('ce-status').value = c.status || 'ativa';
+  document.getElementById('ce-chavePix').value = c.chavePix || '';
+  // Mídia
+  document.getElementById('ce-fotoUrl').value = c.fotoUrl || '';
+  var prev = document.getElementById('ce-fotoPreview');
+  if(c.fotoBase64 || c.fotoUrl){ prev.src = c.fotoBase64||c.fotoUrl; prev.style.display='block'; }
+  else { prev.src=''; prev.style.display='none'; }
+  document.getElementById('ce-videoUrl').value = c.videoUrl || '';
+  onVideoUrlChange();
   // Descrição
   document.getElementById('ce-descricao').value = c.descricao || '';
   updateCharCount(document.getElementById('ce-descricao'), 'desc-count');
   document.getElementById('ce-vakinhaPremiada').value = c.vakinhaPremiada || '';
-  // Chave pix
-  document.getElementById('ce-chavePix').value = c.chavePix || '';
   // Upsell
   document.getElementById('ce-upsell').value = c.upsell ? 'true' : 'false';
   document.getElementById('ce-upsellTexto').value = c.upsellTexto || '';
   // Listas
   atualizacoesData = (c.atualizacoes || []).slice();
   perguntasData = (c.perguntas || []).slice();
-  valoresData = (c.valores || [30,50,100,200,500]).slice();
+  valoresData = (c.valores || [10,25,50,100,200]).slice();
   selosData = (c.selos || []).slice();
   renderAtualizacoes();
   renderPerguntas();
   renderValores();
   renderSelos();
+  // resetar aba ativa
+  document.querySelectorAll('#camp-editor-view .tab-editor-btn').forEach(function(b,i){ b.classList.toggle('active', i===0); });
+  document.querySelectorAll('#camp-editor-view .tab-editor-pane').forEach(function(p,i){ p.classList.toggle('active', i===0); });
   document.getElementById('campanha-loading').style.display = 'none';
   document.getElementById('campanha-editor').style.display = 'block';
 }
+
+// ── Slug helpers ──
+function sanitizeSlug(input){
+  var v = input.value.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9-]/g,'-')
+    .replace(/-+/g,'-')
+    .replace(/^-|-$/g,'');
+  input.value = v;
+  atualizarPreviewSlug();
+}
+function atualizarPreviewSlug(){
+  var slug = document.getElementById('ce-slug');
+  var preview = document.getElementById('ce-slug-preview');
+  if(slug && preview){
+    var val = slug.value.trim();
+    preview.innerHTML = val ? 'Link: <a href="/c/'+val+'" target="_blank" style="color:var(--accent)">/c/'+val+'</a>' : 'Link: —';
+  }
+  var novaSlugPreview = document.getElementById('nova-slug-preview');
+  var novaSlug = document.getElementById('nova-slug');
+  if(novaSlug && novaSlugPreview){
+    var val2 = novaSlug.value.trim();
+    novaSlugPreview.innerHTML = val2 ? 'Link: <a href="/c/'+val2+'" target="_blank" style="color:var(--accent)">/c/'+val2+'</a>' : 'Link: /c/<em>seu-slug</em>';
+  }
+}
+
+// ── Foto URL change ──
+function onFotoUrlChange(){
+  var url = document.getElementById('ce-fotoUrl').value.trim();
+  var prev = document.getElementById('ce-fotoPreview');
+  if(url){ prev.src=url; prev.style.display='block'; }
+  else { prev.src=''; prev.style.display='none'; }
+}
+
+// ── Video preview ──
+function onVideoUrlChange(){
+  var vUrl = (document.getElementById('ce-videoUrl').value || '').trim();
+  var wrap = document.getElementById('ce-videoPreview');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  wrap.style.display = 'none';
+  if(!vUrl) return;
+  var ytMatch = vUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+  var viMatch = vUrl.match(/vimeo\.com\/(\d+)/);
+  if(ytMatch){
+    wrap.innerHTML = '<iframe src="https://www.youtube.com/embed/'+ytMatch[1]+'" width="100%" height="200" frameborder="0" allowfullscreen style="border-radius:8px"></iframe>';
+    wrap.style.display = 'block';
+  } else if(viMatch){
+    wrap.innerHTML = '<iframe src="https://player.vimeo.com/video/'+viMatch[1]+'" width="100%" height="200" frameborder="0" allowfullscreen style="border-radius:8px"></iframe>';
+    wrap.style.display = 'block';
+  } else if(vUrl.match(/\.(mp4|webm|ogg)(\?.*)?$/i)){
+    wrap.innerHTML = '<video src="'+vUrl+'" controls style="width:100%;border-radius:8px;max-height:200px"></video>';
+    wrap.style.display = 'block';
+  }
+}
+
+// ── Excluir campanha (da lista) ──
+async function confirmarExcluirCampanhaId(id, nome){
+  if(!confirm('Tem certeza que deseja EXCLUIR a campanha "'+nome+'"?\n\nEsta ação não pode ser desfeita!')) return;
+  try {
+    var r = await fetch(BASE+'/admin/campanhas/'+id, {method:'DELETE', headers:{'x-admin-token':TOKEN}});
+    var d = await r.json();
+    if(d.ok){ toast('Campanha excluída'); carregarListaCampanhas(); }
+    else toast(d.error||'Erro ao excluir', true);
+  } catch(e){ toast('Erro: '+e.message, true); }
+}
+
+// ── Excluir campanha (do editor) ──
+async function confirmarExcluirCampanha(){
+  if(!campanhaAtual) return;
+  if(!confirm('Tem certeza que deseja EXCLUIR "'+campanhaAtual.nome+'"?\n\nEsta ação não pode ser desfeita!')) return;
+  try {
+    var r = await fetch(BASE+'/admin/campanhas/'+campanhaAtual._id, {method:'DELETE', headers:{'x-admin-token':TOKEN}});
+    var d = await r.json();
+    if(d.ok){ toast('Campanha excluída'); voltarLista(); }
+    else toast(d.error||'Erro ao excluir', true);
+  } catch(e){ toast('Erro: '+e.message, true); }
+}
+
+// ── Carrega lista quando entra na seção (compat) ──
+function carregarCampanhaEditor(){ carregarListaCampanhas(); }
 
 // ── ATUALIZAÇÕES ──
 function renderAtualizacoes(){
@@ -765,16 +1120,18 @@ async function salvarCampanha(){
   var btn = event && event.target;
   if(btn){ btn.disabled=true; btn.textContent='Salvando…'; }
   try {
-    // montar foto
     var fotoBase64 = null, fotoMime = null, fotoUrl = null;
     var fileInput = document.getElementById('ce-fotoFile');
-    if(fileInput.files && fileInput.files[0]){
+    if(fileInput && fileInput.files && fileInput.files[0]){
       var file = fileInput.files[0];
       fotoBase64 = await new Promise(function(res){ var r=new FileReader(); r.onload=function(e){ res(e.target.result); }; r.readAsDataURL(file); });
       fotoMime = file.type;
     } else {
       fotoUrl = document.getElementById('ce-fotoUrl').value.trim() || null;
     }
+    var slugVal = (document.getElementById('ce-slug').value || '').trim()
+      .toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+      .replace(/[^a-z0-9-]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
     var body = {
       nome: document.getElementById('ce-nome').value.trim(),
       resumoCurto: document.getElementById('ce-resumoCurto').value.trim(),
@@ -783,10 +1140,12 @@ async function salvarCampanha(){
       dataCriacao: document.getElementById('ce-dataCriacao').value.trim(),
       meta: parseFloat(document.getElementById('ce-meta').value)||0,
       idPublico: document.getElementById('ce-idPublico').value.trim(),
+      slug: slugVal,
       status: document.getElementById('ce-status').value,
       descricao: document.getElementById('ce-descricao').value,
       vakinhaPremiada: document.getElementById('ce-vakinhaPremiada').value.trim(),
       chavePix: document.getElementById('ce-chavePix').value.trim(),
+      videoUrl: (document.getElementById('ce-videoUrl').value || '').trim(),
       upsell: document.getElementById('ce-upsell').value === 'true',
       upsellTexto: document.getElementById('ce-upsellTexto').value.trim(),
       valores: valoresData,
@@ -795,7 +1154,7 @@ async function salvarCampanha(){
       selos: selosData,
     };
     if(fotoBase64){ body.fotoBase64=fotoBase64; body.fotoMime=fotoMime; }
-    else if(fotoUrl){ body.fotoUrl=fotoUrl; }
+    else if(fotoUrl !== null){ body.fotoUrl=fotoUrl; }
     var r = await fetch(BASE+'/admin/campanhas/'+campanhaAtual._id, {
       method: 'PUT',
       headers: {'Content-Type':'application/json','x-admin-token':TOKEN},
@@ -805,6 +1164,10 @@ async function salvarCampanha(){
     if(d.ok || d.campanha){
       toast('✅ Campanha salva com sucesso!');
       campanhaAtual = d.campanha || campanhaAtual;
+      // atualizar header com novo nome/status/link
+      document.getElementById('ce-titulo-header').textContent = campanhaAtual.nome || 'Campanha';
+      var linkVer = document.getElementById('ce-link-ver');
+      if(campanhaAtual.slug){ linkVer.href='/c/'+campanhaAtual.slug; linkVer.style.display=''; }
     } else {
       toast(d.error || 'Erro ao salvar', true);
     }

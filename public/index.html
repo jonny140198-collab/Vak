@@ -1017,10 +1017,14 @@ function copyShareLink(){
 
 window._campanhaId = null; // ID da campanha ativa (usado no /criar-cobranca)
 
-// ── Carregamento dinâmico da campanha ativa ──────────────────────
+// ── Detecta slug na URL /c/:slug ──────────────────────────────────
 (function carregarCampanha(){
   var BACKEND = 'https://vak-led3.onrender.com';
-  fetch(BACKEND+'/campanha-ativa')
+  // Detecta se estamos em /c/:slug ou na raiz
+  var pathParts = window.location.pathname.split('/').filter(Boolean);
+  var slug = (pathParts[0] === 'c' && pathParts[1]) ? pathParts[1] : null;
+  var endpoint = slug ? (BACKEND+'/campanha-por-slug/'+encodeURIComponent(slug)) : (BACKEND+'/campanha-ativa');
+  fetch(endpoint)
     .then(function(r){ return r.json(); })
     .then(function(data){
       var c = data.campanha;
@@ -1153,6 +1157,37 @@ window._campanhaId = null; // ID da campanha ativa (usado no /criar-cobranca)
             return '<span style="display:inline-flex;align-items:center;gap:4px;background:#e8f5e9;border:1px solid #24ca68;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:#1a6e2e;">'+escHtml(s)+'</span>';
           }).join(' ');
         }
+      }
+
+      // Vídeo da campanha
+      if(c.videoUrl){
+        var videoWrap = document.getElementById('campaign-video-wrap');
+        if(!videoWrap){
+          videoWrap = document.createElement('div');
+          videoWrap.id = 'campaign-video-wrap';
+          videoWrap.style.cssText = 'margin-bottom:16px;border-radius:10px;overflow:hidden;background:#000;';
+          // Inserir após a imagem da campanha
+          var imgWrap = document.querySelector('.campaign-image');
+          if(imgWrap && imgWrap.parentNode) imgWrap.parentNode.insertBefore(videoWrap, imgWrap.nextSibling);
+        }
+        // Detecta YouTube, Vimeo ou vídeo direto
+        var vUrl = c.videoUrl;
+        var ytMatch = vUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+        var viMatch = vUrl.match(/vimeo\.com\/(\d+)/);
+        if(ytMatch){
+          videoWrap.innerHTML = '<iframe style="width:100%;height:220px;border:none;display:block;" src="https://www.youtube.com/embed/'+ytMatch[1]+'?rel=0" allowfullscreen></iframe>';
+        } else if(viMatch){
+          videoWrap.innerHTML = '<iframe style="width:100%;height:220px;border:none;display:block;" src="https://player.vimeo.com/video/'+viMatch[1]+'" allowfullscreen></iframe>';
+        } else {
+          videoWrap.innerHTML = '<video style="width:100%;max-height:260px;display:block;" controls><source src="'+escHtml(vUrl)+'"><p style="color:#fff;padding:12px;font-size:13px;">Vídeo não suportado neste navegador.</p></video>';
+        }
+      }
+
+      // Link de compartilhamento dinâmico (usa URL atual da campanha)
+      var shareInput = document.getElementById('shareLinkInput');
+      if(shareInput){
+        var shareUrl = c.slug ? (window.location.origin+'/c/'+c.slug) : window.location.href;
+        shareInput.value = shareUrl;
       }
     })
     .catch(function(){ /* mantém dados estáticos */ });
