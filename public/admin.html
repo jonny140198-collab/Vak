@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Painel Admin — Campanhas</title>
+<title>Painel Admin — Vakinha Ester</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
 :root {
@@ -27,123 +27,46 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh}
-
-/* ── LOGIN ── */
 #loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh}
 .login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center}
 .login-box h1{font-size:22px;margin-bottom:6px;font-weight:700}
 .login-box p{font-size:13px;color:var(--fg2);margin-bottom:28px}
-
-/* ── APP ── */
 #appScreen{display:none}
 .app{display:flex;min-height:100vh}
-.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
+.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:10}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:10}
 .content{padding:28px 24px;max-width:960px;width:100%}
-
-/* ── SIDEBAR ── */
 .sidebar-logo{padding:20px 20px 8px;display:flex;align-items:center;gap:10px}
 .logo-icon{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .logo-text{font-size:14px;font-weight:700}
 .logo-sub{font-size:11px;color:var(--fg2)}
 .sidebar-sec{padding:16px 12px 4px;font-size:10px;font-weight:700;color:var(--fg2);text-transform:uppercase;letter-spacing:.8px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;margin:1px 8px;border-radius:9px;
-  cursor:pointer;font-size:13px;font-weight:500;color:var(--fg2);transition:all .15s;user-select:none}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;margin:1px 8px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:var(--fg2);transition:all .15s;user-select:none}
 .nav-item:hover{background:var(--surface2);color:var(--fg)}
 .nav-item.active{background:var(--accent-bg);color:var(--accent);font-weight:600}
 .nav-icon{width:18px;text-align:center;font-size:15px}
-.nav-badge{margin-left:auto;background:var(--accent);color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700}
-.nav-badge.warn{background:var(--warn)}
 .sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
 .db-status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--fg2);margin-bottom:10px}
 .db-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
 .db-dot.off{background:var(--warn)}
-
-/* ── BUTTONS ── */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
 .btn-primary{background:var(--accent);color:#fff}
 .btn-primary:hover{filter:brightness(1.08)}
 .btn-ghost{background:transparent;color:var(--fg2);border:1px solid var(--border)}
 .btn-ghost:hover{background:var(--surface2);color:var(--fg)}
 .btn-sm{padding:5px 12px;font-size:12px}
-.btn-danger{background:#fee2e2;color:var(--danger)}
-.btn-danger:hover{background:#fecaca}
-
-/* ── CARDS ── */
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
 .section-title{font-size:18px;font-weight:700}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
-.stat-label{font-size:11px;font-weight:600;color:var(--fg2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.stat-val{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
-.stat-sub{font-size:12px;color:var(--accent);margin-top:3px}
-
-/* ── CAMPAIGN GRID ── */
-.campaign-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-.campaign-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:box-shadow .2s,border-color .2s}
-.campaign-card:hover{box-shadow:var(--shadow);border-color:var(--accent)}
-.campaign-card.card-ativa{border-color:var(--accent)}
-.cc-thumb{width:100%;height:140px;background:var(--surface2);position:relative;overflow:hidden}
-.cc-thumb img{width:100%;height:100%;object-fit:cover}
-.cc-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px}
-.cc-status{position:absolute;top:10px;right:10px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
-.s-ativa{background:#dcfce7;color:#15803d}
-.s-pausada{background:#fef9c3;color:#a16207}
-.s-rascunho{background:rgba(0,0,0,.1);color:var(--fg2)}
-.cc-body{padding:14px 16px}
-.cc-name{font-size:14px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cc-desc{font-size:12px;color:var(--fg2);margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:32px}
-.cc-prog-bar{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-bottom:4px}
-.cc-prog-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
-.cc-prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--fg2)}
-.cc-prog-label strong{color:var(--fg);font-weight:600}
-.cc-actions{display:flex;gap:6px;padding-top:10px;border-top:1px solid var(--border);margin-top:10px}
-.add-card{background:transparent;border:2px dashed var(--border);border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:220px;cursor:pointer;transition:all .2s;color:var(--fg2)}
-.add-card:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
-
-/* ── EDITOR ── */
 .editor-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.editor-tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto}
-.etab{padding:12px 20px;font-size:13px;font-weight:500;cursor:pointer;color:var(--fg2);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
-.etab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.etab:hover:not(.active){color:var(--fg);background:var(--surface2)}
 .editor-body{padding:24px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .form-row.single{grid-template-columns:1fr}
 .form-group{display:flex;flex-direction:column;gap:6px}
 .form-group label{font-size:11px;font-weight:600;color:var(--fg2);text-transform:uppercase;letter-spacing:.5px}
-.form-group input,.form-group textarea,.form-group select{
-  background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;
-  padding:10px 14px;font-size:14px;color:var(--fg);outline:none;transition:border-color .2s;width:100%;font-family:inherit}
+.form-group input,.form-group textarea,.form-group select{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--fg);outline:none;transition:border-color .2s;width:100%;font-family:inherit}
 .form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--accent)}
-.form-group textarea{resize:vertical;min-height:88px;line-height:1.5}
 .hint{font-size:11px;color:var(--fg2);margin-top:3px}
-
-/* ── UPLOAD ── */
-.media-tabs{display:flex;gap:6px;margin-bottom:12px}
-.mtab{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);color:var(--fg2);background:transparent;transition:all .15s}
-.mtab.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
-.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;color:var(--fg2)}
-.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
-.upload-icon{font-size:32px;margin-bottom:8px}
-.upload-label{font-size:13px;font-weight:600;margin-bottom:4px}
-.upload-hint-text{font-size:11px}
-.preview-wrap{position:relative;border-radius:10px;overflow:hidden;background:var(--surface2)}
-.preview-wrap img,.preview-wrap video{width:100%;max-height:220px;object-fit:cover;display:block}
-.preview-actions{position:absolute;top:8px;right:8px;display:flex;gap:6px}
-.prev-btn{background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer}
-
-/* ── CHIPS ── */
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.chip{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;user-select:none}
-.chip-del{color:var(--fg2);font-size:16px;line-height:1;cursor:pointer}
-.chip-del:hover{color:var(--danger)}
-.chip-add{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);cursor:pointer}
-
-/* ── TABLE ── */
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--fg2);border-bottom:1.5px solid var(--border)}
@@ -154,37 +77,15 @@ tr:hover td{background:var(--surface2)}
 .pill-paid{background:#dcfce7;color:#15803d}
 .pill-pend{background:#fef9c3;color:#a16207}
 .pill-fail{background:#fee2e2;color:#dc2626}
-
-/* ── TOAST / MODAL ── */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;display:none;box-shadow:0 4px 20px rgba(0,0,0,.2);animation:slideUp .25s ease}
 .toast.err{background:var(--danger)}
 @keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
-.modal-bg.open{display:flex}
-.modal{background:var(--surface);border-radius:var(--radius);padding:28px;max-width:480px;width:100%}
-.modal h3{font-size:17px;font-weight:700;margin-bottom:16px}
-.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 .info-box{background:var(--surface2);border-radius:9px;padding:14px 16px;font-size:13px;color:var(--fg2);margin-bottom:16px}
-
-/* ── PROGRESS BAR UPLOAD ── */
-.upload-progress{margin-top:10px;display:none}
-.upload-progress-bar{height:4px;background:var(--surface2);border-radius:3px;overflow:hidden}
-.upload-progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s;width:0%}
-.upload-progress-label{font-size:11px;color:var(--fg2);margin-top:4px}
-
-/* ── RESPONSIVE ── */
-@media(max-width:700px){
-  .sidebar{display:none}
-  .stats-row{grid-template-columns:1fr 1fr}
-  .form-row{grid-template-columns:1fr}
-  .content{padding:20px 16px}
-  .campaign-grid{grid-template-columns:1fr}
-}
+@media(max-width:700px){.sidebar{display:none}.form-row{grid-template-columns:1fr}.content{padding:20px 16px}}
 </style>
 </head>
 <body>
 
-<!-- ══ LOGIN ══ -->
 <div id="loginScreen">
   <div class="login-box">
     <div style="font-size:40px;margin-bottom:16px">🔐</div>
@@ -203,11 +104,8 @@ tr:hover td{background:var(--surface2)}
   </div>
 </div>
 
-<!-- ══ APP ══ -->
 <div id="appScreen">
 <div class="app">
-
-  <!-- SIDEBAR -->
   <nav class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">💚</div>
@@ -216,16 +114,10 @@ tr:hover td{background:var(--surface2)}
         <div class="logo-sub">Vakinha Ester</div>
       </div>
     </div>
-
-    <div class="sidebar-sec">Campanhas</div>
-    <div class="nav-item active" id="nav-campanhas" onclick="showSection('campanhas')">
-      <span class="nav-icon">📢</span> Campanhas
-      <span class="nav-badge" id="badge-campanhas">0</span>
-    </div>
-    <div class="nav-item" id="nav-pagamentos" onclick="showSection('pagamentos')">
+    <div class="sidebar-sec">Gestão</div>
+    <div class="nav-item active" id="nav-pagamentos" onclick="showSection('pagamentos')">
       <span class="nav-icon">💰</span> Pagamentos
     </div>
-
     <div class="sidebar-sec">Configurações</div>
     <div class="nav-item" id="nav-credenciais" onclick="showSection('credenciais')">
       <span class="nav-icon">🔑</span> Credenciais Pix
@@ -233,7 +125,6 @@ tr:hover td{background:var(--surface2)}
     <div class="nav-item" id="nav-marketing" onclick="showSection('marketing')">
       <span class="nav-icon">📊</span> Marketing
     </div>
-
     <div class="sidebar-footer">
       <div class="db-status">
         <div class="db-dot" id="dbDot"></div>
@@ -242,255 +133,32 @@ tr:hover td{background:var(--surface2)}
       <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="doLogout()">🚪 Sair</button>
     </div>
   </nav>
-
-  <!-- MAIN -->
   <div class="main">
     <div class="topbar">
-      <div style="font-size:15px;font-weight:600" id="topbarTitle">📢 Campanhas</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:12px;color:var(--fg2)" id="topbarUser"></span>
-        <span id="topbarNewBtn" style="display:none"></span>
-      </div>
+      <div style="font-size:15px;font-weight:600" id="topbarTitle">💰 Pagamentos</div>
+      <span style="font-size:12px;color:var(--fg2)" id="topbarUser"></span>
     </div>
 
-    <!-- ── SEC: CAMPANHAS ── -->
-    <div class="content" id="sec-campanhas">
-      <div class="stats-row" id="statsRow">
-        <div class="stat-card"><div class="stat-label">Arrecadado total</div><div class="stat-val" id="st-total">R$ —</div><div class="stat-sub" id="st-hoje">—</div></div>
-        <div class="stat-card"><div class="stat-label">Doadores</div><div class="stat-val" id="st-doadores">—</div></div>
-        <div class="stat-card"><div class="stat-label">Campanhas ativas</div><div class="stat-val" id="st-ativas">—</div></div>
-        <div class="stat-card"><div class="stat-label">Ticket médio</div><div class="stat-val" id="st-ticket">—</div></div>
-      </div>
-      <div class="section-header">
-        <div class="section-title">Suas campanhas</div>
-      </div>
-      <div class="campaign-grid" id="campaignGrid">
-        <div style="text-align:center;color:var(--fg2);padding:40px;grid-column:1/-1">Carregando campanhas…</div>
-      </div>
-    </div>
-
-    <!-- ── SEC: EDITOR ── -->
-    <div class="content" id="sec-editor" style="display:none">
-      <div class="section-header">
-        <div>
-          <button class="btn btn-ghost btn-sm" onclick="showSection('campanhas')" style="margin-bottom:10px">← Voltar</button>
-          <div class="section-title" id="editorTitle">Nova campanha</div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost btn-sm" onclick="previewCampaign()">👁 Ver site</button>
-          <button class="btn btn-primary" onclick="salvarCampanha()">💾 Salvar campanha</button>
-        </div>
-      </div>
-
-      <div class="editor-wrap">
-        <div class="editor-tabs" style="flex-wrap:wrap">
-          <div class="etab active" onclick="switchTab(this,'tab-info')">📝 Informações</div>
-          <div class="etab" onclick="switchTab(this,'tab-sobre')">📖 Sobre</div>
-          <div class="etab" onclick="switchTab(this,'tab-midia')">📸 Mídia</div>
-          <div class="etab" onclick="switchTab(this,'tab-valores')">💲 Valores</div>
-          <div class="etab" onclick="switchTab(this,'tab-qa')">❓ Q&amp;A</div>
-          <div class="etab" onclick="switchTab(this,'tab-atualizacoes')">📢 Atualizações</div>
-          <div class="etab" onclick="switchTab(this,'tab-pix');atualizarLinkCampanha()">🏦 Pagamento</div>
-        </div>
-
-        <!-- TAB INFO -->
-        <div class="editor-body" id="tab-info">
-          <input type="hidden" id="ed-id">
-          <div class="form-row single"><div class="form-group">
-            <label>Nome da campanha</label>
-            <input type="text" id="ed-nome" placeholder="Ex: Ajude a Pequena Ester">
-          </div></div>
-          <div class="form-row single"><div class="form-group">
-            <label>Resumo curto (aparece na página inicial)</label>
-            <textarea id="ed-resumoCurto" rows="3" placeholder="Breve resumo da campanha exibido antes do 'ver tudo'…"></textarea>
-          </div></div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Localização</label>
-              <input type="text" id="ed-localizacao" placeholder="Ex: São Paulo / SP">
-            </div>
-            <div class="form-group">
-              <label>Categoria</label>
-              <input type="text" id="ed-categoria" placeholder="Ex: Solidariedade / Saúde">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Data de criação</label>
-              <input type="text" id="ed-dataCriacao" placeholder="Ex: 20/08/2026">
-            </div>
-            <div class="form-group">
-              <label>Meta de arrecadação (R$)</label>
-              <input type="number" id="ed-meta" placeholder="140000" min="1">
-            </div>
-          </div>
-          <div class="form-row single"><div class="form-group">
-            <label>Status</label>
-            <select id="ed-status">
-              <option value="ativa">Ativa</option>
-              <option value="pausada">Pausada</option>
-              <option value="rascunho">Rascunho</option>
-            </select>
-          </div></div>
-        </div>
-
-        <!-- TAB SOBRE -->
-        <div class="editor-body" id="tab-sobre" style="display:none">
-          <div class="form-row single"><div class="form-group">
-            <label>Descrição completa (aba "Sobre" do site)</label>
-            <textarea id="ed-descricao" rows="16" placeholder="Conta a história da campanha…&#10;&#10;Use linhas em branco para separar parágrafos."></textarea>
-          </div></div>
-        </div>
-
-        <!-- TAB Q&A -->
-        <div class="editor-body" id="tab-qa" style="display:none">
-          <div id="qa-editor-list"></div>
-          <button class="btn btn-ghost" style="margin-top:12px" onclick="adicionarPergunta()">+ Adicionar pergunta</button>
-        </div>
-
-        <!-- TAB ATUALIZAÇÕES -->
-        <div class="editor-body" id="tab-atualizacoes" style="display:none">
-          <div id="atualizacoes-editor-list"></div>
-          <button class="btn btn-ghost" style="margin-top:12px" onclick="adicionarAtualizacao()">+ Adicionar atualização</button>
-        </div>
-
-        <!-- TAB MÍDIA -->
-        <div class="editor-body" id="tab-midia" style="display:none">
-          <div class="form-group" style="margin-bottom:12px"><label>Foto / Vídeo principal</label></div>
-          <div class="media-tabs">
-            <div class="mtab active" id="mtab-upload" onclick="switchMtab('upload')">📁 Enviar arquivo</div>
-            <div class="mtab" id="mtab-url" onclick="switchMtab('url')">🔗 Colar URL</div>
-          </div>
-
-          <div id="midia-upload">
-            <div class="upload-zone" id="dropzone"
-              onclick="document.getElementById('fileInput').click()"
-              ondragover="this.classList.add('drag');event.preventDefault()"
-              ondragleave="this.classList.remove('drag')"
-              ondrop="handleDrop(event)">
-              <div class="upload-icon">📷</div>
-              <div class="upload-label">Clique ou arraste a foto/vídeo aqui</div>
-              <div class="upload-hint-text">JPG, PNG, GIF, MP4 · máx. 10 MB</div>
-            </div>
-            <input type="file" id="fileInput" accept="image/*,video/mp4,video/webm" style="display:none" onchange="handleFile(this)">
-            <div class="upload-progress" id="uploadProgress">
-              <div class="upload-progress-bar"><div class="upload-progress-fill" id="uploadFill"></div></div>
-              <div class="upload-progress-label" id="uploadLabel">Carregando…</div>
-            </div>
-            <div id="previewWrap" style="display:none;margin-top:12px">
-              <div class="preview-wrap">
-                <img id="previewImg" src="" alt="preview" style="display:none">
-                <video id="previewVid" controls style="display:none;width:100%;max-height:220px"></video>
-                <div class="preview-actions">
-                  <button class="prev-btn" onclick="removerMidia()">🗑 Remover</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div id="midia-url" style="display:none">
-            <div class="form-group">
-              <input type="url" id="ed-fotoUrl" placeholder="https://... (link de imagem ou vídeo público)">
-              <span class="hint">Cole o link direto de uma imagem ou vídeo público (Imgur, Google Drive com compartilhamento, etc.)</span>
-            </div>
-            <div id="urlPreviewWrap" style="margin-top:12px;display:none">
-              <div class="preview-wrap">
-                <img id="urlPreviewImg" src="" alt="preview">
-              </div>
-            </div>
-          </div>
-          <input type="hidden" id="ed-fotoBase64">
-          <input type="hidden" id="ed-fotoMime">
-        </div>
-
-        <!-- TAB VALORES -->
-        <div class="editor-body" id="tab-valores" style="display:none">
-          <div class="form-group" style="margin-bottom:4px"><label>Valores sugeridos nos botões (R$)</label></div>
-          <div class="hint" style="margin-bottom:12px">Clique em × para remover · clique em "+ Adicionar valor" para incluir</div>
-          <div class="chips" id="chipsWrap"></div>
-          <div style="margin-top:24px">
-            <div class="form-row">
-              <div class="form-group">
-                <label>Valor do upsell (R$)</label>
-                <input type="number" id="ed-upsell" value="3.99" step="0.01" min="0.01">
-                <span class="hint">Sugestão de doação extra (padrão: R$ 3,99)</span>
-              </div>
-              <div class="form-group">
-                <label>Texto do upsell</label>
-                <input type="text" id="ed-upsellTexto" value="Adicione mais e ajude ainda mais!">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- TAB PIX -->
-        <div class="editor-body" id="tab-pix" style="display:none">
-          <div class="info-box">🏦 As credenciais XFlow (PK/SK) são <strong>globais</strong> e ficam na seção <strong>Credenciais Pix</strong> do menu lateral. Aqui você configura apenas a chave Pix de fallback desta campanha.</div>
-          <div class="form-row single"><div class="form-group">
-            <label>Chave Pix (fallback)</label>
-            <input type="text" id="ed-chavePix" placeholder="email@exemplo.com ou CPF">
-            <span class="hint">Usada como fallback quando a integração XFlow não estiver disponível</span>
-          </div></div>
-
-          <!-- Link de compartilhamento -->
-          <div id="linkCampanhaWrap" style="display:none;margin-top:24px">
-            <div class="form-group" style="margin-bottom:10px"><label>🔗 Link desta campanha</label></div>
-            <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:16px 18px">
-              <div style="font-size:12px;color:var(--fg2);margin-bottom:10px">Compartilhe este link para direcionar doadores diretamente para esta campanha:</div>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <input type="text" id="linkCampanhaInput" readonly
-                  style="flex:1;min-width:200px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:9px 14px;font-size:13px;color:var(--fg);font-family:monospace">
-                <button class="btn btn-primary btn-sm" onclick="copiarLinkCampanha()">📋 Copiar</button>
-                <a id="linkCampanhaAbrir" href="#" target="_blank" class="btn btn-ghost btn-sm">👁 Abrir</a>
-              </div>
-              <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-                <a id="linkWhatsApp" href="#" target="_blank"
-                  style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#25D366;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">
-                  WhatsApp
-                </a>
-                <a id="linkFacebook" href="#" target="_blank"
-                  style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#1877F2;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">
-                  Facebook
-                </a>
-              </div>
-            </div>
-          </div>
-          <div id="linkCampanhaNovo" style="display:none;margin-top:24px">
-            <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:16px 18px;font-size:13px;color:var(--fg2)">
-              💡 Salve a campanha primeiro para gerar o link de compartilhamento.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── SEC: PAGAMENTOS ── -->
-    <div class="content" id="sec-pagamentos" style="display:none">
+    <div class="content" id="sec-pagamentos">
       <div class="section-header">
         <div class="section-title">💰 Pagamentos recentes</div>
-        <div style="display:flex;gap:8px">
-          <select id="filtro-campanha" class="btn btn-ghost btn-sm" style="border:1px solid var(--border);padding:5px 12px" onchange="carregarPagamentos()">
-            <option value="">Todas as campanhas</option>
-          </select>
-          <button class="btn btn-ghost btn-sm" onclick="exportarCSV()">⬇ Exportar CSV</button>
-        </div>
+        <button class="btn btn-ghost btn-sm" onclick="exportarCSV()">⬇ Exportar CSV</button>
       </div>
       <div class="editor-wrap">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Data</th><th>Campanha</th><th>Valor</th><th>Status</th><th>ID</th></tr></thead>
-            <tbody id="pagamentos-tbody"><tr><td colspan="5" style="text-align:center;color:var(--fg2);padding:30px">Carregando…</td></tr></tbody>
+            <thead><tr><th>Data</th><th>Valor</th><th>Status</th><th>ID</th></tr></thead>
+            <tbody id="pagamentos-tbody"><tr><td colspan="4" style="text-align:center;color:var(--fg2);padding:30px">Carregando…</td></tr></tbody>
           </table>
         </div>
         <div style="padding:14px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--fg2)" id="pagamentos-info"></div>
       </div>
     </div>
 
-    <!-- ── SEC: CREDENCIAIS ── -->
     <div class="content" id="sec-credenciais" style="display:none">
       <div class="section-header"><div class="section-title">🔑 Credenciais de Pagamento</div></div>
       <div class="editor-wrap"><div class="editor-body">
-        <div class="info-box">⚠️ Estas credenciais são <strong>sensíveis</strong> e compartilhadas entre todas as campanhas. Nunca compartilhe a Chave Secreta (SK).</div>
+        <div class="info-box">⚠️ Estas credenciais são <strong>sensíveis</strong>. Nunca compartilhe a Chave Secreta (SK).</div>
         <div class="form-row single"><div class="form-group">
           <label>Chave Pública (PK)</label>
           <input type="text" id="cfg-pk" placeholder="pk_live_...">
@@ -507,7 +175,6 @@ tr:hover td{background:var(--surface2)}
       </div></div>
     </div>
 
-    <!-- ── SEC: MARKETING ── -->
     <div class="content" id="sec-marketing" style="display:none">
       <div class="section-header"><div class="section-title">📊 Rastreamento & Marketing</div></div>
       <div class="editor-wrap"><div class="editor-body">
@@ -526,40 +193,16 @@ tr:hover td{background:var(--surface2)}
       </div></div>
     </div>
 
-  </div><!-- /main -->
-</div><!-- /app -->
-</div><!-- /appScreen -->
-
-<!-- Modal confirmação excluir -->
-<div class="modal-bg" id="modalExcluir">
-  <div class="modal">
-    <h3>🗑 Excluir campanha?</h3>
-    <p style="color:var(--fg2);font-size:14px;margin-bottom:8px">Tem certeza que deseja excluir a campanha <strong id="modalNome"></strong>? Esta ação não pode ser desfeita.</p>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
-      <button class="btn btn-danger" onclick="confirmarExcluir()">🗑 Excluir</button>
-    </div>
   </div>
+</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ════════════════════════════════════════════
-// CONFIG
-// ════════════════════════════════════════════
 var BASE = '';
 var TOKEN = '';
-var campanhas = [];
-var campanhaExcluirId = null;
-var midiaAtual = null; // {tipo:'base64'|'url', valor, mime}
 
-// Valores padrão por campanha
-var valorPadrao = [10, 25, 50, 100, 200];
-
-// ════════════════════════════════════════════
-// TOAST
-// ════════════════════════════════════════════
 function toast(msg, err){
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -569,9 +212,6 @@ function toast(msg, err){
   t._t = setTimeout(function(){ t.style.display = 'none'; }, 3500);
 }
 
-// ════════════════════════════════════════════
-// AUTH
-// ════════════════════════════════════════════
 async function doLogin(){
   var u = document.getElementById('loginUser').value.trim();
   var p = document.getElementById('loginPass').value;
@@ -608,20 +248,13 @@ function iniciarApp(user){
   document.getElementById('appScreen').style.display = 'block';
   document.getElementById('topbarUser').textContent = '👤 ' + user;
   carregarConfig();
-  carregarCampanhas();
+  carregarPagamentos();
 }
 
-// ════════════════════════════════════════════
-// NAVEGAÇÃO
-// ════════════════════════════════════════════
-var secTitles = {
-  campanhas:'📢 Campanhas', editor:'✏️ Editando campanha',
-  pagamentos:'💰 Pagamentos', credenciais:'🔑 Credenciais Pix', marketing:'📊 Marketing'
-};
+var secTitles = {pagamentos:'💰 Pagamentos', credenciais:'🔑 Credenciais Pix', marketing:'📊 Marketing'};
 
 function showSection(id){
-  var secs = ['campanhas','editor','pagamentos','credenciais','marketing'];
-  secs.forEach(function(s){
+  ['pagamentos','credenciais','marketing'].forEach(function(s){
     var el = document.getElementById('sec-'+s);
     if(el) el.style.display = s===id ? 'block' : 'none';
   });
@@ -629,581 +262,30 @@ function showSection(id){
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
   var navEl = document.getElementById('nav-'+id);
   if(navEl) navEl.classList.add('active');
-  var newBtn = document.getElementById('topbarNewBtn');
-  newBtn.style.display = id==='campanhas' ? 'inline-flex' : 'none';
-
   if(id==='pagamentos') carregarPagamentos();
 }
 
-// ════════════════════════════════════════════
-// CAMPANHAS — LISTAGEM
-// ════════════════════════════════════════════
-async function carregarCampanhas(){
-  try {
-    var r = await fetch(BASE+'/admin/campanhas', {headers:{'x-admin-token':TOKEN}});
-    if(r.status===401){ doLogout(); return; }
-    var data = await r.json();
-    campanhas = data.campanhas || [];
-    renderCampanhas();
-    atualizarStats();
-    document.getElementById('badge-campanhas').textContent = campanhas.length;
-  } catch(e){ toast('Erro ao carregar campanhas', true); }
-}
-
-function renderCampanhas(){
-  var grid = document.getElementById('campaignGrid');
-  grid.innerHTML = '';
-
-  campanhas.forEach(function(c){
-    var pct = c.meta > 0 ? Math.min(100, (c.arrecadado||0)/c.meta*100) : 0;
-    var statusClass = {ativa:'s-ativa',pausada:'s-pausada',rascunho:'s-rascunho'}[c.status] || 's-rascunho';
-    var statusLabel = {ativa:'Ativa',pausada:'Pausada',rascunho:'Rascunho'}[c.status] || c.status;
-    var cardClass = c.status==='ativa' ? 'campaign-card card-ativa' : 'campaign-card';
-
-    var thumbHtml = c.fotoUrl || c.fotoBase64
-      ? '<img src="'+(c.fotoBase64||c.fotoUrl)+'" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
-        + '<div class="cc-placeholder" style="display:none">📢</div>'
-      : '<div class="cc-placeholder">📢</div>';
-
-    var card = document.createElement('div');
-    card.className = cardClass;
-    card.innerHTML = '<div class="cc-thumb">'+thumbHtml+'<span class="cc-status '+statusClass+'">'+statusLabel+'</span></div>'
-      +'<div class="cc-body">'
-        +'<div class="cc-name">'+esc(c.nome)+'</div>'
-        +'<div class="cc-desc">'+esc(c.descricao||'')+'</div>'
-        +'<div class="cc-prog-bar"><div class="cc-prog-fill" style="width:'+pct+'%"></div></div>'
-        +'<div class="cc-prog-label"><strong>'+fmtBRL(c.arrecadado||0)+'</strong><span>meta '+fmtBRL(c.meta||0)+'</span></div>'
-        +'<div class="cc-actions">'
-          +'<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editarCampanha(\''+c._id+'\')">✏️ Editar</button>'
-          +(c.status==='ativa'
-            ? '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();toggleStatus(\''+c._id+'\',\'pausada\')">⏸ Pausar</button>'
-            : '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();toggleStatus(\''+c._id+'\',\'ativa\')">▶ Ativar</button>')
-          +'<button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="event.stopPropagation();pedirExcluir(\''+c._id+'\',\''+esc(c.nome)+'\')">🗑</button>'
-        +'</div>'
-      +'</div>';
-    grid.appendChild(card);
-  });
-
-  // card de nova campanha removido
-}
-
-function atualizarStats(){
-  var total = campanhas.reduce(function(a,c){ return a+(c.arrecadado||0); }, 0);
-  var ativas = campanhas.filter(function(c){ return c.status==='ativa'; }).length;
-  document.getElementById('st-total').textContent = fmtBRL(total);
-  document.getElementById('st-ativas').textContent = ativas + ' / ' + campanhas.length;
-  // Pagamentos não temos localmente — placeholder
-  document.getElementById('st-doadores').textContent = '—';
-  document.getElementById('st-ticket').textContent = '—';
-  document.getElementById('st-hoje').textContent = ativas+' ativa'+(ativas!==1?'s':'');
-}
-
-async function toggleStatus(id, novoStatus){
-  var c = campanhas.find(function(x){ return x._id===id; });
-  if(!c) return;
-  c.status = novoStatus;
-  try {
-    await fetch(BASE+'/admin/campanhas/'+id, {
-      method:'PUT', headers:{'Content-Type':'application/json','x-admin-token':TOKEN},
-      body: JSON.stringify({status:novoStatus})
-    });
-    renderCampanhas();
-    toast(novoStatus==='ativa' ? '▶ Campanha ativada!' : '⏸ Campanha pausada!');
-  } catch(e){ toast('Erro ao atualizar status', true); }
-}
-
-// ════════════════════════════════════════════
-// CAMPANHAS — EDITOR
-// ════════════════════════════════════════════
-function showNewCampaign(){
-  campanhaAtual = null;
-  midiaAtual = null;
-  document.getElementById('ed-id').value = '';
-  document.getElementById('ed-nome').value = '';
-  document.getElementById('ed-resumoCurto').value = '';
-  document.getElementById('ed-descricao').value = '';
-  document.getElementById('ed-localizacao').value = '';
-  document.getElementById('ed-categoria').value = '';
-  document.getElementById('ed-dataCriacao').value = '';
-  document.getElementById('ed-meta').value = '140000';
-  document.getElementById('ed-status').value = 'ativa';
-  document.getElementById('ed-chavePix').value = '';
-  document.getElementById('ed-fotoUrl').value = '';
-  document.getElementById('ed-fotoBase64').value = '';
-  document.getElementById('ed-fotoMime').value = '';
-  document.getElementById('ed-upsell').value = '3.99';
-  document.getElementById('ed-upsellTexto').value = 'Adicione mais e ajude ainda mais!';
-  renderChips([10,25,50,100,200]);
-  renderQAEditor([]);
-  renderAtualizacoesEditor([]);
-  removerMidia();
-  switchTab(document.querySelector('.etab'), 'tab-info');
-  document.getElementById('editorTitle').textContent = 'Nova campanha';
-  showSection('editor');
-}
-
-var campanhaAtual = null;
-
-function editarCampanha(id){
-  var c = campanhas.find(function(x){ return x._id===id; });
-  if(!c) return;
-  campanhaAtual = c;
-  midiaAtual = null;
-  document.getElementById('ed-id').value = c._id;
-  document.getElementById('ed-nome').value = c.nome || '';
-  document.getElementById('ed-resumoCurto').value = c.resumoCurto || '';
-  document.getElementById('ed-descricao').value = c.descricao || '';
-  document.getElementById('ed-localizacao').value = c.localizacao || '';
-  document.getElementById('ed-categoria').value = c.categoria || '';
-  document.getElementById('ed-dataCriacao').value = c.dataCriacao || '';
-  document.getElementById('ed-meta').value = c.meta || 140000;
-  document.getElementById('ed-status').value = c.status || 'ativa';
-  document.getElementById('ed-chavePix').value = c.chavePix || '';
-  document.getElementById('ed-upsell').value = c.upsell || 3.99;
-  document.getElementById('ed-upsellTexto').value = c.upsellTexto || 'Adicione mais e ajude ainda mais!';
-  renderChips(c.valores || [10,25,50,100,200]);
-  renderQAEditor(c.perguntas || []);
-  renderAtualizacoesEditor(c.atualizacoes || []);
-
-  // Mídia
-  removerMidia();
-  if(c.fotoBase64){
-    mostrarPreviewBase64(c.fotoBase64, c.fotoMime||'image/jpeg');
-    midiaAtual = {tipo:'base64', valor:c.fotoBase64, mime:c.fotoMime||'image/jpeg'};
-  } else if(c.fotoUrl){
-    document.getElementById('ed-fotoUrl').value = c.fotoUrl;
-    switchMtab('url');
-    mostrarUrlPreview(c.fotoUrl);
-    midiaAtual = {tipo:'url', valor:c.fotoUrl};
-  }
-
-  document.getElementById('editorTitle').textContent = c.nome;
-  switchTab(document.querySelector('.etab'), 'tab-info');
-  showSection('editor');
-  atualizarLinkCampanha();
-}
-
-async function salvarCampanha(){
-  var id = document.getElementById('ed-id').value;
-  var chips = Array.from(document.querySelectorAll('#chipsWrap .chip:not(.chip-add)')).map(function(el){
-    return parseFloat(el.dataset.valor);
-  }).filter(function(v){ return !isNaN(v); });
-
-  var payload = {
-    nome: document.getElementById('ed-nome').value.trim(),
-    resumoCurto: document.getElementById('ed-resumoCurto').value.trim(),
-    descricao: document.getElementById('ed-descricao').value.trim(),
-    localizacao: document.getElementById('ed-localizacao').value.trim(),
-    categoria: document.getElementById('ed-categoria').value.trim(),
-    dataCriacao: document.getElementById('ed-dataCriacao').value.trim(),
-    meta: parseFloat(document.getElementById('ed-meta').value) || 140000,
-    status: document.getElementById('ed-status').value,
-    chavePix: document.getElementById('ed-chavePix').value.trim(),
-    upsell: parseFloat(document.getElementById('ed-upsell').value) || 3.99,
-    upsellTexto: document.getElementById('ed-upsellTexto').value.trim(),
-    valores: chips,
-    perguntas: coletarPerguntas(),
-    atualizacoes: coletarAtualizacoes()
-  };
-
-  if(!payload.nome){ toast('⚠️ Informe o nome da campanha', true); return; }
-
-  // Mídia
-  if(midiaAtual){
-    if(midiaAtual.tipo==='base64'){
-      payload.fotoBase64 = midiaAtual.valor;
-      payload.fotoMime = midiaAtual.mime;
-      payload.fotoUrl = '';
-    } else {
-      payload.fotoUrl = midiaAtual.valor;
-      payload.fotoBase64 = '';
-    }
-  } else if(document.getElementById('ed-fotoUrl').value.trim()){
-    payload.fotoUrl = document.getElementById('ed-fotoUrl').value.trim();
-    payload.fotoBase64 = '';
-  }
-
-  try {
-    var url = id ? BASE+'/admin/campanhas/'+id : BASE+'/admin/campanhas';
-    var method = id ? 'PUT' : 'POST';
-    var r = await fetch(url, {method:method, headers:{'Content-Type':'application/json','x-admin-token':TOKEN}, body:JSON.stringify(payload)});
-    var d = await r.json();
-    if(d.ok || d._id){
-      toast('✅ Campanha salva com sucesso!');
-      if(!id && d._id) document.getElementById('ed-id').value = d._id;
-      atualizarLinkCampanha();
-      await carregarCampanhas();
-      showSection('campanhas');
-    } else {
-      toast(d.error || 'Erro ao salvar', true);
-    }
-  } catch(e){ toast('Erro de conexão', true); }
-}
-
-// ════════════════════════════════════════════
-// Q&A EDITOR
-// ════════════════════════════════════════════
-function escA(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function renderQAEditor(lista){
-  var wrap = document.getElementById('qa-editor-list');
-  if(!wrap) return;
-  if(!lista || lista.length === 0){
-    wrap.innerHTML = '<p style="color:var(--fg2);font-size:13px;padding:8px 0">Nenhuma pergunta ainda. Clique em "+ Adicionar pergunta" para incluir.</p>';
-    return;
-  }
-  wrap.innerHTML = lista.map(function(q,i){
-    return '<div class="qa-editor-item" style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:12px">'
-      +'<div class="form-group" style="margin-bottom:8px"><label>Pergunta</label>'
-      +'<input type="text" data-qa="pergunta" data-idx="'+i+'" value="'+escA(q.pergunta)+'" placeholder="Digite a pergunta…"></div>'
-      +'<div class="form-group" style="margin-bottom:8px"><label>Resposta</label>'
-      +'<textarea data-qa="resposta" data-idx="'+i+'" rows="3" placeholder="Digite a resposta…">'+escA(q.resposta)+'</textarea></div>'
-      +'<div class="form-group" style="margin-bottom:8px"><label>Autor (opcional)</label>'
-      +'<input type="text" data-qa="autor" data-idx="'+i+'" value="'+escA(q.autor||'')+'" placeholder="Ex: João Silva"></div>'
-      +'<button class="btn btn-danger btn-sm" onclick="removerQA('+i+')">🗑 Remover</button>'
-      +'</div>';
-  }).join('');
-}
-
-function coletarPerguntas(){
-  var wrap = document.getElementById('qa-editor-list');
-  if(!wrap) return [];
-  var items = wrap.querySelectorAll('.qa-editor-item');
-  var result = [];
-  items.forEach(function(item){
-    var p = item.querySelector('[data-qa="pergunta"]');
-    var r = item.querySelector('[data-qa="resposta"]');
-    var a = item.querySelector('[data-qa="autor"]');
-    if(p && p.value.trim()) result.push({ pergunta: p.value.trim(), resposta: (r?r.value.trim():''), autor: (a?a.value.trim():'') });
-  });
-  return result;
-}
-
-function adicionarPergunta(){
-  var atual = coletarPerguntas();
-  atual.push({ pergunta:'', resposta:'', autor:'' });
-  renderQAEditor(atual);
-  var items = document.querySelectorAll('#qa-editor-list .qa-editor-item');
-  if(items.length) items[items.length-1].querySelector('input').focus();
-}
-
-function removerQA(i){
-  var atual = coletarPerguntas();
-  atual.splice(i,1);
-  renderQAEditor(atual);
-}
-
-// ════════════════════════════════════════════
-// ATUALIZAÇÕES EDITOR
-// ════════════════════════════════════════════
-function renderAtualizacoesEditor(lista){
-  var wrap = document.getElementById('atualizacoes-editor-list');
-  if(!wrap) return;
-  if(!lista || lista.length === 0){
-    wrap.innerHTML = '<p style="color:var(--fg2);font-size:13px;padding:8px 0">Nenhuma atualização ainda. Clique em "+ Adicionar atualização" para incluir.</p>';
-    return;
-  }
-  wrap.innerHTML = lista.map(function(u,i){
-    return '<div class="upd-editor-item" style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:12px">'
-      +'<div class="form-row"><div class="form-group" style="margin-bottom:8px"><label>Título</label>'
-      +'<input type="text" data-upd="titulo" data-idx="'+i+'" value="'+escA(u.titulo)+'" placeholder="Ex: Atualização do tratamento"></div>'
-      +'<div class="form-group" style="margin-bottom:8px"><label>Data</label>'
-      +'<input type="text" data-upd="data" data-idx="'+i+'" value="'+escA(u.data||'')+'" placeholder="Ex: 24/11/2026"></div></div>'
-      +'<div class="form-group" style="margin-bottom:8px"><label>Texto</label>'
-      +'<textarea data-upd="texto" data-idx="'+i+'" rows="4" placeholder="Descreva a atualização…">'+escA(u.texto)+'</textarea></div>'
-      +'<button class="btn btn-danger btn-sm" onclick="removerAtualizacao('+i+')">🗑 Remover</button>'
-      +'</div>';
-  }).join('');
-}
-
-function coletarAtualizacoes(){
-  var wrap = document.getElementById('atualizacoes-editor-list');
-  if(!wrap) return [];
-  var items = wrap.querySelectorAll('.upd-editor-item');
-  var result = [];
-  items.forEach(function(item){
-    var t = item.querySelector('[data-upd="titulo"]');
-    var x = item.querySelector('[data-upd="texto"]');
-    var d = item.querySelector('[data-upd="data"]');
-    if(t && t.value.trim()) result.push({ titulo: t.value.trim(), texto: (x?x.value.trim():''), data: (d?d.value.trim():'') });
-  });
-  return result;
-}
-
-function adicionarAtualizacao(){
-  var atual = coletarAtualizacoes();
-  atual.push({ titulo:'', texto:'', data:'' });
-  renderAtualizacoesEditor(atual);
-  var items = document.querySelectorAll('#atualizacoes-editor-list .upd-editor-item');
-  if(items.length) items[items.length-1].querySelector('input').focus();
-}
-
-function removerAtualizacao(i){
-  var atual = coletarAtualizacoes();
-  atual.splice(i,1);
-  renderAtualizacoesEditor(atual);
-}
-
-function previewCampaign(){
-  var id = document.getElementById('ed-id').value;
-  if(id) window.open('/?c='+encodeURIComponent(id), '_blank');
-  else window.open('/', '_blank');
-}
-
-function atualizarLinkCampanha(){
-  var id = document.getElementById('ed-id').value;
-  var wrap = document.getElementById('linkCampanhaWrap');
-  var novo = document.getElementById('linkCampanhaNovo');
-  if(!id){
-    if(wrap) wrap.style.display = 'none';
-    if(novo) novo.style.display = 'block';
-    return;
-  }
-  if(novo) novo.style.display = 'none';
-  if(wrap) wrap.style.display = 'block';
-  var base = window.location.origin;
-  var link = base + '/?c=' + encodeURIComponent(id);
-  var inp = document.getElementById('linkCampanhaInput');
-  if(inp) inp.value = link;
-  var abrir = document.getElementById('linkCampanhaAbrir');
-  if(abrir) abrir.href = link;
-  var nome = document.getElementById('ed-nome').value || 'Ajude!';
-  var msg = encodeURIComponent('💚 ' + nome + '! Ajude agora: ' + link);
-  var wa = document.getElementById('linkWhatsApp');
-  if(wa) wa.href = 'https://wa.me/?text=' + msg;
-  var fb = document.getElementById('linkFacebook');
-  if(fb) fb.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(link);
-}
-
-function copiarLinkCampanha(){
-  var inp = document.getElementById('linkCampanhaInput');
-  if(!inp) return;
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(inp.value).then(function(){
-      toast('📋 Link copiado!');
-    });
-  } else {
-    inp.select();
-    document.execCommand('copy');
-    toast('📋 Link copiado!');
-  }
-}
-
-// ════════════════════════════════════════════
-// CHIPS DE VALORES
-// ════════════════════════════════════════════
-function renderChips(valores){
-  var wrap = document.getElementById('chipsWrap');
-  wrap.innerHTML = '';
-  valores.forEach(function(v){ addChipEl(v, wrap); });
-  var addBtn = document.createElement('div');
-  addBtn.className = 'chip chip-add';
-  addBtn.textContent = '+ Adicionar valor';
-  addBtn.onclick = adicionarChip;
-  wrap.appendChild(addBtn);
-}
-
-function addChipEl(v, wrap){
-  var chip = document.createElement('div');
-  chip.className = 'chip';
-  chip.dataset.valor = v;
-  chip.innerHTML = 'R$ '+parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:2})
-    +' <span class="chip-del" onclick="this.parentElement.remove()">×</span>';
-  if(!wrap) wrap = document.getElementById('chipsWrap');
-  var addBtn = wrap.querySelector('.chip-add');
-  if(addBtn) wrap.insertBefore(chip, addBtn);
-  else wrap.appendChild(chip);
-}
-
-function adicionarChip(){
-  var v = prompt('Digite o valor em R$:');
-  if(v===null) return;
-  var n = parseFloat(v.replace(',','.'));
-  if(isNaN(n)||n<=0){ toast('⚠️ Valor inválido', true); return; }
-  addChipEl(n);
-}
-
-// ════════════════════════════════════════════
-// UPLOAD DE MÍDIA
-// ════════════════════════════════════════════
-function switchTab(el, id){
-  document.querySelectorAll('.etab').forEach(function(t){ t.classList.remove('active'); });
-  el.classList.add('active');
-  ['tab-info','tab-midia','tab-valores','tab-pix'].forEach(function(t){
-    var d = document.getElementById(t);
-    if(d) d.style.display = t===id ? 'block' : 'none';
-  });
-}
-
-function switchMtab(mode){
-  document.getElementById('mtab-upload').classList.toggle('active', mode==='upload');
-  document.getElementById('mtab-url').classList.toggle('active', mode==='url');
-  document.getElementById('midia-upload').style.display = mode==='upload' ? 'block' : 'none';
-  document.getElementById('midia-url').style.display = mode==='url' ? 'block' : 'none';
-}
-
-function handleDrop(e){
-  e.preventDefault();
-  document.getElementById('dropzone').classList.remove('drag');
-  var f = e.dataTransfer.files[0];
-  if(!f) return;
-  processarArquivo(f);
-}
-
-function handleFile(input){
-  if(!input.files||!input.files[0]) return;
-  processarArquivo(input.files[0]);
-}
-
-function processarArquivo(f){
-  var maxMB = 10;
-  if(f.size > maxMB*1024*1024){ toast('⚠️ Arquivo muito grande. Máximo: '+maxMB+'MB', true); return; }
-  var isVideo = f.type.startsWith('video/');
-  var isImage = f.type.startsWith('image/');
-  if(!isVideo && !isImage){ toast('⚠️ Formato não suportado. Use imagem ou MP4.', true); return; }
-
-  // Progress simulado
-  var prog = document.getElementById('uploadProgress');
-  var fill = document.getElementById('uploadFill');
-  var label = document.getElementById('uploadLabel');
-  prog.style.display = 'block';
-  fill.style.width = '0%';
-  label.textContent = 'Carregando…';
-
-  var reader = new FileReader();
-  reader.onprogress = function(ev){
-    if(ev.lengthComputable){
-      var pct = Math.round(ev.loaded/ev.total*90);
-      fill.style.width = pct+'%';
-    }
-  };
-  reader.onload = function(ev){
-    fill.style.width = '100%';
-    label.textContent = 'Pronto!';
-    setTimeout(function(){ prog.style.display = 'none'; }, 800);
-    var base64 = ev.target.result;
-    midiaAtual = {tipo:'base64', valor:base64, mime:f.type};
-    document.getElementById('ed-fotoBase64').value = base64;
-    document.getElementById('ed-fotoMime').value = f.type;
-    mostrarPreviewBase64(base64, f.type, isVideo);
-  };
-  reader.readAsDataURL(f);
-}
-
-function mostrarPreviewBase64(base64, mime, isVideo){
-  document.getElementById('dropzone').style.display = 'none';
-  document.getElementById('previewWrap').style.display = 'block';
-  if(isVideo || (mime && mime.startsWith('video/'))){
-    document.getElementById('previewImg').style.display = 'none';
-    var vid = document.getElementById('previewVid');
-    vid.style.display = 'block';
-    vid.src = base64;
-  } else {
-    document.getElementById('previewVid').style.display = 'none';
-    var img = document.getElementById('previewImg');
-    img.style.display = 'block';
-    img.src = base64;
-  }
-}
-
-function removerMidia(){
-  midiaAtual = null;
-  document.getElementById('ed-fotoBase64').value = '';
-  document.getElementById('ed-fotoMime').value = '';
-  document.getElementById('previewWrap').style.display = 'none';
-  document.getElementById('previewImg').src = '';
-  document.getElementById('previewImg').style.display = 'none';
-  document.getElementById('previewVid').src = '';
-  document.getElementById('previewVid').style.display = 'none';
-  document.getElementById('dropzone').style.display = 'flex';
-  document.getElementById('uploadProgress').style.display = 'none';
-}
-
-// URL preview
-document.addEventListener('DOMContentLoaded', function(){
-  var urlInput = document.getElementById('ed-fotoUrl');
-  if(urlInput){
-    urlInput.addEventListener('blur', function(){
-      mostrarUrlPreview(this.value.trim());
-    });
-  }
-});
-
-function mostrarUrlPreview(url){
-  var wrap = document.getElementById('urlPreviewWrap');
-  var img = document.getElementById('urlPreviewImg');
-  if(!url){ wrap.style.display='none'; return; }
-  img.src = url;
-  img.onerror = function(){ wrap.style.display='none'; };
-  img.onload = function(){ wrap.style.display='block'; };
-  if(midiaAtual===null || midiaAtual.tipo==='url'){
-    midiaAtual = {tipo:'url', valor:url};
-  }
-}
-
-// ════════════════════════════════════════════
-// EXCLUIR CAMPANHA
-// ════════════════════════════════════════════
-function pedirExcluir(id, nome){
-  campanhaExcluirId = id;
-  document.getElementById('modalNome').textContent = nome;
-  document.getElementById('modalExcluir').classList.add('open');
-}
-function fecharModal(){
-  document.getElementById('modalExcluir').classList.remove('open');
-  campanhaExcluirId = null;
-}
-async function confirmarExcluir(){
-  if(!campanhaExcluirId) return;
-  fecharModal();
-  try {
-    var r = await fetch(BASE+'/admin/campanhas/'+campanhaExcluirId, {method:'DELETE', headers:{'x-admin-token':TOKEN}});
-    var d = await r.json();
-    if(d.ok){ toast('🗑 Campanha excluída!'); await carregarCampanhas(); }
-    else toast(d.error||'Erro ao excluir', true);
-  } catch(e){ toast('Erro de conexão', true); }
-}
-
-// ════════════════════════════════════════════
-// PAGAMENTOS
-// ════════════════════════════════════════════
 async function carregarPagamentos(){
   var tbody = document.getElementById('pagamentos-tbody');
-  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--fg2);padding:30px">Carregando…</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--fg2);padding:30px">Carregando…</td></tr>';
   try {
-    var filtro = document.getElementById('filtro-campanha').value;
-    var url = BASE + '/admin/pagamentos' + (filtro ? '?campanhaId='+filtro : '');
-    var r = await fetch(url, {headers:{'x-admin-token':TOKEN}});
+    var r = await fetch(BASE + '/admin/pagamentos', {headers:{'x-admin-token':TOKEN}});
+    if(r.status===401){ doLogout(); return; }
     var d = await r.json();
     var pagamentos = d.pagamentos || [];
-
-    // Popular filtro
-    var sel = document.getElementById('filtro-campanha');
-    var atual = sel.value;
-    sel.innerHTML = '<option value="">Todas as campanhas</option>';
-    campanhas.forEach(function(c){
-      var opt = document.createElement('option');
-      opt.value = c._id;
-      opt.textContent = c.nome;
-      if(opt.value===atual) opt.selected = true;
-      sel.appendChild(opt);
-    });
-
     if(!pagamentos.length){
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--fg2);padding:30px">Nenhum pagamento encontrado</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--fg2);padding:30px">Nenhum pagamento encontrado</td></tr>';
       document.getElementById('pagamentos-info').textContent = '';
       return;
     }
-
     tbody.innerHTML = '';
     pagamentos.forEach(function(p){
       var statusClass = p.status==='paid'||p.status==='approved'||p.status==='completed' ? 'pill-paid'
         : p.status==='failed'||p.status==='cancelled' ? 'pill-fail' : 'pill-pend';
       var statusLabel = {paid:'Pago',completed:'Pago',approved:'Pago',pending:'Pendente',failed:'Falhou',cancelled:'Cancelado'}[p.status] || p.status;
       var data = p.createdAt ? new Date(p.createdAt).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
-      var campanhaNome = (campanhas.find(function(c){ return c._id===p.campanhaId; })||{}).nome || '—';
       var tr = document.createElement('tr');
-      tr.innerHTML = '<td>'+data+'</td><td>'+esc(campanhaNome)+'</td>'
+      tr.innerHTML = '<td>'+data+'</td>'
         +'<td><strong>'+fmtBRL((p.amountCents||0)/100)+'</strong></td>'
         +'<td><span class="pill '+statusClass+'">'+statusLabel+'</span></td>'
         +'<td style="font-size:11px;color:var(--fg2)">'+esc((p.chargeId||p._id||'').slice(0,16))+'…</td>';
@@ -1211,12 +293,12 @@ async function carregarPagamentos(){
     });
     document.getElementById('pagamentos-info').textContent = pagamentos.length + ' registro(s) · use Exportar CSV para ver todos';
   } catch(e){
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--fg2);padding:30px">Erro ao carregar pagamentos</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--fg2);padding:30px">Erro ao carregar pagamentos</td></tr>';
   }
 }
 
 function exportarCSV(){
-  var rows = [['Data','Campanha','Valor','Status','ID']];
+  var rows = [['Data','Valor','Status','ID']];
   document.querySelectorAll('#pagamentos-tbody tr').forEach(function(tr){
     var tds = tr.querySelectorAll('td');
     if(tds.length>1) rows.push(Array.from(tds).map(function(td){ return '"'+td.textContent.replace(/"/g,'""')+'"'; }));
@@ -1229,9 +311,6 @@ function exportarCSV(){
   a.click();
 }
 
-// ════════════════════════════════════════════
-// CONFIG GLOBAL (credenciais / marketing)
-// ════════════════════════════════════════════
 async function carregarConfig(){
   try {
     var r = await fetch(BASE+'/admin/config', {headers:{'x-admin-token':TOKEN}});
@@ -1245,7 +324,6 @@ async function carregarConfig(){
       document.getElementById('cfg-pixelFb').value = cfg.marketing.pixelFacebook || '';
       document.getElementById('cfg-ga').value = cfg.marketing.googleAnalytics || '';
     }
-    // DB status
     var dot = document.getElementById('dbDot');
     var lbl = document.getElementById('dbLabel');
     if(cfg._db){ dot.className='db-dot'; lbl.textContent='MongoDB ativo'; }
@@ -1254,10 +332,7 @@ async function carregarConfig(){
 }
 
 async function salvarCredenciais(){
-  var body = {pagamento:{
-    pk: document.getElementById('cfg-pk').value.trim(),
-    sk: document.getElementById('cfg-sk').value.trim()
-  }};
+  var body = {pagamento:{pk:document.getElementById('cfg-pk').value.trim(),sk:document.getElementById('cfg-sk').value.trim()}};
   try {
     var r = await fetch(BASE+'/admin/config',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});
     var d = await r.json();
@@ -1267,10 +342,7 @@ async function salvarCredenciais(){
 }
 
 async function salvarMarketing(){
-  var body = {marketing:{
-    pixelFacebook: document.getElementById('cfg-pixelFb').value.trim(),
-    googleAnalytics: document.getElementById('cfg-ga').value.trim()
-  }};
+  var body = {marketing:{pixelFacebook:document.getElementById('cfg-pixelFb').value.trim(),googleAnalytics:document.getElementById('cfg-ga').value.trim()}};
   try {
     var r = await fetch(BASE+'/admin/config',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});
     var d = await r.json();
@@ -1284,17 +356,11 @@ function toggleSK(){
   i.type = i.type==='password' ? 'text' : 'password';
 }
 
-// ════════════════════════════════════════════
-// UTILS
-// ════════════════════════════════════════════
 function fmtBRL(val){
   return 'R$ '+parseFloat(val||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 function esc(s){ var d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
 
-// ════════════════════════════════════════════
-// BOOT
-// ════════════════════════════════════════════
 window.onload = function(){
   TOKEN = localStorage.getItem('adminToken') || '';
   if(TOKEN){
