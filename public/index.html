@@ -137,7 +137,7 @@
   .btn-back-main{padding:14px 32px;background:#24ca68;color:#fff;font-size:16px;font-weight:700;border:none;border-radius:10px;cursor:pointer;}
 </style>
 </head>
-<body>
+<body style="opacity:0;transition:opacity 0.15s ease;">
 
 <nav class="nav">
   <div class="nav-inner">
@@ -1020,6 +1020,8 @@ window._campanhaId = null; // ID da campanha ativa (usado no /criar-cobranca)
 // ── Detecta slug na URL /c/:slug ──────────────────────────────────
 (function carregarCampanha(){
   var BACKEND = 'https://vak-led3.onrender.com';
+  // Fallback: se backend demorar > 2s, mostra a página com dados estáticos
+  var _revealTimer = setTimeout(function(){ document.body.style.opacity = '1'; }, 2000);
   // Detecta se estamos em /c/:slug ou na raiz
   var pathParts = window.location.pathname.split('/').filter(Boolean);
   var slug = (pathParts[0] === 'c' && pathParts[1]) ? pathParts[1] : null;
@@ -1222,8 +1224,15 @@ window._campanhaId = null; // ID da campanha ativa (usado no /criar-cobranca)
       if(agrP && agrP.length >= 2 && c.textoAgradecimentoP2) agrP[1].textContent = c.textoAgradecimentoP2;
       if(agrP && agrP.length >= 3 && c.textoAgradecimentoP3) agrP[2].innerHTML = c.textoAgradecimentoP3;
 
+      // Revela a página após todos os dados estarem prontos (sem flash de conteúdo antigo)
+      clearTimeout(_revealTimer);
+      document.body.style.opacity = '1';
     })
-    .catch(function(){ /* mantém dados estáticos */ });
+    .catch(function(){
+      // Erro na requisição: mostra a página com dados estáticos mesmo assim
+      clearTimeout(_revealTimer);
+      document.body.style.opacity = '1';
+    });
 })();
 
 function escHtml(s){ var d=document.createElement('div');d.textContent=s||'';return d.innerHTML; }
