@@ -131,7 +131,10 @@ const campanhaSchema = new mongoose.Schema({
   textoAgradecimentoP3: { type: String, default: '' },  // 3º parágrafo
   textoUpsellTitulo:    { type: String, default: '' },  // "Deseja adicionar R$..."
   textoUpsellSub:       { type: String, default: '' },  // subtexto do upsell
-  arrecadado:   { type: Number, default: 0 },
+  arrecadado:        { type: Number, default: 0 },
+  arrecadadoBase:    { type: Number, default: 0 },   // valor base de exibição (histórico externo)
+  apoiadoresBase:    { type: Number, default: 0 },   // apoiadores base de exibição
+  coracoesBase:      { type: Number, default: 0 },   // corações base de exibição
   ordemExibicao: { type: Number, default: 0 },
   vakinhaPremiada: { type: String, default: '' },
   selos:        { type: [String], default: [] },

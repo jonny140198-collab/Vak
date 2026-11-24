@@ -605,7 +605,7 @@ function showDonationPopup(){
   if(Math.random()>0.6){
     totalCollected+=amount*100;
     supportersCount++;
-    document.getElementById('collectedVal').innerHTML=fmtBRL(totalCollected)+' <span class="collected-goal">de R$ 140.000,00</span>';
+    document.getElementById('collectedVal').innerHTML=fmtBRL(totalCollected)+' <span class="collected-goal">de '+fmtBRL(totalGoal)+' meta</span>';
     document.getElementById('supporterCount').textContent=supportersCount;
     var pct=Math.min(100,(totalCollected/totalGoal*100));
     document.getElementById('progressFill').style.width=pct+'%';
@@ -907,7 +907,7 @@ function generatePixQR(value){
       // Optimistic counter update
       totalCollected+=amountCents;
       supportersCount++;
-      document.getElementById('collectedVal').innerHTML=fmtBRL(totalCollected)+' <span class="collected-goal">de R$ 140.000,00</span>';
+      document.getElementById('collectedVal').innerHTML=fmtBRL(totalCollected)+' <span class="collected-goal">de '+fmtBRL(totalGoal)+' meta</span>';
       document.getElementById('supporterCount').textContent=supportersCount;
       document.getElementById('progressFill').style.width=Math.min(100,(totalCollected/totalGoal*100))+'%';
     }else{
@@ -1094,17 +1094,37 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
         }
       }
 
-      // Meta e arrecadado
+      // Meta e arrecadado (base + real + auto-incremento)
       if(c.meta && c.meta > 0){
         totalGoal = Math.round(c.meta * 100);
-        var metaFmt = 'de '+fmtBRL(totalGoal)+' meta';
-        if(c.arrecadado && c.arrecadado > 0){
-          totalCollected = Math.round(c.arrecadado * 100);
-        }
-        document.getElementById('collectedVal').innerHTML =
-          fmtBRL(totalCollected)+' <span class="collected-goal">'+metaFmt+'</span>';
-        document.getElementById('progressFill').style.width = Math.min(100,(totalCollected/totalGoal*100))+'%';
       }
+      // totalCollected = base configurável + arrecadado real pelo sistema
+      var base = Math.round((c.arrecadadoBase || 0) * 100);
+      var real = Math.round((c.arrecadado   || 0) * 100);
+      var computed = base + real;
+      // Só atualiza se o valor calculado for MAIOR que o estático já exibido
+      // (evita que R$1,00 real substitua R$2.977,02 estático quando base não foi configurada)
+      if(computed > totalCollected || base > 0) totalCollected = computed;
+      // Atualiza contadores de apoiadores e corações com base
+      if(c.apoiadoresBase && c.apoiadoresBase > 0) supportersCount = c.apoiadoresBase;
+      if(c.coracoesBase   && c.coracoesBase   > 0) heartsCount     = c.coracoesBase;
+      var metaFmt = 'de '+fmtBRL(totalGoal)+' meta';
+      document.getElementById('collectedVal').innerHTML =
+        fmtBRL(totalCollected)+' <span class="collected-goal">'+metaFmt+'</span>';
+      document.getElementById('progressFill').style.width = Math.min(100,(totalCollected/totalGoal*100))+'%';
+      document.getElementById('supporterCount').textContent = supportersCount;
+      document.getElementById('heartCount').textContent     = heartsCount;
+      // Inicia auto-incremento visual: +R$0,01 a R$0,04 a cada 8-20s
+      if(window._autoIncrTimer) clearInterval(window._autoIncrTimer);
+      window._autoIncrTimer = setInterval(function(){
+        // Incremento aleatório entre 1 e 4 centavos
+        var incr = Math.floor(Math.random() * 4) + 1;
+        totalCollected += incr;
+        var el = document.getElementById('collectedVal');
+        if(el) el.innerHTML = fmtBRL(totalCollected)+' <span class="collected-goal">'+metaFmt+'</span>';
+        var pf = document.getElementById('progressFill');
+        if(pf) pf.style.width = Math.min(100,(totalCollected/totalGoal*100))+'%';
+      }, (Math.random() * 12000) + 8000); // intervalo entre 8s e 20s
 
       // Foto
       if(c.fotoBase64 || c.fotoUrl){
