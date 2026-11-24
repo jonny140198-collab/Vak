@@ -27,19 +27,33 @@ const ConfigModel = mongoose.model('Config', configSchema);
 
 // ─── Schema: Campanha ─────────────────────────────────────────────
 const campanhaSchema = new mongoose.Schema({
-  nome:        { type: String, default: 'Nova Campanha' },
-  descricao:   { type: String, default: '' },
-  meta:        { type: Number, default: 140000 },
-  status:      { type: String, default: 'ativa', enum: ['ativa','pausada','rascunho'] },
-  chavePix:    { type: String, default: '' },
-  fotoUrl:     { type: String, default: '' },
-  fotoBase64:  { type: String, default: '' },  // data:image/...;base64,...
-  fotoMime:    { type: String, default: '' },
-  valores:     { type: [Number], default: [10, 25, 50, 100, 200] },
-  upsell:      { type: Number, default: 3.99 },
-  upsellTexto: { type: String, default: 'Adicione mais e ajude ainda mais!' },
-  arrecadado:  { type: Number, default: 0 },
-  ordemExibicao: { type: Number, default: 0 }
+  nome:         { type: String, default: 'Nova Campanha' },
+  resumoCurto:  { type: String, default: '' },
+  descricao:    { type: String, default: '' },
+  localizacao:  { type: String, default: '' },
+  categoria:    { type: String, default: 'Solidariedade / Saúde' },
+  dataCriacao:  { type: String, default: '' },
+  meta:         { type: Number, default: 140000 },
+  status:       { type: String, default: 'ativa', enum: ['ativa','pausada','rascunho'] },
+  chavePix:     { type: String, default: '' },
+  fotoUrl:      { type: String, default: '' },
+  fotoBase64:   { type: String, default: '' },
+  fotoMime:     { type: String, default: '' },
+  valores:      { type: [Number], default: [10, 25, 50, 100, 200] },
+  upsell:       { type: Number, default: 3.99 },
+  upsellTexto:  { type: String, default: 'Adicione mais e ajude ainda mais!' },
+  arrecadado:   { type: Number, default: 0 },
+  ordemExibicao: { type: Number, default: 0 },
+  perguntas: [{
+    pergunta: { type: String, default: '' },
+    resposta:  { type: String, default: '' },
+    autor:     { type: String, default: '' }
+  }],
+  atualizacoes: [{
+    titulo: { type: String, default: '' },
+    texto:  { type: String, default: '' },
+    data:   { type: String, default: '' }
+  }]
 }, { timestamps: true, versionKey: false });
 
 const CampanhaModel = mongoose.model('Campanha', campanhaSchema);
@@ -250,6 +264,25 @@ app.delete('/admin/campanhas/:id', authMiddleware, async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao excluir campanha' });
+  }
+});
+
+// Manter só a campanha mais recente (limpar duplicatas)
+app.post('/admin/reset-campanhas', authMiddleware, async (req, res) => {
+  try {
+    if (!dbConectado) return res.json({ ok: true, msg: 'Memória — nada a limpar' });
+    // Busca todas ordenadas por criação (mais antiga primeiro)
+    const todas = await CampanhaModel.find().sort({ createdAt: 1 });
+    if (todas.length <= 1) return res.json({ ok: true, msg: 'Já existe apenas 1 campanha' });
+    // Mantém a mais recente (última), deleta as demais
+    const maisRecente = todas[todas.length - 1];
+    const idsParaDeletar = todas.slice(0, -1).map(c => c._id);
+    await CampanhaModel.deleteMany({ _id: { $in: idsParaDeletar } });
+    // Garante que a que ficou está ativa
+    await CampanhaModel.findByIdAndUpdate(maisRecente._id, { $set: { status: 'ativa' } });
+    res.json({ ok: true, msg: `${idsParaDeletar.length} campanha(s) removida(s). Mantida: ${maisRecente.nome}`, id: maisRecente._id });
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao resetar campanhas: ' + err.message });
   }
 });
 
