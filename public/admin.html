@@ -283,10 +283,13 @@ tr:hover td{background:var(--surface2)}
       </div>
 
       <div class="editor-wrap">
-        <div class="editor-tabs">
+        <div class="editor-tabs" style="flex-wrap:wrap">
           <div class="etab active" onclick="switchTab(this,'tab-info')">📝 Informações</div>
+          <div class="etab" onclick="switchTab(this,'tab-sobre')">📖 Sobre</div>
           <div class="etab" onclick="switchTab(this,'tab-midia')">📸 Mídia</div>
           <div class="etab" onclick="switchTab(this,'tab-valores')">💲 Valores</div>
+          <div class="etab" onclick="switchTab(this,'tab-qa')">❓ Q&amp;A</div>
+          <div class="etab" onclick="switchTab(this,'tab-atualizacoes')">📢 Atualizações</div>
           <div class="etab" onclick="switchTab(this,'tab-pix');atualizarLinkCampanha()">🏦 Pagamento</div>
         </div>
 
@@ -298,23 +301,57 @@ tr:hover td{background:var(--surface2)}
             <input type="text" id="ed-nome" placeholder="Ex: Ajude a Pequena Ester">
           </div></div>
           <div class="form-row single"><div class="form-group">
-            <label>Descrição completa</label>
-            <textarea id="ed-descricao" rows="5" placeholder="Conta a história da campanha…"></textarea>
+            <label>Resumo curto (aparece na página inicial)</label>
+            <textarea id="ed-resumoCurto" rows="3" placeholder="Breve resumo da campanha exibido antes do 'ver tudo'…"></textarea>
           </div></div>
           <div class="form-row">
+            <div class="form-group">
+              <label>Localização</label>
+              <input type="text" id="ed-localizacao" placeholder="Ex: São Paulo / SP">
+            </div>
+            <div class="form-group">
+              <label>Categoria</label>
+              <input type="text" id="ed-categoria" placeholder="Ex: Solidariedade / Saúde">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Data de criação</label>
+              <input type="text" id="ed-dataCriacao" placeholder="Ex: 20/08/2026">
+            </div>
             <div class="form-group">
               <label>Meta de arrecadação (R$)</label>
               <input type="number" id="ed-meta" placeholder="140000" min="1">
             </div>
-            <div class="form-group">
-              <label>Status</label>
-              <select id="ed-status">
-                <option value="ativa">Ativa</option>
-                <option value="pausada">Pausada</option>
-                <option value="rascunho">Rascunho</option>
-              </select>
-            </div>
           </div>
+          <div class="form-row single"><div class="form-group">
+            <label>Status</label>
+            <select id="ed-status">
+              <option value="ativa">Ativa</option>
+              <option value="pausada">Pausada</option>
+              <option value="rascunho">Rascunho</option>
+            </select>
+          </div></div>
+        </div>
+
+        <!-- TAB SOBRE -->
+        <div class="editor-body" id="tab-sobre" style="display:none">
+          <div class="form-row single"><div class="form-group">
+            <label>Descrição completa (aba "Sobre" do site)</label>
+            <textarea id="ed-descricao" rows="16" placeholder="Conta a história da campanha…&#10;&#10;Use linhas em branco para separar parágrafos."></textarea>
+          </div></div>
+        </div>
+
+        <!-- TAB Q&A -->
+        <div class="editor-body" id="tab-qa" style="display:none">
+          <div id="qa-editor-list"></div>
+          <button class="btn btn-ghost" style="margin-top:12px" onclick="adicionarPergunta()">+ Adicionar pergunta</button>
+        </div>
+
+        <!-- TAB ATUALIZAÇÕES -->
+        <div class="editor-body" id="tab-atualizacoes" style="display:none">
+          <div id="atualizacoes-editor-list"></div>
+          <button class="btn btn-ghost" style="margin-top:12px" onclick="adicionarAtualizacao()">+ Adicionar atualização</button>
         </div>
 
         <!-- TAB MÍDIA -->
@@ -683,7 +720,11 @@ function showNewCampaign(){
   midiaAtual = null;
   document.getElementById('ed-id').value = '';
   document.getElementById('ed-nome').value = '';
+  document.getElementById('ed-resumoCurto').value = '';
   document.getElementById('ed-descricao').value = '';
+  document.getElementById('ed-localizacao').value = '';
+  document.getElementById('ed-categoria').value = '';
+  document.getElementById('ed-dataCriacao').value = '';
   document.getElementById('ed-meta').value = '140000';
   document.getElementById('ed-status').value = 'ativa';
   document.getElementById('ed-chavePix').value = '';
@@ -693,6 +734,8 @@ function showNewCampaign(){
   document.getElementById('ed-upsell').value = '3.99';
   document.getElementById('ed-upsellTexto').value = 'Adicione mais e ajude ainda mais!';
   renderChips([10,25,50,100,200]);
+  renderQAEditor([]);
+  renderAtualizacoesEditor([]);
   removerMidia();
   switchTab(document.querySelector('.etab'), 'tab-info');
   document.getElementById('editorTitle').textContent = 'Nova campanha';
@@ -708,13 +751,19 @@ function editarCampanha(id){
   midiaAtual = null;
   document.getElementById('ed-id').value = c._id;
   document.getElementById('ed-nome').value = c.nome || '';
+  document.getElementById('ed-resumoCurto').value = c.resumoCurto || '';
   document.getElementById('ed-descricao').value = c.descricao || '';
+  document.getElementById('ed-localizacao').value = c.localizacao || '';
+  document.getElementById('ed-categoria').value = c.categoria || '';
+  document.getElementById('ed-dataCriacao').value = c.dataCriacao || '';
   document.getElementById('ed-meta').value = c.meta || 140000;
   document.getElementById('ed-status').value = c.status || 'ativa';
   document.getElementById('ed-chavePix').value = c.chavePix || '';
   document.getElementById('ed-upsell').value = c.upsell || 3.99;
   document.getElementById('ed-upsellTexto').value = c.upsellTexto || 'Adicione mais e ajude ainda mais!';
   renderChips(c.valores || [10,25,50,100,200]);
+  renderQAEditor(c.perguntas || []);
+  renderAtualizacoesEditor(c.atualizacoes || []);
 
   // Mídia
   removerMidia();
@@ -742,13 +791,19 @@ async function salvarCampanha(){
 
   var payload = {
     nome: document.getElementById('ed-nome').value.trim(),
+    resumoCurto: document.getElementById('ed-resumoCurto').value.trim(),
     descricao: document.getElementById('ed-descricao').value.trim(),
+    localizacao: document.getElementById('ed-localizacao').value.trim(),
+    categoria: document.getElementById('ed-categoria').value.trim(),
+    dataCriacao: document.getElementById('ed-dataCriacao').value.trim(),
     meta: parseFloat(document.getElementById('ed-meta').value) || 140000,
     status: document.getElementById('ed-status').value,
     chavePix: document.getElementById('ed-chavePix').value.trim(),
     upsell: parseFloat(document.getElementById('ed-upsell').value) || 3.99,
     upsellTexto: document.getElementById('ed-upsellTexto').value.trim(),
-    valores: chips
+    valores: chips,
+    perguntas: coletarPerguntas(),
+    atualizacoes: coletarAtualizacoes()
   };
 
   if(!payload.nome){ toast('⚠️ Informe o nome da campanha', true); return; }
@@ -783,6 +838,110 @@ async function salvarCampanha(){
       toast(d.error || 'Erro ao salvar', true);
     }
   } catch(e){ toast('Erro de conexão', true); }
+}
+
+// ════════════════════════════════════════════
+// Q&A EDITOR
+// ════════════════════════════════════════════
+function escA(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function renderQAEditor(lista){
+  var wrap = document.getElementById('qa-editor-list');
+  if(!wrap) return;
+  if(!lista || lista.length === 0){
+    wrap.innerHTML = '<p style="color:var(--fg2);font-size:13px;padding:8px 0">Nenhuma pergunta ainda. Clique em "+ Adicionar pergunta" para incluir.</p>';
+    return;
+  }
+  wrap.innerHTML = lista.map(function(q,i){
+    return '<div class="qa-editor-item" style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:12px">'
+      +'<div class="form-group" style="margin-bottom:8px"><label>Pergunta</label>'
+      +'<input type="text" data-qa="pergunta" data-idx="'+i+'" value="'+escA(q.pergunta)+'" placeholder="Digite a pergunta…"></div>'
+      +'<div class="form-group" style="margin-bottom:8px"><label>Resposta</label>'
+      +'<textarea data-qa="resposta" data-idx="'+i+'" rows="3" placeholder="Digite a resposta…">'+escA(q.resposta)+'</textarea></div>'
+      +'<div class="form-group" style="margin-bottom:8px"><label>Autor (opcional)</label>'
+      +'<input type="text" data-qa="autor" data-idx="'+i+'" value="'+escA(q.autor||'')+'" placeholder="Ex: João Silva"></div>'
+      +'<button class="btn btn-danger btn-sm" onclick="removerQA('+i+')">🗑 Remover</button>'
+      +'</div>';
+  }).join('');
+}
+
+function coletarPerguntas(){
+  var wrap = document.getElementById('qa-editor-list');
+  if(!wrap) return [];
+  var items = wrap.querySelectorAll('.qa-editor-item');
+  var result = [];
+  items.forEach(function(item){
+    var p = item.querySelector('[data-qa="pergunta"]');
+    var r = item.querySelector('[data-qa="resposta"]');
+    var a = item.querySelector('[data-qa="autor"]');
+    if(p && p.value.trim()) result.push({ pergunta: p.value.trim(), resposta: (r?r.value.trim():''), autor: (a?a.value.trim():'') });
+  });
+  return result;
+}
+
+function adicionarPergunta(){
+  var atual = coletarPerguntas();
+  atual.push({ pergunta:'', resposta:'', autor:'' });
+  renderQAEditor(atual);
+  var items = document.querySelectorAll('#qa-editor-list .qa-editor-item');
+  if(items.length) items[items.length-1].querySelector('input').focus();
+}
+
+function removerQA(i){
+  var atual = coletarPerguntas();
+  atual.splice(i,1);
+  renderQAEditor(atual);
+}
+
+// ════════════════════════════════════════════
+// ATUALIZAÇÕES EDITOR
+// ════════════════════════════════════════════
+function renderAtualizacoesEditor(lista){
+  var wrap = document.getElementById('atualizacoes-editor-list');
+  if(!wrap) return;
+  if(!lista || lista.length === 0){
+    wrap.innerHTML = '<p style="color:var(--fg2);font-size:13px;padding:8px 0">Nenhuma atualização ainda. Clique em "+ Adicionar atualização" para incluir.</p>';
+    return;
+  }
+  wrap.innerHTML = lista.map(function(u,i){
+    return '<div class="upd-editor-item" style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:12px">'
+      +'<div class="form-row"><div class="form-group" style="margin-bottom:8px"><label>Título</label>'
+      +'<input type="text" data-upd="titulo" data-idx="'+i+'" value="'+escA(u.titulo)+'" placeholder="Ex: Atualização do tratamento"></div>'
+      +'<div class="form-group" style="margin-bottom:8px"><label>Data</label>'
+      +'<input type="text" data-upd="data" data-idx="'+i+'" value="'+escA(u.data||'')+'" placeholder="Ex: 24/11/2026"></div></div>'
+      +'<div class="form-group" style="margin-bottom:8px"><label>Texto</label>'
+      +'<textarea data-upd="texto" data-idx="'+i+'" rows="4" placeholder="Descreva a atualização…">'+escA(u.texto)+'</textarea></div>'
+      +'<button class="btn btn-danger btn-sm" onclick="removerAtualizacao('+i+')">🗑 Remover</button>'
+      +'</div>';
+  }).join('');
+}
+
+function coletarAtualizacoes(){
+  var wrap = document.getElementById('atualizacoes-editor-list');
+  if(!wrap) return [];
+  var items = wrap.querySelectorAll('.upd-editor-item');
+  var result = [];
+  items.forEach(function(item){
+    var t = item.querySelector('[data-upd="titulo"]');
+    var x = item.querySelector('[data-upd="texto"]');
+    var d = item.querySelector('[data-upd="data"]');
+    if(t && t.value.trim()) result.push({ titulo: t.value.trim(), texto: (x?x.value.trim():''), data: (d?d.value.trim():'') });
+  });
+  return result;
+}
+
+function adicionarAtualizacao(){
+  var atual = coletarAtualizacoes();
+  atual.push({ titulo:'', texto:'', data:'' });
+  renderAtualizacoesEditor(atual);
+  var items = document.querySelectorAll('#atualizacoes-editor-list .upd-editor-item');
+  if(items.length) items[items.length-1].querySelector('input').focus();
+}
+
+function removerAtualizacao(i){
+  var atual = coletarAtualizacoes();
+  atual.splice(i,1);
+  renderAtualizacoesEditor(atual);
 }
 
 function previewCampaign(){

@@ -27,19 +27,33 @@ const ConfigModel = mongoose.model('Config', configSchema);
 
 // ─── Schema: Campanha ─────────────────────────────────────────────
 const campanhaSchema = new mongoose.Schema({
-  nome:        { type: String, default: 'Nova Campanha' },
-  descricao:   { type: String, default: '' },
-  meta:        { type: Number, default: 140000 },
-  status:      { type: String, default: 'ativa', enum: ['ativa','pausada','rascunho'] },
-  chavePix:    { type: String, default: '' },
-  fotoUrl:     { type: String, default: '' },
-  fotoBase64:  { type: String, default: '' },  // data:image/...;base64,...
-  fotoMime:    { type: String, default: '' },
-  valores:     { type: [Number], default: [10, 25, 50, 100, 200] },
-  upsell:      { type: Number, default: 3.99 },
-  upsellTexto: { type: String, default: 'Adicione mais e ajude ainda mais!' },
-  arrecadado:  { type: Number, default: 0 },
-  ordemExibicao: { type: Number, default: 0 }
+  nome:         { type: String, default: 'Nova Campanha' },
+  resumoCurto:  { type: String, default: '' },
+  descricao:    { type: String, default: '' },
+  localizacao:  { type: String, default: '' },
+  categoria:    { type: String, default: '' },
+  dataCriacao:  { type: String, default: '' },
+  meta:         { type: Number, default: 140000 },
+  status:       { type: String, default: 'ativa', enum: ['ativa','pausada','rascunho'] },
+  chavePix:     { type: String, default: '' },
+  fotoUrl:      { type: String, default: '' },
+  fotoBase64:   { type: String, default: '' },
+  fotoMime:     { type: String, default: '' },
+  valores:      { type: [Number], default: [10, 25, 50, 100, 200] },
+  upsell:       { type: Number, default: 3.99 },
+  upsellTexto:  { type: String, default: 'Adicione mais e ajude ainda mais!' },
+  arrecadado:   { type: Number, default: 0 },
+  ordemExibicao: { type: Number, default: 0 },
+  perguntas: [{
+    pergunta: { type: String, default: '' },
+    resposta:  { type: String, default: '' },
+    autor:     { type: String, default: '' }
+  }],
+  atualizacoes: [{
+    titulo: { type: String, default: '' },
+    texto:  { type: String, default: '' },
+    data:   { type: String, default: '' }
+  }]
 }, { timestamps: true, versionKey: false });
 
 const CampanhaModel = mongoose.model('Campanha', campanhaSchema);
@@ -205,14 +219,20 @@ app.get('/admin/campanhas', authMiddleware, async (req, res) => {
 // Criar
 app.post('/admin/campanhas', authMiddleware, async (req, res) => {
   try {
-    const { nome, descricao, meta, status, chavePix, fotoUrl, fotoBase64, fotoMime, valores, upsell, upsellTexto } = req.body;
+    const { nome, resumoCurto, descricao, localizacao, categoria, dataCriacao,
+            meta, status, chavePix, fotoUrl, fotoBase64, fotoMime,
+            valores, upsell, upsellTexto, perguntas, atualizacoes } = req.body;
     if (!nome) return res.status(400).json({ error: 'Nome obrigatório' });
     if (!dbConectado) {
-      const nova = { _id: 'mem-'+Date.now(), nome, descricao, meta, status, chavePix, fotoUrl, fotoBase64, fotoMime, valores, upsell, upsellTexto, arrecadado: 0 };
+      const nova = { _id: 'mem-'+Date.now(), nome, resumoCurto, descricao, localizacao, categoria, dataCriacao,
+                     meta, status, chavePix, fotoUrl, fotoBase64, fotoMime,
+                     valores, upsell, upsellTexto, perguntas, atualizacoes, arrecadado: 0 };
       CAMPANHAS_MEM.push(nova);
       return res.json({ ok: true, _id: nova._id });
     }
-    const c = await CampanhaModel.create({ nome, descricao, meta, status, chavePix, fotoUrl, fotoBase64, fotoMime, valores, upsell, upsellTexto });
+    const c = await CampanhaModel.create({ nome, resumoCurto, descricao, localizacao, categoria, dataCriacao,
+                                           meta, status, chavePix, fotoUrl, fotoBase64, fotoMime,
+                                           valores, upsell, upsellTexto, perguntas, atualizacoes });
     res.json({ ok: true, _id: c._id });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao criar campanha' });
