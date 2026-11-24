@@ -288,7 +288,7 @@ tr:hover td{background:var(--surface2)}
           <div class="etab active" onclick="switchTab(this,'tab-info')">📝 Informações</div>
           <div class="etab" onclick="switchTab(this,'tab-midia')">📸 Mídia</div>
           <div class="etab" onclick="switchTab(this,'tab-valores')">💲 Valores</div>
-          <div class="etab" onclick="switchTab(this,'tab-pix')">🏦 Pagamento</div>
+          <div class="etab" onclick="switchTab(this,'tab-pix');atualizarLinkCampanha()">🏦 Pagamento</div>
         </div>
 
         <!-- TAB INFO -->
@@ -395,6 +395,35 @@ tr:hover td{background:var(--surface2)}
             <input type="text" id="ed-chavePix" placeholder="email@exemplo.com ou CPF">
             <span class="hint">Usada como fallback quando a integração XFlow não estiver disponível</span>
           </div></div>
+
+          <!-- Link de compartilhamento -->
+          <div id="linkCampanhaWrap" style="display:none;margin-top:24px">
+            <div class="form-group" style="margin-bottom:10px"><label>🔗 Link desta campanha</label></div>
+            <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:16px 18px">
+              <div style="font-size:12px;color:var(--fg2);margin-bottom:10px">Compartilhe este link para direcionar doadores diretamente para esta campanha:</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <input type="text" id="linkCampanhaInput" readonly
+                  style="flex:1;min-width:200px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:9px 14px;font-size:13px;color:var(--fg);font-family:monospace">
+                <button class="btn btn-primary btn-sm" onclick="copiarLinkCampanha()">📋 Copiar</button>
+                <a id="linkCampanhaAbrir" href="#" target="_blank" class="btn btn-ghost btn-sm">👁 Abrir</a>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+                <a id="linkWhatsApp" href="#" target="_blank"
+                  style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#25D366;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">
+                  WhatsApp
+                </a>
+                <a id="linkFacebook" href="#" target="_blank"
+                  style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#1877F2;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">
+                  Facebook
+                </a>
+              </div>
+            </div>
+          </div>
+          <div id="linkCampanhaNovo" style="display:none;margin-top:24px">
+            <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:16px 18px;font-size:13px;color:var(--fg2)">
+              💡 Salve a campanha primeiro para gerar o link de compartilhamento.
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -708,6 +737,7 @@ function editarCampanha(id){
   document.getElementById('editorTitle').textContent = c.nome;
   switchTab(document.querySelector('.etab'), 'tab-info');
   showSection('editor');
+  atualizarLinkCampanha();
 }
 
 async function salvarCampanha(){
@@ -751,6 +781,8 @@ async function salvarCampanha(){
     var d = await r.json();
     if(d.ok || d._id){
       toast('✅ Campanha salva com sucesso!');
+      if(!id && d._id) document.getElementById('ed-id').value = d._id;
+      atualizarLinkCampanha();
       await carregarCampanhas();
       showSection('campanhas');
     } else {
@@ -760,7 +792,48 @@ async function salvarCampanha(){
 }
 
 function previewCampaign(){
-  window.open('/', '_blank');
+  var id = document.getElementById('ed-id').value;
+  if(id) window.open('/?c='+encodeURIComponent(id), '_blank');
+  else window.open('/', '_blank');
+}
+
+function atualizarLinkCampanha(){
+  var id = document.getElementById('ed-id').value;
+  var wrap = document.getElementById('linkCampanhaWrap');
+  var novo = document.getElementById('linkCampanhaNovo');
+  if(!id){
+    if(wrap) wrap.style.display = 'none';
+    if(novo) novo.style.display = 'block';
+    return;
+  }
+  if(novo) novo.style.display = 'none';
+  if(wrap) wrap.style.display = 'block';
+  var base = window.location.origin;
+  var link = base + '/?c=' + encodeURIComponent(id);
+  var inp = document.getElementById('linkCampanhaInput');
+  if(inp) inp.value = link;
+  var abrir = document.getElementById('linkCampanhaAbrir');
+  if(abrir) abrir.href = link;
+  var nome = document.getElementById('ed-nome').value || 'Ajude!';
+  var msg = encodeURIComponent('💚 ' + nome + '! Ajude agora: ' + link);
+  var wa = document.getElementById('linkWhatsApp');
+  if(wa) wa.href = 'https://wa.me/?text=' + msg;
+  var fb = document.getElementById('linkFacebook');
+  if(fb) fb.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(link);
+}
+
+function copiarLinkCampanha(){
+  var inp = document.getElementById('linkCampanhaInput');
+  if(!inp) return;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(inp.value).then(function(){
+      toast('📋 Link copiado!');
+    });
+  } else {
+    inp.select();
+    document.execCommand('copy');
+    toast('📋 Link copiado!');
+  }
 }
 
 // ════════════════════════════════════════════
