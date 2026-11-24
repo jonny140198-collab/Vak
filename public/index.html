@@ -618,8 +618,16 @@ function showDonationPopup(){
 setInterval(showDonationPopup,15000);
 
 // ---- PAGAMENTO ----
+// selectedValue mantido como var para compatibilidade com funções existentes
+// A validação real de valor mínimo é feita no servidor (amountCents >= 100)
 var selectedValue=25;
 var selectedMethod='pix';
+// Proteção: impede manipulação do campanhaId pelo console
+Object.defineProperty(window, '_campanhaId', {
+  get: function(){ return window.__campanhaIdInternal__; },
+  set: function(v){ if(v === null || (typeof v === 'string' && /^[a-f0-9]{24}$/i.test(v))) window.__campanhaIdInternal__ = v; },
+  configurable: false
+});
 
 function openPayment(){
   document.getElementById('payment-page').style.display='block';
@@ -1015,7 +1023,7 @@ function copyShareLink(){
   } else {document.execCommand('copy');}
 }
 
-window._campanhaId = null; // ID da campanha ativa (usado no /criar-cobranca)
+window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-cobranca)
 
 // ── Detecta slug na URL /c/:slug ──────────────────────────────────
 (function carregarCampanha(){

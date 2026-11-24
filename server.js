@@ -5,10 +5,87 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const app = express();
 
+// ─── Headers de segurança HTTP ────────────────────────────────────
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  // Impede que o site seja embutido em iframes de outros domínios
+  res.setHeader('Content-Security-Policy',
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline'; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "font-src 'self' https://fonts.gstatic.com data:; " +
+    "img-src 'self' data: blob: https:; " +
+    "connect-src 'self' https://vak-led3.onrender.com https://app.xflowpayments.com; " +
+    "frame-ancestors 'none';"
+  );
+  next();
+});
+
+// ─── CORS restrito ao próprio domínio ────────────────────────────
+const ALLOWED_ORIGINS = [
+  'https://vak-led3.onrender.com',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000'
+];
+app.use(cors({
+  origin: function(origin, callback) {
+    // Permite requisições sem origin (mobile apps, Postman, etc.) ou do próprio domínio
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+    callback(new Error('CORS bloqueado'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'x-admin-token']
+}));
+
 app.use(express.json({ limit: '25mb' }));
 app.use(express.urlencoded({ extended: true, limit: '25mb' }));
-app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ─── Rate limit para login (anti brute-force) ────────────────────
+const loginAttempts = new Map(); // ip -> { count, firstAt }
+const MAX_LOGIN_ATTEMPTS = 5;    // máximo de tentativas
+const LOGIN_WINDOW_MS = 15 * 60 * 1000; // janela de 15 min
+const LOCKOUT_MS = 30 * 60 * 1000;      // bloqueio por 30 min
+
+function checkLoginRateLimit(ip) {
+  const now = Date.now();
+  const entry = loginAttempts.get(ip);
+  if (!entry) return true;
+  // Reseta a janela se já passou o tempo
+  if (now - entry.firstAt > LOGIN_WINDOW_MS) {
+    loginAttempts.delete(ip);
+    return true;
+  }
+  if (entry.count >= MAX_LOGIN_ATTEMPTS) {
+    // Dentro do lockout?
+    if (now - entry.firstAt < LOCKOUT_MS) return false;
+    loginAttempts.delete(ip);
+    return true;
+  }
+  return true;
+}
+
+function recordLoginFailure(ip) {
+  const now = Date.now();
+  const entry = loginAttempts.get(ip);
+  if (!entry || now - entry.firstAt > LOGIN_WINDOW_MS) {
+    loginAttempts.set(ip, { count: 1, firstAt: now });
+  } else {
+    entry.count++;
+  }
+}
+
+// Limpeza periódica do mapa de tentativas (a cada 1h)
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of loginAttempts.entries()) {
+    if (now - entry.firstAt > LOCKOUT_MS) loginAttempts.delete(ip);
+  }
+}, 60 * 60 * 1000);
 
 // ─── Schema: Config global ────────────────────────────────────────
 const configSchema = new mongoose.Schema({
@@ -223,23 +300,47 @@ async function salvarConfigNoBanco() {
 const ADMIN_USER = process.env.ADMIN_USER || 'garciaST';
 const ADMIN_PASS_HASH = crypto.createHash('sha256').update(process.env.ADMIN_PASS || 'Lu!131020').digest('hex');
 const sessions = new Map();
+const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // sessão expira em 8h
 
 function makeToken() { return crypto.randomBytes(32).toString('hex'); }
 function authMiddleware(req, res, next) {
   const token = req.headers['x-admin-token'] || req.query.token;
-  if (token && sessions.has(token)) return next();
+  if (token && sessions.has(token)) {
+    const sess = sessions.get(token);
+    // Verifica expiração da sessão
+    if (Date.now() - sess.at < SESSION_TTL_MS) return next();
+    sessions.delete(token); // sessão expirada
+  }
   res.status(401).json({ error: 'Não autorizado' });
 }
 
+// Limpeza de sessões expiradas a cada hora
+setInterval(() => {
+  const now = Date.now();
+  for (const [tok, sess] of sessions.entries()) {
+    if (now - sess.at >= SESSION_TTL_MS) sessions.delete(tok);
+  }
+}, 60 * 60 * 1000);
+
 app.post('/admin/login', (req, res) => {
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
+  // Verifica rate limit antes de qualquer coisa
+  if (!checkLoginRateLimit(ip)) {
+    return res.status(429).json({ error: 'Muitas tentativas. Aguarde 30 minutos.' });
+  }
   const { usuario, senha } = req.body;
   const senhaHash = crypto.createHash('sha256').update(senha || '').digest('hex');
   if (usuario === ADMIN_USER && senhaHash === ADMIN_PASS_HASH) {
+    // Login bem-sucedido: limpa tentativas do IP
+    loginAttempts.delete(ip);
     const token = makeToken();
     sessions.set(token, { user: usuario, at: Date.now() });
     res.json({ ok: true, token });
   } else {
-    res.status(401).json({ error: 'Usuário ou senha incorretos' });
+    recordLoginFailure(ip);
+    const entry = loginAttempts.get(ip);
+    const restantes = Math.max(0, MAX_LOGIN_ATTEMPTS - (entry?.count || 0));
+    res.status(401).json({ error: 'Usuário ou senha incorretos', tentativasRestantes: restantes });
   }
 });
 
@@ -446,8 +547,9 @@ app.get('/admin/pagamentos', authMiddleware, async (req, res) => {
 app.post('/criar-cobranca', async (req, res) => {
   try {
     const { amountCents, donorName, campanhaId } = req.body;
-    if (!amountCents || amountCents < 100)
-      return res.status(400).json({ error: 'Valor mínimo: R$ 1,00' });
+    // Validação rigorosa: apenas inteiros, mínimo R$1, máximo R$10.000
+    if (!amountCents || !Number.isInteger(amountCents) || amountCents < 100 || amountCents > 1000000)
+      return res.status(400).json({ error: 'Valor inválido. Mínimo R$ 1,00 e máximo R$ 10.000,00' });
 
     const PK = CONFIG.pagamento.pk;
     const SK = CONFIG.pagamento.sk;

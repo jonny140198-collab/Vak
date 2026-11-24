@@ -650,6 +650,8 @@ async function doLogin(){
   var u = document.getElementById('loginUser').value.trim();
   var p = document.getElementById('loginPass').value;
   var err = document.getElementById('loginErr');
+  var btn = document.querySelector('#loginScreen button[onclick="doLogin()"]') ||
+            document.querySelector('#loginScreen button[type="submit"]');
   err.style.display = 'none';
   try {
     var r = await fetch(BASE+'/admin/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u,senha:p})});
@@ -660,7 +662,17 @@ async function doLogin(){
       localStorage.setItem('adminUser', u);
       iniciarApp(u);
     } else {
-      err.textContent = d.error || 'Usuário ou senha incorretos';
+      var msg = d.error || 'Usuário ou senha incorretos';
+      if(r.status === 429){
+        msg = '🔒 Acesso bloqueado. Muitas tentativas incorretas. Aguarde 30 minutos.';
+        if(btn){ btn.disabled = true; setTimeout(function(){ btn.disabled = false; }, 5*60*1000); }
+      } else if(typeof d.tentativasRestantes === 'number' && d.tentativasRestantes > 0){
+        msg += ' (' + d.tentativasRestantes + ' tentativa' + (d.tentativasRestantes > 1 ? 's' : '') + ' restante' + (d.tentativasRestantes > 1 ? 's' : '') + ')';
+      } else if(typeof d.tentativasRestantes === 'number' && d.tentativasRestantes === 0){
+        msg = '🔒 Acesso bloqueado por 30 minutos.';
+        if(btn){ btn.disabled = true; setTimeout(function(){ btn.disabled = false; }, 5*60*1000); }
+      }
+      err.textContent = msg;
       err.style.display = 'block';
     }
   } catch(e){
