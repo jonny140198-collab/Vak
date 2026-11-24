@@ -1017,6 +1017,149 @@ function copyShareLink(){
 
 window._campanhaId = null; // ID da campanha ativa (usado no /criar-cobranca)
 
+// ── Carregamento dinâmico da campanha ativa ──────────────────────
+(function carregarCampanha(){
+  var BACKEND = 'https://vak-led3.onrender.com';
+  fetch(BACKEND+'/campanha-ativa')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var c = data.campanha;
+      if(!c) return;
+      window._campanhaId = c._id || null;
+
+      // Título (cabeçalho)
+      if(c.nome){
+        document.querySelectorAll('.campaign-title').forEach(function(el){ el.textContent = c.nome; });
+        document.title = c.nome;
+      }
+
+      // Resumo curto
+      if(c.resumoCurto){
+        var sd = document.querySelector('.short-desc');
+        if(sd){
+          var span = sd.querySelector('span');
+          sd.textContent = c.resumoCurto+' ';
+          if(span){ sd.appendChild(span); }
+        }
+      }
+
+      // Localização
+      if(c.localizacao){
+        var locEl = document.querySelector('.location');
+        if(locEl){
+          var svg = locEl.querySelector('svg');
+          locEl.textContent = c.localizacao;
+          if(svg){ locEl.insertBefore(svg, locEl.firstChild); }
+        }
+      }
+
+      // Categoria
+      if(c.categoria){
+        var tagEl = document.querySelector('.tags-row span:first-child');
+        if(tagEl) tagEl.textContent = c.categoria;
+      }
+
+      // Data de criação
+      if(c.dataCriacao){
+        var dateEl = document.querySelector('.created-date');
+        if(dateEl) dateEl.innerHTML = '<strong>Vaquinha criada em:</strong> '+c.dataCriacao;
+      }
+
+      // Descrição completa (aba Sobre)
+      if(c.descricao){
+        var descEl = document.querySelector('.description');
+        if(descEl){
+          var paragrafos = c.descricao.split(/\n{2,}/).filter(function(p){ return p.trim(); });
+          if(paragrafos.length > 1){
+            descEl.innerHTML = paragrafos.map(function(p){
+              return '<p>'+p.trim().replace(/\n/g,'<br>')+'</p>';
+            }).join('');
+          } else if(c.descricao.length > 100){
+            descEl.innerHTML = '<p>'+c.descricao.replace(/\n/g,'<br>')+'</p>';
+          }
+        }
+      }
+
+      // Meta e arrecadado
+      if(c.meta && c.meta > 0){
+        totalGoal = Math.round(c.meta * 100);
+        var metaFmt = 'de '+fmtBRL(totalGoal)+' meta';
+        if(c.arrecadado && c.arrecadado > 0){
+          totalCollected = Math.round(c.arrecadado * 100);
+        }
+        document.getElementById('collectedVal').innerHTML =
+          fmtBRL(totalCollected)+' <span class="collected-goal">'+metaFmt+'</span>';
+        document.getElementById('progressFill').style.width = Math.min(100,(totalCollected/totalGoal*100))+'%';
+      }
+
+      // Foto
+      if(c.fotoBase64 || c.fotoUrl){
+        var src = c.fotoBase64 || c.fotoUrl;
+        document.querySelectorAll('.campaign-photo, .campaign-img, img.foto-campanha').forEach(function(img){ img.src = src; });
+      }
+
+      // Botões de valor
+      if(c.valores && c.valores.length > 0){
+        var wrap = document.getElementById('valueOptions');
+        if(wrap){
+          wrap.innerHTML = '';
+          c.valores.forEach(function(v, i){
+            var btn = document.createElement('button');
+            btn.className = 'value-btn' + (i===1 ? ' selected' : '');
+            btn.textContent = 'R$ '+parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:2});
+            btn.onclick = function(){ selectValue(v); };
+            wrap.appendChild(btn);
+          });
+          var defaultVal = c.valores[1] || c.valores[0];
+          if(defaultVal) selectValue(defaultVal);
+        }
+      }
+
+      // Q&A
+      if(c.perguntas && c.perguntas.length > 0){
+        var qaWrap = document.getElementById('tab4');
+        if(qaWrap){
+          var html = '';
+          c.perguntas.forEach(function(q){
+            html += '<div class="qa-item">'
+              +'<div class="qa-question">❓ '+escHtml(q.pergunta)+'</div>'
+              +'<div class="qa-answer">'+escHtml(q.resposta)+'</div>'
+              +(q.autor ? '<div class="qa-meta">Perguntado por '+escHtml(q.autor)+' — Respondido pelo organizador</div>' : '')
+              +'</div>';
+          });
+          qaWrap.innerHTML = html;
+        }
+      }
+
+      // Atualizações
+      if(c.atualizacoes && c.atualizacoes.length > 0){
+        updatesData = c.atualizacoes.map(function(u){
+          return { date: u.data, title: u.titulo, text: u.texto };
+        });
+        renderUpdates();
+      }
+
+      // Vakinha premiada
+      if(c.vakinhaPremiada){
+        var tab3 = document.getElementById('tab3');
+        if(tab3) tab3.innerHTML = '<div style="padding:20px"><p style="font-size:14px;line-height:1.6">'+escHtml(c.vakinhaPremiada)+'</p></div>';
+      }
+
+      // Selos
+      if(c.selos && c.selos.length > 0){
+        var selosEl = document.getElementById('selos-wrap');
+        if(selosEl){
+          selosEl.innerHTML = c.selos.map(function(s){
+            return '<span style="display:inline-flex;align-items:center;gap:4px;background:#e8f5e9;border:1px solid #24ca68;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:#1a6e2e;">'+escHtml(s)+'</span>';
+          }).join(' ');
+        }
+      }
+    })
+    .catch(function(){ /* mantém dados estáticos */ });
+})();
+
+function escHtml(s){ var d=document.createElement('div');d.textContent=s||'';return d.innerHTML; }
+
 // Init progress bar
 (function(){
   var pct=(totalCollected/totalGoal*100);

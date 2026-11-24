@@ -34,16 +34,19 @@ const campanhaSchema = new mongoose.Schema({
   categoria:    { type: String, default: '' },
   dataCriacao:  { type: String, default: '' },
   meta:         { type: Number, default: 140000 },
-  status:       { type: String, default: 'ativa', enum: ['ativa','pausada','rascunho'] },
+  status:       { type: String, default: 'ativa', enum: ['ativa','pausada','rascunho','encerrada'] },
   chavePix:     { type: String, default: '' },
   fotoUrl:      { type: String, default: '' },
   fotoBase64:   { type: String, default: '' },
   fotoMime:     { type: String, default: '' },
+  idPublico:    { type: String, default: '' },
   valores:      { type: [Number], default: [10, 25, 50, 100, 200] },
-  upsell:       { type: Number, default: 3.99 },
+  upsell:       { type: Boolean, default: false },
   upsellTexto:  { type: String, default: 'Adicione mais e ajude ainda mais!' },
   arrecadado:   { type: Number, default: 0 },
   ordemExibicao: { type: Number, default: 0 },
+  vakinhaPremiada: { type: String, default: '' },
+  selos:        { type: [String], default: [] },
   perguntas: [{
     pergunta: { type: String, default: '' },
     resposta:  { type: String, default: '' },
@@ -54,7 +57,7 @@ const campanhaSchema = new mongoose.Schema({
     texto:  { type: String, default: '' },
     data:   { type: String, default: '' }
   }]
-}, { timestamps: true, versionKey: false });
+}, { timestamps: true, versionKey: false, strict: false });
 
 const CampanhaModel = mongoose.model('Campanha', campanhaSchema);
 
@@ -303,9 +306,9 @@ app.put('/admin/campanhas/:id', authMiddleware, async (req, res) => {
       CAMPANHAS_MEM[idx] = { ...CAMPANHAS_MEM[idx], ...campos };
       return res.json({ ok: true });
     }
-    const c = await CampanhaModel.findByIdAndUpdate(id, { $set: campos }, { new: true });
+    const c = await CampanhaModel.findByIdAndUpdate(id, { $set: campos }, { new: true, runValidators: false });
     if (!c) return res.status(404).json({ error: 'Campanha não encontrada' });
-    res.json({ ok: true });
+    res.json({ ok: true, campanha: c });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao atualizar campanha' });
   }
@@ -357,12 +360,45 @@ app.get('/config-publica', async (req, res) => {
   }
 });
 
-// ─── Histórico de pagamentos ──────────────────────────────────────
+// ─── Webhook XFlow — atualiza status do pagamento automaticamente ────
+app.post('/webhook/xflow', async (req, res) => {
+  try {
+    const event = req.body;
+    const chargeId = event.id || event.charge_id || event.data?.id;
+    const status = event.status || event.data?.status || event.type;
+    if (!chargeId) return res.json({ ok: true });
+
+    const statusNormalizado = (status || '').toLowerCase().replace('charge.', '');
+    const pago = ['paid', 'completed', 'approved'].includes(statusNormalizado);
+
+    if (dbConectado && chargeId) {
+      const pag = await PagamentoModel.findOne({ chargeId });
+      if (pag) {
+        const statusAnterior = pag.status;
+        await PagamentoModel.findOneAndUpdate({ chargeId }, { $set: { status: statusNormalizado } });
+        // Incrementar arrecadado apenas se for nova confirmação de pagamento
+        if (pago && statusAnterior !== 'paid' && statusAnterior !== 'completed' && statusAnterior !== 'approved') {
+          if (pag.campanhaId) {
+            await CampanhaModel.findByIdAndUpdate(pag.campanhaId, { $inc: { arrecadado: pag.amountCents / 100 } });
+          }
+        }
+      }
+    }
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Erro webhook:', err);
+    res.status(500).json({ error: 'Erro interno' });
+  }
+});
+
+// ─── Histórico de pagamentos (apenas reais: paid/completed/approved) ─
 app.get('/admin/pagamentos', authMiddleware, async (req, res) => {
   try {
     if (!dbConectado) return res.json({ pagamentos: [] });
     const { campanhaId } = req.query;
-    const filtro = campanhaId ? { campanhaId } : {};
+    // Filtrar apenas pagamentos com status confirmado pela XFlow (pagamentos reais)
+    const filtroStatus = { status: { $in: ['paid', 'completed', 'approved'] } };
+    const filtro = campanhaId ? { campanhaId, ...filtroStatus } : filtroStatus;
     const pagamentos = await PagamentoModel.find(filtro).sort({ createdAt: -1 }).limit(200);
     res.json({ pagamentos });
   } catch (err) {

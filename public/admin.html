@@ -82,6 +82,33 @@ tr:hover td{background:var(--surface2)}
 @keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
 .info-box{background:var(--surface2);border-radius:9px;padding:14px 16px;font-size:13px;color:var(--fg2);margin-bottom:16px}
 @media(max-width:700px){.sidebar{display:none}.form-row{grid-template-columns:1fr}.content{padding:20px 16px}}
+
+/* ── Campanha editor extras ── */
+.field-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.field-row .form-group{flex:1;margin:0}
+.edit-btn{background:none;border:1.5px solid var(--border);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;color:var(--fg2);transition:all .15s;white-space:nowrap;flex-shrink:0;align-self:flex-end;margin-bottom:1px}
+.edit-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.edit-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.view-val{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--fg);min-height:40px;word-break:break-word}
+.view-val.empty{color:var(--fg2);font-style:italic}
+.list-item-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border-radius:8px;margin-bottom:8px;border:1px solid var(--border)}
+.list-item-row span{flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.list-item-row .pill{flex-shrink:0}
+.list-item-btn{background:none;border:none;cursor:pointer;font-size:14px;padding:3px 6px;border-radius:5px;transition:background .15s}
+.list-item-btn:hover{background:var(--border)}
+.add-item-box{background:var(--surface2);border:1.5px dashed var(--border);border-radius:9px;padding:16px;margin-top:8px}
+.add-item-box .form-group{margin-bottom:10px}
+.section-divider{height:1px;background:var(--border);margin:24px 0}
+.tab-editor-nav{display:flex;gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:20px;overflow-x:auto}
+.tab-editor-btn{padding:8px 16px;font-size:13px;font-weight:500;color:var(--fg2);cursor:pointer;border:none;background:none;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;white-space:nowrap;transition:all .15s}
+.tab-editor-btn.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tab-editor-pane{display:none}
+.tab-editor-pane.active{display:block}
+.char-count{font-size:10px;color:var(--fg2);text-align:right;margin-top:3px}
+.img-preview{width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-top:8px;display:none}
+.valores-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:6px}
+.valor-chip{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.valor-chip button{background:none;border:none;cursor:pointer;color:var(--danger);font-size:14px;padding:0;line-height:1}
 </style>
 </head>
 <body>
@@ -117,6 +144,9 @@ tr:hover td{background:var(--surface2)}
     <div class="sidebar-sec">Gestão</div>
     <div class="nav-item active" id="nav-pagamentos" onclick="showSection('pagamentos')">
       <span class="nav-icon">💰</span> Pagamentos
+    </div>
+    <div class="nav-item" id="nav-campanha" onclick="showSection('campanha')">
+      <span class="nav-icon">🎗️</span> Campanha
     </div>
     <div class="sidebar-sec">Configurações</div>
     <div class="nav-item" id="nav-credenciais" onclick="showSection('credenciais')">
@@ -193,6 +223,221 @@ tr:hover td{background:var(--surface2)}
       </div></div>
     </div>
 
+    <!-- ══ CAMPANHA EDITOR ══ -->
+    <div class="content" id="sec-campanha" style="display:none">
+      <div class="section-header">
+        <div class="section-title">🎗️ Editor de Campanha</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="carregarCampanhaEditor()">🔄 Recarregar</button>
+          <button class="btn btn-primary btn-sm" onclick="salvarCampanha()">💾 Salvar tudo</button>
+        </div>
+      </div>
+
+      <div id="campanha-loading" style="text-align:center;padding:40px;color:var(--fg2)">Carregando campanha…</div>
+      <div id="campanha-editor" style="display:none">
+
+        <!-- ── ABAS DO EDITOR ── -->
+        <div class="tab-editor-nav">
+          <button class="tab-editor-btn active" onclick="showEditorTab('info')">📋 Informações</button>
+          <button class="tab-editor-btn" onclick="showEditorTab('descricao')">📝 Descrição</button>
+          <button class="tab-editor-btn" onclick="showEditorTab('atualizacoes')">📢 Atualizações</button>
+          <button class="tab-editor-btn" onclick="showEditorTab('perguntas')">❓ Q &amp; A</button>
+          <button class="tab-editor-btn" onclick="showEditorTab('valores')">💲 Valores</button>
+          <button class="tab-editor-btn" onclick="showEditorTab('extras')">⭐ Extras</button>
+        </div>
+
+        <!-- ABA: INFORMAÇÕES -->
+        <div class="tab-editor-pane active" id="ceditor-info">
+          <div class="editor-wrap"><div class="editor-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Título / Cabeçalho ✏️</label>
+                <input type="text" id="ce-nome" placeholder="Ex: Ajude o Robson a cuidar da pequena Ester">
+              </div>
+              <div class="form-group">
+                <label>Resumo curto</label>
+                <input type="text" id="ce-resumoCurto" placeholder="Texto de destaque abaixo do título">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Localização / Estado ✏️</label>
+                <input type="text" id="ce-localizacao" placeholder="Ex: Barcarena / PA">
+              </div>
+              <div class="form-group">
+                <label>Categoria ✏️</label>
+                <select id="ce-categoria">
+                  <option value="Solidariedade">Solidariedade</option>
+                  <option value="Saúde">Saúde</option>
+                  <option value="Solidariedade / Saúde">Solidariedade / Saúde</option>
+                  <option value="Educação">Educação</option>
+                  <option value="Animal">Animal</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Data de criação</label>
+                <input type="text" id="ce-dataCriacao" placeholder="Ex: 15 de Janeiro de 2024">
+              </div>
+              <div class="form-group">
+                <label>Meta (R$)</label>
+                <input type="number" id="ce-meta" placeholder="Ex: 140000" min="0" step="100">
+                <span class="hint">Valor total a arrecadar em reais (ex: 140000 = R$140.000)</span>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>ID da Campanha (exibido no site)</label>
+                <input type="text" id="ce-idPublico" placeholder="Ex: 5333124">
+              </div>
+              <div class="form-group">
+                <label>Status</label>
+                <select id="ce-status">
+                  <option value="ativa">Ativa</option>
+                  <option value="pausada">Pausada</option>
+                  <option value="encerrada">Encerrada</option>
+                </select>
+              </div>
+            </div>
+            <div class="section-divider"></div>
+            <div class="form-row single">
+              <div class="form-group">
+                <label>Foto da campanha</label>
+                <input type="url" id="ce-fotoUrl" placeholder="URL da imagem (https://...)">
+                <span class="hint">Cole a URL da imagem ou envie em base64 abaixo</span>
+                <img id="ce-fotoPreview" class="img-preview" alt="Preview">
+              </div>
+            </div>
+            <div class="form-row single">
+              <div class="form-group">
+                <label>Ou envie uma imagem</label>
+                <input type="file" id="ce-fotoFile" accept="image/*" onchange="previewFoto(this)" style="padding:8px">
+                <span class="hint">Aceita JPG, PNG, WebP — máx 2MB</span>
+              </div>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- ABA: DESCRIÇÃO -->
+        <div class="tab-editor-pane" id="ceditor-descricao">
+          <div class="editor-wrap"><div class="editor-body">
+            <div class="form-group" style="margin-bottom:16px">
+              <label>Descrição completa (Aba "Sobre") ✏️</label>
+              <textarea id="ce-descricao" rows="18" placeholder="Texto completo da campanha. Use duas quebras de linha para separar parágrafos.&#10;&#10;Parágrafo 1...&#10;&#10;Parágrafo 2..." oninput="updateCharCount(this,'desc-count')"></textarea>
+              <div class="char-count" id="desc-count">0 caracteres</div>
+              <span class="hint">Separe parágrafos com linha em branco (Enter duas vezes). Os parágrafos aparecem em sequência na aba Sobre.</span>
+            </div>
+            <div class="form-group">
+              <label>Texto — Vakinha Premiada (Aba "Vakinha Premiada") ✏️</label>
+              <textarea id="ce-vakinhaPremiada" rows="5" placeholder="Texto sobre o prêmio da vakinha..."></textarea>
+              <span class="hint">Aparece na aba "Vakinha Premiada" do site</span>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- ABA: ATUALIZAÇÕES -->
+        <div class="tab-editor-pane" id="ceditor-atualizacoes">
+          <div class="editor-wrap"><div class="editor-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <div style="font-size:14px;font-weight:600">Atualizações da campanha</div>
+              <button class="btn btn-ghost btn-sm" onclick="toggleAddAtualizacao()">+ Nova atualização</button>
+            </div>
+            <div id="add-atualizacao-box" class="add-item-box" style="display:none;margin-bottom:16px">
+              <div class="form-group"><label>Título</label><input type="text" id="new-atu-titulo" placeholder="Ex: Atualização do tratamento"></div>
+              <div class="form-group"><label>Data</label><input type="text" id="new-atu-data" placeholder="Ex: 10/06/2024"></div>
+              <div class="form-group"><label>Texto</label><textarea id="new-atu-texto" rows="4" placeholder="Texto da atualização…"></textarea></div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn btn-primary btn-sm" onclick="adicionarAtualizacao()">✅ Adicionar</button>
+                <button class="btn btn-ghost btn-sm" onclick="toggleAddAtualizacao()">Cancelar</button>
+              </div>
+            </div>
+            <div id="atualizacoes-list"></div>
+            <div id="atualizacoes-vazio" style="text-align:center;padding:30px;color:var(--fg2);display:none">Nenhuma atualização ainda</div>
+          </div></div>
+        </div>
+
+        <!-- ABA: PERGUNTAS & RESPOSTAS -->
+        <div class="tab-editor-pane" id="ceditor-perguntas">
+          <div class="editor-wrap"><div class="editor-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <div style="font-size:14px;font-weight:600">Perguntas &amp; Respostas</div>
+              <button class="btn btn-ghost btn-sm" onclick="toggleAddPergunta()">+ Nova pergunta</button>
+            </div>
+            <div id="add-pergunta-box" class="add-item-box" style="display:none;margin-bottom:16px">
+              <div class="form-group"><label>Pergunta</label><input type="text" id="new-perg-pergunta" placeholder="Ex: Como posso acompanhar o tratamento?"></div>
+              <div class="form-group"><label>Resposta</label><textarea id="new-perg-resposta" rows="3" placeholder="Resposta completa…"></textarea></div>
+              <div class="form-group"><label>Autor (opcional)</label><input type="text" id="new-perg-autor" placeholder="Ex: Maria Silva"></div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn btn-primary btn-sm" onclick="adicionarPergunta()">✅ Adicionar</button>
+                <button class="btn btn-ghost btn-sm" onclick="toggleAddPergunta()">Cancelar</button>
+              </div>
+            </div>
+            <div id="perguntas-list"></div>
+            <div id="perguntas-vazio" style="text-align:center;padding:30px;color:var(--fg2);display:none">Nenhuma pergunta ainda</div>
+          </div></div>
+        </div>
+
+        <!-- ABA: VALORES DOS BOTÕES -->
+        <div class="tab-editor-pane" id="ceditor-valores">
+          <div class="editor-wrap"><div class="editor-body">
+            <div style="font-size:14px;font-weight:600;margin-bottom:4px">Valores dos botões de doação</div>
+            <div style="font-size:12px;color:var(--fg2);margin-bottom:16px">Estes são os valores pré-definidos que o doador pode escolher. Mínimo 1, máximo 8.</div>
+            <div id="valores-chips" class="valores-grid"></div>
+            <div style="display:flex;gap:8px;margin-top:14px;align-items:flex-end">
+              <div class="form-group" style="margin:0;flex:1">
+                <label>Novo valor (R$)</label>
+                <input type="number" id="new-valor" placeholder="Ex: 50" min="1" step="1">
+              </div>
+              <button class="btn btn-ghost btn-sm" style="margin-bottom:1px" onclick="adicionarValor()">+ Adicionar</button>
+            </div>
+            <div class="section-divider"></div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Upsell ativo?</label>
+                <select id="ce-upsell">
+                  <option value="false">Não</option>
+                  <option value="true">Sim</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Texto do upsell</label>
+                <input type="text" id="ce-upsellTexto" placeholder="Ex: Contribua um pouco mais e ajude mais!">
+              </div>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- ABA: EXTRAS (selos, chave pix) -->
+        <div class="tab-editor-pane" id="ceditor-extras">
+          <div class="editor-wrap"><div class="editor-body">
+            <div class="form-group" style="margin-bottom:16px">
+              <label>Chave Pix</label>
+              <input type="text" id="ce-chavePix" placeholder="CPF, CNPJ, e-mail ou chave aleatória">
+            </div>
+            <div class="section-divider"></div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:4px">Selos recebidos ✏️</div>
+            <div style="font-size:12px;color:var(--fg2);margin-bottom:12px">Selos de verificação e conquistas que aparecem no site</div>
+            <div id="selos-list"></div>
+            <div style="display:flex;gap:8px;margin-top:10px;align-items:flex-end">
+              <div class="form-group" style="margin:0;flex:1">
+                <label>Novo selo</label>
+                <input type="text" id="new-selo" placeholder="Ex: ✅ Campanha Verificada">
+              </div>
+              <button class="btn btn-ghost btn-sm" style="margin-bottom:1px" onclick="adicionarSelo()">+ Adicionar</button>
+            </div>
+          </div></div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding:4px 0">
+          <button class="btn btn-ghost" onclick="carregarCampanhaEditor()">🔄 Descartar alterações</button>
+          <button class="btn btn-primary" onclick="salvarCampanha()">💾 Salvar campanha</button>
+        </div>
+
+      </div><!-- /campanha-editor -->
+    </div><!-- /sec-campanha -->
+
   </div>
 </div>
 </div>
@@ -251,10 +496,10 @@ function iniciarApp(user){
   carregarPagamentos();
 }
 
-var secTitles = {pagamentos:'💰 Pagamentos', credenciais:'🔑 Credenciais Pix', marketing:'📊 Marketing'};
+var secTitles = {pagamentos:'💰 Pagamentos', credenciais:'🔑 Credenciais Pix', marketing:'📊 Marketing', campanha:'🎗️ Campanha'};
 
 function showSection(id){
-  ['pagamentos','credenciais','marketing'].forEach(function(s){
+  ['pagamentos','credenciais','marketing','campanha'].forEach(function(s){
     var el = document.getElementById('sec-'+s);
     if(el) el.style.display = s===id ? 'block' : 'none';
   });
@@ -263,6 +508,316 @@ function showSection(id){
   var navEl = document.getElementById('nav-'+id);
   if(navEl) navEl.classList.add('active');
   if(id==='pagamentos') carregarPagamentos();
+  if(id==='campanha') carregarCampanhaEditor();
+}
+
+// ═══════════════════════════════════════════
+// CAMPANHA EDITOR
+// ═══════════════════════════════════════════
+var campanhaAtual = null;
+var atualizacoesData = [];
+var perguntasData = [];
+var valoresData = [];
+var selosData = [];
+
+function showEditorTab(tab) {
+  document.querySelectorAll('.tab-editor-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.tab-editor-pane').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('ceditor-'+tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+async function carregarCampanhaEditor(){
+  document.getElementById('campanha-loading').style.display = 'block';
+  document.getElementById('campanha-editor').style.display = 'none';
+  try {
+    var r = await fetch(BASE+'/admin/campanhas', {headers:{'x-admin-token':TOKEN}});
+    if(r.status===401){ doLogout(); return; }
+    var d = await r.json();
+    var campanhas = d.campanhas || [];
+    // pega a ativa ou a primeira
+    campanhaAtual = campanhas.find(function(c){ return c.status==='ativa'; }) || campanhas[0] || null;
+    if(!campanhaAtual){
+      document.getElementById('campanha-loading').textContent = 'Nenhuma campanha encontrada. Crie uma via API ou banco.';
+      return;
+    }
+    popularEditor(campanhaAtual);
+  } catch(e){
+    document.getElementById('campanha-loading').textContent = 'Erro ao carregar campanha: '+e.message;
+  }
+}
+
+function popularEditor(c){
+  // Informações
+  document.getElementById('ce-nome').value = c.nome || '';
+  document.getElementById('ce-resumoCurto').value = c.resumoCurto || '';
+  document.getElementById('ce-localizacao').value = c.localizacao || '';
+  document.getElementById('ce-dataCriacao').value = c.dataCriacao || '';
+  document.getElementById('ce-meta').value = c.meta || '';
+  document.getElementById('ce-idPublico').value = c.idPublico || '';
+  var catSel = document.getElementById('ce-categoria');
+  if(c.categoria){ catSel.value = c.categoria; if(!catSel.value){ var op=document.createElement('option'); op.value=c.categoria; op.textContent=c.categoria; catSel.appendChild(op); catSel.value=c.categoria; } }
+  var stSel = document.getElementById('ce-status');
+  stSel.value = c.status || 'ativa';
+  // Foto
+  if(c.fotoUrl) document.getElementById('ce-fotoUrl').value = c.fotoUrl;
+  if(c.fotoBase64 || c.fotoUrl){ var prev=document.getElementById('ce-fotoPreview'); prev.src=c.fotoBase64||c.fotoUrl; prev.style.display='block'; }
+  document.getElementById('ce-fotoUrl').oninput = function(){ var prev=document.getElementById('ce-fotoPreview'); if(this.value){ prev.src=this.value; prev.style.display='block'; } else prev.style.display='none'; };
+  // Descrição
+  document.getElementById('ce-descricao').value = c.descricao || '';
+  updateCharCount(document.getElementById('ce-descricao'), 'desc-count');
+  document.getElementById('ce-vakinhaPremiada').value = c.vakinhaPremiada || '';
+  // Chave pix
+  document.getElementById('ce-chavePix').value = c.chavePix || '';
+  // Upsell
+  document.getElementById('ce-upsell').value = c.upsell ? 'true' : 'false';
+  document.getElementById('ce-upsellTexto').value = c.upsellTexto || '';
+  // Listas
+  atualizacoesData = (c.atualizacoes || []).slice();
+  perguntasData = (c.perguntas || []).slice();
+  valoresData = (c.valores || [30,50,100,200,500]).slice();
+  selosData = (c.selos || []).slice();
+  renderAtualizacoes();
+  renderPerguntas();
+  renderValores();
+  renderSelos();
+  document.getElementById('campanha-loading').style.display = 'none';
+  document.getElementById('campanha-editor').style.display = 'block';
+}
+
+// ── ATUALIZAÇÕES ──
+function renderAtualizacoes(){
+  var list = document.getElementById('atualizacoes-list');
+  var vazio = document.getElementById('atualizacoes-vazio');
+  list.innerHTML = '';
+  if(!atualizacoesData.length){ vazio.style.display='block'; return; }
+  vazio.style.display = 'none';
+  atualizacoesData.forEach(function(a, i){
+    var div = document.createElement('div');
+    div.className = 'list-item-row';
+    div.style.flexDirection = 'column';
+    div.style.alignItems = 'flex-start';
+    div.style.gap = '6px';
+    div.innerHTML = '<div style="display:flex;width:100%;align-items:center;gap:8px">'
+      +'<span style="flex:1;font-weight:600;font-size:13px">'+esc(a.titulo||'Sem título')+'</span>'
+      +'<span style="font-size:11px;color:var(--fg2)">'+esc(a.data||'')+'</span>'
+      +'<button class="list-item-btn" title="Editar" onclick="editarAtualizacao('+i+')">✏️</button>'
+      +'<button class="list-item-btn" title="Remover" onclick="removerAtualizacao('+i+')">🗑️</button>'
+      +'</div>'
+      +'<div style="font-size:12px;color:var(--fg2);line-height:1.4">'+esc((a.texto||'').slice(0,100)+(a.texto&&a.texto.length>100?'…':''))+'</div>';
+    list.appendChild(div);
+  });
+}
+function toggleAddAtualizacao(){
+  var box = document.getElementById('add-atualizacao-box');
+  box.style.display = box.style.display==='none' ? 'block' : 'none';
+  if(box.style.display==='block'){ document.getElementById('new-atu-titulo').value=''; document.getElementById('new-atu-data').value=''; document.getElementById('new-atu-texto').value=''; document.getElementById('new-atu-titulo').focus(); }
+}
+function adicionarAtualizacao(){
+  var t=document.getElementById('new-atu-titulo').value.trim();
+  var d=document.getElementById('new-atu-data').value.trim();
+  var tx=document.getElementById('new-atu-texto').value.trim();
+  if(!t) return toast('Informe o título da atualização', true);
+  atualizacoesData.unshift({titulo:t,data:d,texto:tx});
+  toggleAddAtualizacao();
+  renderAtualizacoes();
+  toast('Atualização adicionada — salve para confirmar');
+}
+function removerAtualizacao(i){
+  if(!confirm('Remover esta atualização?')) return;
+  atualizacoesData.splice(i,1);
+  renderAtualizacoes();
+}
+function editarAtualizacao(i){
+  var a = atualizacoesData[i];
+  document.getElementById('new-atu-titulo').value = a.titulo||'';
+  document.getElementById('new-atu-data').value = a.data||'';
+  document.getElementById('new-atu-texto').value = a.texto||'';
+  document.getElementById('add-atualizacao-box').style.display = 'block';
+  atualizacoesData.splice(i,1);
+  renderAtualizacoes();
+  document.getElementById('new-atu-titulo').focus();
+}
+
+// ── PERGUNTAS ──
+function renderPerguntas(){
+  var list = document.getElementById('perguntas-list');
+  var vazio = document.getElementById('perguntas-vazio');
+  list.innerHTML = '';
+  if(!perguntasData.length){ vazio.style.display='block'; return; }
+  vazio.style.display = 'none';
+  perguntasData.forEach(function(p, i){
+    var div = document.createElement('div');
+    div.className = 'list-item-row';
+    div.style.flexDirection = 'column';
+    div.style.alignItems = 'flex-start';
+    div.style.gap = '6px';
+    div.innerHTML = '<div style="display:flex;width:100%;align-items:center;gap:8px">'
+      +'<span style="flex:1;font-weight:600;font-size:13px">❓ '+esc(p.pergunta||'Sem pergunta')+'</span>'
+      +(p.autor?'<span style="font-size:11px;color:var(--fg2)">'+esc(p.autor)+'</span>':'')
+      +'<button class="list-item-btn" title="Editar" onclick="editarPergunta('+i+')">✏️</button>'
+      +'<button class="list-item-btn" title="Remover" onclick="removerPergunta('+i+')">🗑️</button>'
+      +'</div>'
+      +'<div style="font-size:12px;color:var(--fg2);line-height:1.4">↩ '+esc((p.resposta||'').slice(0,100)+(p.resposta&&p.resposta.length>100?'…':''))+'</div>';
+    list.appendChild(div);
+  });
+}
+function toggleAddPergunta(){
+  var box = document.getElementById('add-pergunta-box');
+  box.style.display = box.style.display==='none' ? 'block' : 'none';
+  if(box.style.display==='block'){ document.getElementById('new-perg-pergunta').value=''; document.getElementById('new-perg-resposta').value=''; document.getElementById('new-perg-autor').value=''; document.getElementById('new-perg-pergunta').focus(); }
+}
+function adicionarPergunta(){
+  var p=document.getElementById('new-perg-pergunta').value.trim();
+  var r=document.getElementById('new-perg-resposta').value.trim();
+  var a=document.getElementById('new-perg-autor').value.trim();
+  if(!p) return toast('Informe a pergunta', true);
+  if(!r) return toast('Informe a resposta', true);
+  perguntasData.push({pergunta:p,resposta:r,autor:a});
+  toggleAddPergunta();
+  renderPerguntas();
+  toast('Pergunta adicionada — salve para confirmar');
+}
+function removerPergunta(i){
+  if(!confirm('Remover esta pergunta?')) return;
+  perguntasData.splice(i,1);
+  renderPerguntas();
+}
+function editarPergunta(i){
+  var p = perguntasData[i];
+  document.getElementById('new-perg-pergunta').value = p.pergunta||'';
+  document.getElementById('new-perg-resposta').value = p.resposta||'';
+  document.getElementById('new-perg-autor').value = p.autor||'';
+  document.getElementById('add-pergunta-box').style.display = 'block';
+  perguntasData.splice(i,1);
+  renderPerguntas();
+  document.getElementById('new-perg-pergunta').focus();
+}
+
+// ── VALORES ──
+function renderValores(){
+  var grid = document.getElementById('valores-chips');
+  grid.innerHTML = '';
+  valoresData.forEach(function(v, i){
+    var chip = document.createElement('div');
+    chip.className = 'valor-chip';
+    chip.innerHTML = '<span>R$ '+parseFloat(v).toLocaleString('pt-BR')+'</span>'
+      +'<button onclick="removerValor('+i+')" title="Remover">×</button>';
+    grid.appendChild(chip);
+  });
+}
+function adicionarValor(){
+  var v = parseFloat(document.getElementById('new-valor').value);
+  if(!v||v<1) return toast('Informe um valor válido', true);
+  if(valoresData.length>=8) return toast('Máximo 8 valores', true);
+  valoresData.push(v);
+  valoresData.sort(function(a,b){return a-b;});
+  document.getElementById('new-valor').value = '';
+  renderValores();
+}
+function removerValor(i){
+  valoresData.splice(i,1);
+  renderValores();
+}
+
+// ── SELOS ──
+function renderSelos(){
+  var list = document.getElementById('selos-list');
+  list.innerHTML = '';
+  selosData.forEach(function(s, i){
+    var div = document.createElement('div');
+    div.className = 'list-item-row';
+    div.style.padding = '8px 12px';
+    div.innerHTML = '<span style="flex:1">'+esc(s)+'</span>'
+      +'<button class="list-item-btn" onclick="removerSelo('+i+')">🗑️</button>';
+    list.appendChild(div);
+  });
+}
+function adicionarSelo(){
+  var s = document.getElementById('new-selo').value.trim();
+  if(!s) return toast('Informe o selo', true);
+  selosData.push(s);
+  document.getElementById('new-selo').value='';
+  renderSelos();
+}
+function removerSelo(i){
+  selosData.splice(i,1);
+  renderSelos();
+}
+
+// ── FOTO ──
+function previewFoto(input){
+  var file = input.files && input.files[0];
+  if(!file) return;
+  if(file.size > 2*1024*1024){ toast('Imagem muito grande (máx 2MB)', true); input.value=''; return; }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var prev = document.getElementById('ce-fotoPreview');
+    prev.src = e.target.result;
+    prev.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── SALVAR CAMPANHA ──
+async function salvarCampanha(){
+  if(!campanhaAtual) return toast('Campanha não carregada', true);
+  var btn = event && event.target;
+  if(btn){ btn.disabled=true; btn.textContent='Salvando…'; }
+  try {
+    // montar foto
+    var fotoBase64 = null, fotoMime = null, fotoUrl = null;
+    var fileInput = document.getElementById('ce-fotoFile');
+    if(fileInput.files && fileInput.files[0]){
+      var file = fileInput.files[0];
+      fotoBase64 = await new Promise(function(res){ var r=new FileReader(); r.onload=function(e){ res(e.target.result); }; r.readAsDataURL(file); });
+      fotoMime = file.type;
+    } else {
+      fotoUrl = document.getElementById('ce-fotoUrl').value.trim() || null;
+    }
+    var body = {
+      nome: document.getElementById('ce-nome').value.trim(),
+      resumoCurto: document.getElementById('ce-resumoCurto').value.trim(),
+      localizacao: document.getElementById('ce-localizacao').value.trim(),
+      categoria: document.getElementById('ce-categoria').value,
+      dataCriacao: document.getElementById('ce-dataCriacao').value.trim(),
+      meta: parseFloat(document.getElementById('ce-meta').value)||0,
+      idPublico: document.getElementById('ce-idPublico').value.trim(),
+      status: document.getElementById('ce-status').value,
+      descricao: document.getElementById('ce-descricao').value,
+      vakinhaPremiada: document.getElementById('ce-vakinhaPremiada').value.trim(),
+      chavePix: document.getElementById('ce-chavePix').value.trim(),
+      upsell: document.getElementById('ce-upsell').value === 'true',
+      upsellTexto: document.getElementById('ce-upsellTexto').value.trim(),
+      valores: valoresData,
+      atualizacoes: atualizacoesData,
+      perguntas: perguntasData,
+      selos: selosData,
+    };
+    if(fotoBase64){ body.fotoBase64=fotoBase64; body.fotoMime=fotoMime; }
+    else if(fotoUrl){ body.fotoUrl=fotoUrl; }
+    var r = await fetch(BASE+'/admin/campanhas/'+campanhaAtual._id, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json','x-admin-token':TOKEN},
+      body: JSON.stringify(body)
+    });
+    var d = await r.json();
+    if(d.ok || d.campanha){
+      toast('✅ Campanha salva com sucesso!');
+      campanhaAtual = d.campanha || campanhaAtual;
+    } else {
+      toast(d.error || 'Erro ao salvar', true);
+    }
+  } catch(e){
+    toast('Erro: '+e.message, true);
+  } finally {
+    if(btn){ btn.disabled=false; btn.textContent='💾 Salvar campanha'; }
+  }
+}
+
+function updateCharCount(el, countId){
+  var c = document.getElementById(countId);
+  if(c) c.textContent = el.value.length + ' caracteres';
 }
 
 async function carregarPagamentos(){
