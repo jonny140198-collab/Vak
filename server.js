@@ -127,13 +127,66 @@ async function conectarMongo() {
     if (count === 0) {
       await CampanhaModel.create({
         nome: process.env.CAMP_NOME || 'Ajude a Pequena Ester',
-        descricao: process.env.CAMP_DESC || 'Ester tem leucemia e precisa de tratamento urgente.',
+        resumoCurto: 'Olá, meu nome é Robson e sou pai da pequena Ester. É com o coração apertado e muita esperança que venho pedir a ajuda de vocês. Minha filha está enfrentando uma batalha muito difícil contra a leucemia.',
+        descricao: process.env.CAMP_DESC || `Olá, meu nome é Robson e sou pai da pequena Ester.
+
+É com o coração apertado e muita esperança que venho pedir a ajuda de vocês. Minha filha Ester está enfrentando uma batalha muito difícil: ela está passando por um tratamento contra a leucemia.
+
+Ester é uma menina meiga, doce e cheia de vida. Como pai, tudo o que mais desejo neste momento é poder estar ao lado dela, dando todo o amor, apoio e força que ela precisa para enfrentar essa fase tão delicada.
+
+Nós moramos em Barcarena, no Pará, e diariamente preciso me deslocar até Belém para acompanhar minha filha durante o tratamento. São viagens, alimentação, transporte e outras despesas que acabam pesando muito no orçamento da nossa família.
+
+Infelizmente, essa não é a primeira vez que o câncer entra na nossa família. Minha esposa, mãe da Ester, também enfrentou essa doença e, infelizmente, acabou falecendo por causa dela. Desde então, tenho seguido em frente tentando ser forte pela minha filha e fazer tudo o que estiver ao meu alcance para protegê-la.
+
+Hoje, estou aqui deixando de lado qualquer orgulho e pedindo ajuda. Não estou fazendo isso por mim, mas pela minha pequena Ester. Quero poder continuar acompanhando seu tratamento e proporcionar a ela tudo o que estiver ao meu alcance durante essa caminhada.
+
+Qualquer contribuição, independentemente do valor, será muito importante para nós. E se você não puder contribuir financeiramente, compartilhar esta vakinha com outras pessoas já será uma enorme ajuda.
+
+Peço, de coração, que você inclua a Ester em suas orações e torça pela recuperação dela.
+
+Por favor, nos ajude a dar à pequena Ester a chance de continuar lutando e, um dia, poder voltar a viver sua infância com toda a alegria que ela merece.`,
+        localizacao: 'Barcarena / PA',
+        categoria: 'Solidariedade / Saúde',
+        dataCriacao: '20/08/2026',
         meta: parseFloat(process.env.CAMP_META) || 140000,
         status: 'ativa',
         chavePix: process.env.CAMP_PIX || '',
-        fotoUrl: process.env.CAMP_FOTO || ''
+        fotoUrl: process.env.CAMP_FOTO || '',
+        valores: [10, 25, 50, 100, 200],
+        upsell: 3.99,
+        perguntas: [
+          { pergunta: 'O dinheiro arrecadado vai realmente para o tratamento da Ester?', resposta: 'Sim! Todas as doações são destinadas diretamente ao custeio do tratamento, incluindo transporte de Barcarena para Belém, hospedagem durante os ciclos de quimioterapia, alimentação e medicamentos não fornecidos pelo SUS.', autor: 'Ana Lima' },
+          { pergunta: 'Qual é o tipo de leucemia que a Ester tem?', resposta: 'A Ester foi diagnosticada com Leucemia Linfoblástica Aguda (LLA), que é o tipo mais comum em crianças. Ela está na fase de consolidação da quimioterapia. Os médicos têm boas expectativas para a recuperação dela.', autor: 'Carlos Mendes' },
+          { pergunta: 'Posso acompanhar como o dinheiro está sendo utilizado?', resposta: 'Com certeza! O Robson publica atualizações frequentes na aba "Atualizações" com fotos, recibos e relatos de como cada centavo está sendo usado. A transparência é fundamental para nós.', autor: 'Fernanda Costa' }
+        ],
+        atualizacoes: [
+          { titulo: 'Hoje foi dia de quimioterapia', texto: 'Ester passou pela 8ª sessão de quimio hoje em Belém. Ela estava cansada, mas sorriu para os enfermeiros que já a conhecem pelo nome. Cada sessão é um passo mais perto da cura! Obrigado a todos que tornaram essa viagem possível. 🙏', data: '19/11/2026' },
+          { titulo: 'Atualização médica — boas notícias!', texto: 'Os exames desta semana mostraram resposta positiva ao tratamento. A médica responsável ficou animada com os resultados. Ainda temos um caminho longo, mas cada resultado bom renova nossas forças. Graças a Deus e a vocês!', data: '12/11/2026' },
+          { titulo: 'Como o dinheiro foi usado em outubro', texto: 'Com as doações de outubro, conseguimos pagar: 14 passagens de ônibus Barcarena-Belém (R$ 420), hospedagem por 6 noites (R$ 480), alimentação durante o tratamento (R$ 310) e um medicamento específico não fornecido pelo SUS (R$ 180). Total: R$ 1.390.', data: '01/11/2026' }
+        ]
       });
       console.log('📄 Campanha padrão migrada para MongoDB');
+    } else {
+      // Atualizar campos vazios na campanha existente
+      const campExistente = await CampanhaModel.findOne({ status: 'ativa' });
+      if (campExistente && !campExistente.descricao) {
+        await CampanhaModel.findByIdAndUpdate(campExistente._id, { $set: {
+          resumoCurto: 'Olá, meu nome é Robson e sou pai da pequena Ester. É com o coração apertado e muita esperança que venho pedir a ajuda de vocês. Minha filha está enfrentando uma batalha muito difícil contra a leucemia.',
+          descricao: `Olá, meu nome é Robson e sou pai da pequena Ester.\n\nÉ com o coração apertado e muita esperança que venho pedir a ajuda de vocês. Minha filha Ester está enfrentando uma batalha muito difícil: ela está passando por um tratamento contra a leucemia.\n\nEster é uma menina meiga, doce e cheia de vida. Como pai, tudo o que mais desejo neste momento é poder estar ao lado dela, dando todo o amor, apoio e força que ela precisa para enfrentar essa fase tão delicada.\n\nNós moramos em Barcarena, no Pará, e diariamente preciso me deslocar até Belém para acompanhar minha filha durante o tratamento. São viagens, alimentação, transporte e outras despesas que acabam pesando muito no orçamento da nossa família.\n\nHoje, estou aqui deixando de lado qualquer orgulho e pedindo ajuda. Não estou fazendo isso por mim, mas pela minha pequena Ester. Quero poder continuar acompanhando seu tratamento e proporcionar a ela tudo o que estiver ao meu alcance durante essa caminhada.\n\nQualquer contribuição, independentemente do valor, será muito importante para nós.\n\nPeço, de coração, que você inclua a Ester em suas orações e torça pela recuperação dela.`,
+          localizacao: campExistente.localizacao || 'Barcarena / PA',
+          categoria: campExistente.categoria || 'Solidariedade / Saúde',
+          dataCriacao: campExistente.dataCriacao || '20/08/2026',
+          perguntas: campExistente.perguntas && campExistente.perguntas.length ? campExistente.perguntas : [
+            { pergunta: 'O dinheiro arrecadado vai realmente para o tratamento?', resposta: 'Sim! Todas as doações são destinadas diretamente ao custeio do tratamento, incluindo transporte, hospedagem e medicamentos.', autor: '' },
+            { pergunta: 'Posso acompanhar como o dinheiro está sendo utilizado?', resposta: 'Com certeza! Atualizações frequentes são publicadas na aba Atualizações com relatos de como cada centavo está sendo usado.', autor: '' }
+          ],
+          atualizacoes: campExistente.atualizacoes && campExistente.atualizacoes.length ? campExistente.atualizacoes : [
+            { titulo: 'Hoje foi dia de quimioterapia', texto: 'Ester passou pela 8ª sessão de quimio hoje em Belém. Ela estava cansada, mas sorriu para os enfermeiros. Cada sessão é um passo mais perto da cura!', data: '19/11/2026' },
+            { titulo: 'Atualização médica — boas notícias!', texto: 'Os exames desta semana mostraram resposta positiva ao tratamento. Ainda temos um caminho longo, mas cada resultado bom renova nossas forças.', data: '12/11/2026' }
+          ]
+        }});
+        console.log('📄 Campanha existente atualizada com campos padrão');
+      }
     }
   } catch (err) {
     console.error('❌ Erro ao conectar MongoDB:', err.message);
