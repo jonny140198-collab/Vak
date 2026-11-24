@@ -284,13 +284,10 @@ tr:hover td{background:var(--surface2)}
       </div>
 
       <div class="editor-wrap">
-        <div class="editor-tabs" style="flex-wrap:wrap">
+        <div class="editor-tabs">
           <div class="etab active" onclick="switchTab(this,'tab-info')">📝 Informações</div>
-          <div class="etab" onclick="switchTab(this,'tab-descricao')">📖 Sobre</div>
           <div class="etab" onclick="switchTab(this,'tab-midia')">📸 Mídia</div>
           <div class="etab" onclick="switchTab(this,'tab-valores')">💲 Valores</div>
-          <div class="etab" onclick="switchTab(this,'tab-qa')">❓ Q&amp;A</div>
-          <div class="etab" onclick="switchTab(this,'tab-atualizacoes')">📢 Atualizações</div>
           <div class="etab" onclick="switchTab(this,'tab-pix');atualizarLinkCampanha()">🏦 Pagamento</div>
         </div>
 
@@ -302,45 +299,23 @@ tr:hover td{background:var(--surface2)}
             <input type="text" id="ed-nome" placeholder="Ex: Ajude a Pequena Ester">
           </div></div>
           <div class="form-row single"><div class="form-group">
-            <label>Resumo curto <span class="hint" style="font-size:11px">(aparece logo abaixo do título no site)</span></label>
-            <input type="text" id="ed-resumoCurto" placeholder="Ex: Olá, meu nome é Robson e sou pai da pequena Ester…">
+            <label>Descrição completa</label>
+            <textarea id="ed-descricao" rows="5" placeholder="Conta a história da campanha…"></textarea>
           </div></div>
           <div class="form-row">
-            <div class="form-group">
-              <label>Localização</label>
-              <input type="text" id="ed-localizacao" placeholder="Ex: Barcarena / PA">
-            </div>
-            <div class="form-group">
-              <label>Categoria</label>
-              <input type="text" id="ed-categoria" placeholder="Ex: SOLIDARIEDADE / SAÚDE">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Data de criação</label>
-              <input type="text" id="ed-dataCriacao" placeholder="Ex: 20/08/2026">
-            </div>
             <div class="form-group">
               <label>Meta de arrecadação (R$)</label>
               <input type="number" id="ed-meta" placeholder="140000" min="1">
             </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select id="ed-status">
+                <option value="ativa">Ativa</option>
+                <option value="pausada">Pausada</option>
+                <option value="rascunho">Rascunho</option>
+              </select>
+            </div>
           </div>
-          <div class="form-row single"><div class="form-group">
-            <label>Status</label>
-            <select id="ed-status">
-              <option value="ativa">Ativa</option>
-              <option value="pausada">Pausada</option>
-              <option value="rascunho">Rascunho</option>
-            </select>
-          </div></div>
-        </div>
-
-        <!-- TAB DESCRIÇÃO / SOBRE -->
-        <div class="editor-body" id="tab-descricao" style="display:none">
-          <div class="form-row single"><div class="form-group">
-            <label>Texto completo da aba "Sobre" <span class="hint" style="font-size:11px">(use linhas em branco para separar parágrafos)</span></label>
-            <textarea id="ed-descricao" rows="14" placeholder="Olá, meu nome é…&#10;&#10;Conte a história completa da campanha aqui. Separe em parágrafos com uma linha em branco."></textarea>
-          </div></div>
         </div>
 
         <!-- TAB MÍDIA -->
@@ -410,24 +385,6 @@ tr:hover td{background:var(--surface2)}
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- TAB Q&A -->
-        <div class="editor-body" id="tab-qa" style="display:none">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <label style="font-weight:600">Perguntas & Respostas</label>
-            <button class="btn btn-primary btn-sm" onclick="adicionarPergunta()">+ Adicionar pergunta</button>
-          </div>
-          <div id="qa-editor-list"></div>
-        </div>
-
-        <!-- TAB ATUALIZAÇÕES -->
-        <div class="editor-body" id="tab-atualizacoes" style="display:none">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <label style="font-weight:600">Atualizações da campanha</label>
-            <button class="btn btn-primary btn-sm" onclick="adicionarAtualizacao()">+ Adicionar atualização</button>
-          </div>
-          <div id="atualizacoes-editor-list"></div>
         </div>
 
         <!-- TAB PIX -->
@@ -732,10 +689,6 @@ function showNewCampaign(){
   midiaAtual = null;
   document.getElementById('ed-id').value = '';
   document.getElementById('ed-nome').value = '';
-  document.getElementById('ed-resumoCurto').value = '';
-  document.getElementById('ed-localizacao').value = '';
-  document.getElementById('ed-categoria').value = 'SOLIDARIEDADE / SAÚDE';
-  document.getElementById('ed-dataCriacao').value = '';
   document.getElementById('ed-descricao').value = '';
   document.getElementById('ed-meta').value = '140000';
   document.getElementById('ed-status').value = 'ativa';
@@ -746,8 +699,6 @@ function showNewCampaign(){
   document.getElementById('ed-upsell').value = '3.99';
   document.getElementById('ed-upsellTexto').value = 'Adicione mais e ajude ainda mais!';
   renderChips([10,25,50,100,200]);
-  renderQAEditor([]);
-  renderAtualizacoesEditor([]);
   removerMidia();
   switchTab(document.querySelector('.etab'), 'tab-info');
   document.getElementById('editorTitle').textContent = 'Nova campanha';
@@ -763,10 +714,6 @@ function editarCampanha(id){
   midiaAtual = null;
   document.getElementById('ed-id').value = c._id;
   document.getElementById('ed-nome').value = c.nome || '';
-  document.getElementById('ed-resumoCurto').value = c.resumoCurto || '';
-  document.getElementById('ed-localizacao').value = c.localizacao || '';
-  document.getElementById('ed-categoria').value = c.categoria || 'SOLIDARIEDADE / SAÚDE';
-  document.getElementById('ed-dataCriacao').value = c.dataCriacao || '';
   document.getElementById('ed-descricao').value = c.descricao || '';
   document.getElementById('ed-meta').value = c.meta || 140000;
   document.getElementById('ed-status').value = c.status || 'ativa';
@@ -774,8 +721,6 @@ function editarCampanha(id){
   document.getElementById('ed-upsell').value = c.upsell || 3.99;
   document.getElementById('ed-upsellTexto').value = c.upsellTexto || 'Adicione mais e ajude ainda mais!';
   renderChips(c.valores || [10,25,50,100,200]);
-  renderQAEditor(c.perguntas || []);
-  renderAtualizacoesEditor(c.atualizacoes || []);
 
   // Mídia
   removerMidia();
@@ -803,19 +748,13 @@ async function salvarCampanha(){
 
   var payload = {
     nome: document.getElementById('ed-nome').value.trim(),
-    resumoCurto: document.getElementById('ed-resumoCurto').value.trim(),
-    localizacao: document.getElementById('ed-localizacao').value.trim(),
-    categoria: document.getElementById('ed-categoria').value.trim(),
-    dataCriacao: document.getElementById('ed-dataCriacao').value.trim(),
     descricao: document.getElementById('ed-descricao').value.trim(),
     meta: parseFloat(document.getElementById('ed-meta').value) || 140000,
     status: document.getElementById('ed-status').value,
     chavePix: document.getElementById('ed-chavePix').value.trim(),
     upsell: parseFloat(document.getElementById('ed-upsell').value) || 3.99,
     upsellTexto: document.getElementById('ed-upsellTexto').value.trim(),
-    valores: chips,
-    perguntas: coletarPerguntas(),
-    atualizacoes: coletarAtualizacoes()
+    valores: chips
   };
 
   if(!payload.nome){ toast('⚠️ Informe o nome da campanha', true); return; }
@@ -896,123 +835,6 @@ function copiarLinkCampanha(){
     toast('📋 Link copiado!');
   }
 }
-
-// ════════════════════════════════════════════
-// Q&A EDITOR
-// ════════════════════════════════════════════
-function renderQAEditor(perguntas){
-  var wrap = document.getElementById('qa-editor-list');
-  if(!wrap) return;
-  wrap.innerHTML = '';
-  if(!perguntas || perguntas.length===0){
-    wrap.innerHTML = '<p style="color:var(--fg2);font-size:13px;text-align:center;padding:20px 0">Nenhuma pergunta ainda. Clique em "+ Adicionar pergunta".</p>';
-    return;
-  }
-  perguntas.forEach(function(q, i){
-    var div = document.createElement('div');
-    div.style.cssText = 'background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px';
-    div.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
-      + '<span style="font-size:12px;font-weight:600;color:var(--fg2)">Pergunta '+(i+1)+'</span>'
-      + '<button class="btn btn-danger btn-sm" onclick="removerQA('+i+')">🗑 Remover</button>'
-      + '</div>'
-      + '<div class="form-group" style="margin-bottom:8px">'
-      + '<label style="font-size:12px">Pergunta</label>'
-      + '<input type="text" class="qa-pergunta" data-index="'+i+'" value="'+escAdmin(q.pergunta||'')+'" placeholder="Ex: O dinheiro vai realmente para o tratamento?">'
-      + '</div>'
-      + '<div class="form-group" style="margin-bottom:8px">'
-      + '<label style="font-size:12px">Resposta</label>'
-      + '<textarea class="qa-resposta" data-index="'+i+'" rows="3" placeholder="Sim! Todo valor é destinado…">'+escAdmin(q.resposta||'')+'</textarea>'
-      + '</div>'
-      + '<div class="form-group">'
-      + '<label style="font-size:12px">Autor da pergunta (opcional)</label>'
-      + '<input type="text" class="qa-autor" data-index="'+i+'" value="'+escAdmin(q.autor||'')+'" placeholder="Ex: Ana Lima">'
-      + '</div>';
-    wrap.appendChild(div);
-  });
-}
-
-function adicionarPergunta(){
-  var pergs = coletarPerguntas();
-  pergs.push({pergunta:'', resposta:'', autor:''});
-  renderQAEditor(pergs);
-  document.querySelector('#tab-qa .qa-pergunta:last-of-type')&&document.querySelector('#tab-qa .qa-pergunta:last-of-type').focus();
-}
-
-function removerQA(idx){
-  var pergs = coletarPerguntas();
-  pergs.splice(idx,1);
-  renderQAEditor(pergs);
-}
-
-function coletarPerguntas(){
-  var result = [];
-  document.querySelectorAll('#qa-editor-list [data-index]').forEach(function(el){
-    var i = parseInt(el.dataset.index);
-    if(!result[i]) result[i]={pergunta:'',resposta:'',autor:''};
-    if(el.classList.contains('qa-pergunta')) result[i].pergunta = el.value;
-    if(el.classList.contains('qa-resposta')) result[i].resposta = el.value;
-    if(el.classList.contains('qa-autor')) result[i].autor = el.value;
-  });
-  return result;
-}
-
-// ════════════════════════════════════════════
-// ATUALIZAÇÕES EDITOR
-// ════════════════════════════════════════════
-function renderAtualizacoesEditor(atualizacoes){
-  var wrap = document.getElementById('atualizacoes-editor-list');
-  if(!wrap) return;
-  wrap.innerHTML = '';
-  if(!atualizacoes || atualizacoes.length===0){
-    wrap.innerHTML = '<p style="color:var(--fg2);font-size:13px;text-align:center;padding:20px 0">Nenhuma atualização ainda. Clique em "+ Adicionar atualização".</p>';
-    return;
-  }
-  atualizacoes.forEach(function(u, i){
-    var div = document.createElement('div');
-    div.style.cssText = 'background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px';
-    div.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
-      + '<span style="font-size:12px;font-weight:600;color:var(--fg2)">Atualização '+(i+1)+'</span>'
-      + '<button class="btn btn-danger btn-sm" onclick="removerAtualizacao('+i+')">🗑 Remover</button>'
-      + '</div>'
-      + '<div class="form-row">'
-      + '<div class="form-group"><label style="font-size:12px">Título</label>'
-      + '<input type="text" class="upd-titulo" data-index="'+i+'" value="'+escAdmin(u.titulo||'')+'" placeholder="Ex: Ester está bem após a última sessão!"></div>'
-      + '<div class="form-group"><label style="font-size:12px">Data</label>'
-      + '<input type="text" class="upd-data" data-index="'+i+'" value="'+escAdmin(u.data||'')+'" placeholder="Ex: 20/11/2026"></div>'
-      + '</div>'
-      + '<div class="form-group">'
-      + '<label style="font-size:12px">Texto</label>'
-      + '<textarea class="upd-texto" data-index="'+i+'" rows="4" placeholder="Descreva o que aconteceu…">'+escAdmin(u.texto||'')+'</textarea>'
-      + '</div>';
-    wrap.appendChild(div);
-  });
-}
-
-function adicionarAtualizacao(){
-  var atuals = coletarAtualizacoes();
-  atuals.unshift({titulo:'',texto:'',data:''});
-  renderAtualizacoesEditor(atuals);
-}
-
-function removerAtualizacao(idx){
-  var atuals = coletarAtualizacoes();
-  atuals.splice(idx,1);
-  renderAtualizacoesEditor(atuals);
-}
-
-function coletarAtualizacoes(){
-  var result = [];
-  document.querySelectorAll('#atualizacoes-editor-list [data-index]').forEach(function(el){
-    var i = parseInt(el.dataset.index);
-    if(!result[i]) result[i]={titulo:'',texto:'',data:''};
-    if(el.classList.contains('upd-titulo')) result[i].titulo = el.value;
-    if(el.classList.contains('upd-data')) result[i].data = el.value;
-    if(el.classList.contains('upd-texto')) result[i].texto = el.value;
-  });
-  return result;
-}
-
-function escAdmin(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ════════════════════════════════════════════
 // CHIPS DE VALORES
