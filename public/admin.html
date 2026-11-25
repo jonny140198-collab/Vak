@@ -3,152 +3,208 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Painel Admin — Vakinha Ester</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<title>Painel Admin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
 :root {
-  --bg:#f5f6fa; --surface:#fff; --surface2:#f0f1f7; --border:#e2e4ef;
-  --fg:#1a1d2e; --fg2:#5a5f7a; --accent:#24ca68; --accent-bg:#e8faf0;
-  --warn:#f59e0b; --danger:#ef4444; --radius:12px;
-  --shadow:0 1px 4px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);
-  --sidebar-w:240px;
-}
-@media(prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --bg:#0f1117;--surface:#1a1d2e;--surface2:#252840;--border:#2a2d3e;
-    --fg:#e8eaf5;--fg2:#8b90b0;--accent-bg:#0f2a1a;
-    --shadow:0 1px 4px rgba(0,0,0,.3);color-scheme:dark;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#0f1117;--surface:#1a1d2e;--surface2:#252840;--border:#2a2d3e;
-  --fg:#e8eaf5;--fg2:#8b90b0;--accent-bg:#0f2a1a;
-  --shadow:0 1px 4px rgba(0,0,0,.3);color-scheme:dark;
+  --bg:#080808; --card:#111; --card2:#181818; --border:#222; --border2:#2a2a2a;
+  --fg:#f0f0f0; --fg2:#888; --fg3:#555;
+  --accent:#22c55e; --accent-dim:#16a34a; --accent-bg:rgba(34,197,94,.08);
+  --danger:#ef4444; --warn:#f59e0b;
+  --radius:10px; --sidebar-w:220px;
+  --input:#141414; --input-border:#2e2e2e;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh}
-#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh}
-.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center}
-.login-box h1{font-size:22px;margin-bottom:6px;font-weight:700}
+
+/* ── LOGIN ── */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)}
+.login-box{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:44px 40px;width:100%;max-width:380px;text-align:center}
+.login-logo{width:52px;height:52px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 20px}
+.login-box h1{font-size:20px;font-weight:800;margin-bottom:5px;letter-spacing:-.3px}
 .login-box p{font-size:13px;color:var(--fg2);margin-bottom:28px}
+
+/* ── APP SHELL ── */
 #appScreen{display:none}
 .app{display:flex;min-height:100vh}
-.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
-.main{flex:1;min-width:0;display:flex;flex-direction:column}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:10}
-.content{padding:28px 24px;max-width:960px;width:100%}
-.sidebar-logo{padding:20px 20px 8px;display:flex;align-items:center;gap:10px}
-.logo-icon{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.logo-text{font-size:14px;font-weight:700}
-.logo-sub{font-size:11px;color:var(--fg2)}
-.sidebar-sec{padding:16px 12px 4px;font-size:10px;font-weight:700;color:var(--fg2);text-transform:uppercase;letter-spacing:.8px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;margin:1px 8px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:var(--fg2);transition:all .15s;user-select:none}
-.nav-item:hover{background:var(--surface2);color:var(--fg)}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
+.sidebar-logo{padding:22px 18px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.logo-icon{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo-text{font-size:13px;font-weight:800;letter-spacing:-.2px}
+.logo-sub{font-size:10px;color:var(--fg3);margin-top:1px}
+.sidebar-sec{padding:16px 18px 5px;font-size:9px;font-weight:700;color:var(--fg3);text-transform:uppercase;letter-spacing:1.2px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 14px;margin:1px 8px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--fg2);transition:all .12s;user-select:none}
+.nav-item:hover{background:var(--card2);color:var(--fg)}
 .nav-item.active{background:var(--accent-bg);color:var(--accent);font-weight:600}
-.nav-icon{width:18px;text-align:center;font-size:15px}
-.sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
-.db-status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--fg2);margin-bottom:10px}
-.db-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.nav-icon{width:17px;text-align:center;font-size:14px;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:14px;border-top:1px solid var(--border)}
+.db-status{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--fg3);margin-bottom:10px}
+.db-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
 .db-dot.off{background:var(--warn)}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{filter:brightness(1.08)}
-.btn-ghost{background:transparent;color:var(--fg2);border:1px solid var(--border)}
-.btn-ghost:hover{background:var(--surface2);color:var(--fg)}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:13px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:10}
+.topbar-title{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.topbar-user{font-size:12px;color:var(--fg3)}
+.content{padding:28px 24px;max-width:960px;width:100%}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .12s;white-space:nowrap;font-family:inherit}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:#28de6d}
+.btn-ghost{background:transparent;color:var(--fg2);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--card2);color:var(--fg);border-color:var(--border2)}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn-danger:hover{background:#ef444415}
 .btn-sm{padding:5px 12px;font-size:12px}
+
+/* ── CARDS / EDITOR ── */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.panel-body{padding:24px}
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
-.section-title{font-size:18px;font-weight:700}
-.editor-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.editor-body{padding:24px}
+.section-title{font-size:16px;font-weight:800;letter-spacing:-.3px}
+
+/* ── FORMS ── */
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .form-row.single{grid-template-columns:1fr}
-.form-group{display:flex;flex-direction:column;gap:6px}
-.form-group label{font-size:11px;font-weight:600;color:var(--fg2);text-transform:uppercase;letter-spacing:.5px}
-.form-group input,.form-group textarea,.form-group select{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--fg);outline:none;transition:border-color .2s;width:100%;font-family:inherit}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:10px;font-weight:700;color:var(--fg3);text-transform:uppercase;letter-spacing:.7px}
+.form-group input,.form-group textarea,.form-group select{
+  background:var(--input);border:1.5px solid var(--input-border);border-radius:8px;
+  padding:10px 13px;font-size:13px;color:var(--fg);outline:none;
+  transition:border-color .15s;width:100%;font-family:inherit}
 .form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--accent)}
-.hint{font-size:11px;color:var(--fg2);margin-top:3px}
+.form-group select option{background:var(--card2)}
+.hint{font-size:11px;color:var(--fg3);margin-top:3px;line-height:1.4}
+
+/* ── TABLE ── */
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--fg2);border-bottom:1.5px solid var(--border)}
+th{text-align:left;padding:10px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--fg3);border-bottom:1px solid var(--border)}
 td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--fg)}
 tr:last-child td{border:none}
-tr:hover td{background:var(--surface2)}
+tr:hover td{background:var(--card2)}
 .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
-.pill-paid{background:#dcfce7;color:#15803d}
-.pill-pend{background:#fef9c3;color:#a16207}
-.pill-fail{background:#fee2e2;color:#dc2626}
-.toast{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;display:none;box-shadow:0 4px 20px rgba(0,0,0,.2);animation:slideUp .25s ease}
-.toast.err{background:var(--danger)}
-@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
-.info-box{background:var(--surface2);border-radius:9px;padding:14px 16px;font-size:13px;color:var(--fg2);margin-bottom:16px}
-@media(max-width:700px){.sidebar{display:none}.form-row{grid-template-columns:1fr}.content{padding:20px 16px}}
+.pill-paid{background:#15803d22;color:#22c55e}
+.pill-pend{background:#a1620722;color:#f59e0b}
+.pill-fail{background:#dc262622;color:#ef4444}
 
-/* ── Campanha editor extras ── */
-.field-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#000;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:700;z-index:9999;display:none;box-shadow:0 4px 24px rgba(0,0,0,.5);animation:slideUp .22s ease}
+.toast.err{background:var(--danger);color:#fff}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ── INFOBOX ── */
+.info-box{background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--fg2);line-height:1.5;margin-bottom:16px}
+.info-box.green{background:var(--accent-bg);border-color:var(--accent);color:#86efac}
+.info-box.warn{background:#78350f18;border-color:var(--warn);color:#fcd34d}
+
+/* ── EDITOR TABS ── */
+.tab-nav{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto;background:var(--card2);padding:4px 4px 0}
+.tab-btn{padding:8px 15px;font-size:12px;font-weight:600;color:var(--fg3);cursor:pointer;border:none;background:none;border-radius:7px 7px 0 0;white-space:nowrap;transition:all .12s;font-family:inherit}
+.tab-btn:hover{color:var(--fg)}
+.tab-btn.active{background:var(--card);color:var(--accent);border-bottom:2px solid var(--accent)}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* ── CHIPS / LIST ITEMS ── */
+.chip{background:var(--card2);border:1.5px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.chip button{background:none;border:none;cursor:pointer;color:var(--danger);font-size:15px;padding:0;line-height:1;opacity:.6}
+.chip button:hover{opacity:1}
+.valores-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:6px}
+.list-row{display:flex;align-items:flex-start;gap:8px;padding:12px;background:var(--card2);border-radius:8px;margin-bottom:6px;border:1px solid var(--border)}
+.list-row-btn{background:none;border:none;cursor:pointer;font-size:13px;padding:3px 6px;border-radius:5px;color:var(--fg3);transition:all .12s;flex-shrink:0}
+.list-row-btn:hover{background:var(--border);color:var(--fg)}
+.add-box{background:var(--card2);border:1.5px dashed var(--border2);border-radius:9px;padding:16px;margin-top:10px}
+.add-box .form-group{margin-bottom:10px}
+.divider{height:1px;background:var(--border);margin:22px 0}
+.char-count{font-size:10px;color:var(--fg3);text-align:right;margin-top:3px}
+.img-preview{width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-top:8px;display:none}
+.field-row{display:flex;align-items:flex-end;gap:10px;margin-bottom:14px}
 .field-row .form-group{flex:1;margin:0}
-.edit-btn{background:none;border:1.5px solid var(--border);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;color:var(--fg2);transition:all .15s;white-space:nowrap;flex-shrink:0;align-self:flex-end;margin-bottom:1px}
+.edit-btn{background:none;border:1.5px solid var(--border2);border-radius:7px;padding:7px 11px;cursor:pointer;font-size:12px;font-weight:600;color:var(--fg3);transition:all .12s;white-space:nowrap;flex-shrink:0;font-family:inherit}
 .edit-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
 .edit-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
-.view-val{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--fg);min-height:40px;word-break:break-word}
-.view-val.empty{color:var(--fg2);font-style:italic}
-.list-item-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border-radius:8px;margin-bottom:8px;border:1px solid var(--border)}
-.list-item-row span{flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.list-item-row .pill{flex-shrink:0}
-.list-item-btn{background:none;border:none;cursor:pointer;font-size:14px;padding:3px 6px;border-radius:5px;transition:background .15s}
-.list-item-btn:hover{background:var(--border)}
-.add-item-box{background:var(--surface2);border:1.5px dashed var(--border);border-radius:9px;padding:16px;margin-top:8px}
-.add-item-box .form-group{margin-bottom:10px}
-.section-divider{height:1px;background:var(--border);margin:24px 0}
-.tab-editor-nav{display:flex;gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:20px;overflow-x:auto}
-.tab-editor-btn{padding:8px 16px;font-size:13px;font-weight:500;color:var(--fg2);cursor:pointer;border:none;background:none;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;white-space:nowrap;transition:all .15s}
-.tab-editor-btn.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
-.tab-editor-pane{display:none}
-.tab-editor-pane.active{display:block}
-.char-count{font-size:10px;color:var(--fg2);text-align:right;margin-top:3px}
-.img-preview{width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-top:8px;display:none}
-.valores-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:6px}
-.valor-chip{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:6px}
-.valor-chip button{background:none;border:none;cursor:pointer;color:var(--danger);font-size:14px;padding:0;line-height:1}
+.view-val{background:var(--input);border:1.5px solid var(--input-border);border-radius:8px;padding:10px 13px;font-size:13px;color:var(--fg);min-height:40px;word-break:break-word}
+.view-val.empty{color:var(--fg3);font-style:italic}
+
+/* ── CAMP CARDS ── */
+.camp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px}
+.camp-card-thumb{width:62px;height:62px;object-fit:cover;border-radius:8px;flex-shrink:0;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:24px}
+.camp-card-info{flex:1;min-width:0}
+.camp-card-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+
+/* ── PROGRESS BAR ── */
+.progress{background:var(--border);border-radius:4px;height:4px;margin:7px 0}
+.progress-bar{background:var(--accent);height:4px;border-radius:4px;transition:width .3s}
+
+/* ── CREDENCIAIS PIX (per-admin, locked style) ── */
+.cred-block{background:var(--card2);border:1px solid var(--border2);border-radius:9px;padding:16px}
+.cred-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.cred-label{font-size:10px;font-weight:700;color:var(--fg3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
+.cred-val{font-size:13px;font-family:monospace;color:var(--fg);word-break:break-all}
+.cred-locked{font-size:12px;color:var(--fg3);font-style:italic}
+
+/* ── BADGE ── */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-green{background:var(--accent-bg);color:var(--accent)}
+.badge-gray{background:#ffffff0d;color:var(--fg3)}
+.badge-purple{background:#7c3aed18;color:#a78bfa}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:28px;width:100%;max-width:420px;margin:16px;box-shadow:0 12px 48px rgba(0,0,0,.6)}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:20px;letter-spacing:-.2px}
+
+@media(max-width:700px){.sidebar{display:none}.form-row{grid-template-columns:1fr}.content{padding:18px 14px}}
 </style>
 </head>
 <body>
 
+<!-- ══ LOGIN ══ -->
 <div id="loginScreen">
   <div class="login-box">
-    <div style="font-size:40px;margin-bottom:16px">🔐</div>
-    <h1>Painel Administrativo</h1>
+    <div class="login-logo">🔐</div>
+    <h1>Painel Admin</h1>
     <p>Acesso restrito — insira suas credenciais</p>
-    <div class="form-group" style="margin-bottom:14px;text-align:left">
+    <div class="form-group" style="margin-bottom:12px;text-align:left">
       <label>Usuário</label>
-      <input type="text" id="loginUser" placeholder="Usuário" autocomplete="username">
+      <input type="text" id="loginUser" placeholder="usuário" autocomplete="username">
     </div>
     <div class="form-group" style="margin-bottom:20px;text-align:left">
       <label>Senha</label>
-      <input type="password" id="loginPass" placeholder="Senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doLogin()">Entrar</button>
-    <p id="loginErr" style="color:var(--danger);font-size:13px;margin-top:12px;display:none"></p>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px" onclick="doLogin()">Entrar</button>
+    <p id="loginErr" style="color:var(--danger);font-size:12px;margin-top:12px;display:none"></p>
   </div>
 </div>
 
+<!-- ══ APP ══ -->
 <div id="appScreen">
 <div class="app">
+
+  <!-- SIDEBAR -->
   <nav class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">💚</div>
       <div>
-        <div class="logo-text">Painel Admin</div>
+        <div class="logo-text">Admin Panel</div>
         <div class="logo-sub">Vakinha Ester</div>
       </div>
     </div>
     <div class="sidebar-sec">Gestão</div>
     <div class="nav-item active" id="nav-pagamentos" onclick="showSection('pagamentos')">
-      <span class="nav-icon">💰</span> Pagamentos
+      <span class="nav-icon">💳</span> Pagamentos
     </div>
     <div class="nav-item" id="nav-campanha" onclick="showSection('campanha')">
-      <span class="nav-icon">🎗️</span> Campanha
+      <span class="nav-icon">🎗️</span> Campanhas
     </div>
-    <div class="sidebar-sec">Configurações</div>
+    <div class="sidebar-sec">Conta</div>
     <div class="nav-item" id="nav-credenciais" onclick="showSection('credenciais')">
       <span class="nav-icon">🔑</span> Credenciais Pix
     </div>
@@ -163,66 +219,114 @@ tr:hover td{background:var(--surface2)}
         <div class="db-dot" id="dbDot"></div>
         <span id="dbLabel">Verificando…</span>
       </div>
-      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="doLogout()">🚪 Sair</button>
+      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="doLogout()">Sair</button>
     </div>
   </nav>
+
+  <!-- MAIN -->
   <div class="main">
     <div class="topbar">
-      <div style="font-size:15px;font-weight:600" id="topbarTitle">💰 Pagamentos</div>
-      <span style="font-size:12px;color:var(--fg2)" id="topbarUser"></span>
+      <div class="topbar-title" id="topbarTitle">💳 Pagamentos</div>
+      <span class="topbar-user" id="topbarUser"></span>
     </div>
 
+    <!-- ══ PAGAMENTOS ══ -->
     <div class="content" id="sec-pagamentos">
       <div class="section-header">
-        <div class="section-title">💰 Pagamentos recentes</div>
-        <button class="btn btn-ghost btn-sm" onclick="exportarCSV()">⬇ Exportar CSV</button>
+        <div class="section-title">Pagamentos recentes</div>
+        <button class="btn btn-ghost btn-sm" onclick="exportarCSV()">↓ Exportar CSV</button>
       </div>
-      <div class="editor-wrap">
+      <div class="panel">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Data</th><th>Valor</th><th>Status</th><th>ID</th></tr></thead>
-            <tbody id="pagamentos-tbody"><tr><td colspan="4" style="text-align:center;color:var(--fg2);padding:30px">Carregando…</td></tr></tbody>
+            <thead><tr><th>Data</th><th>Valor</th><th>Doador</th><th>Status</th><th>ID</th></tr></thead>
+            <tbody id="pagamentos-tbody"><tr><td colspan="5" style="text-align:center;color:var(--fg3);padding:30px">Carregando…</td></tr></tbody>
           </table>
         </div>
-        <div style="padding:14px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--fg2)" id="pagamentos-info"></div>
+        <div style="padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--fg3)" id="pagamentos-info"></div>
       </div>
     </div>
 
+    <!-- ══ CREDENCIAIS PIX (per-admin) ══ -->
     <div class="content" id="sec-credenciais" style="display:none">
-      <div class="section-header"><div class="section-title">🔑 Credenciais de Pagamento</div></div>
-      <div class="editor-wrap"><div class="editor-body">
-        <div class="info-box">⚠️ Estas credenciais são <strong>sensíveis</strong>. Nunca compartilhe a Chave Secreta (SK).</div>
-        <div class="form-row single"><div class="form-group">
-          <label>Chave Pública (PK)</label>
-          <input type="text" id="cfg-pk" placeholder="pk_live_...">
-        </div></div>
-        <div class="form-row single"><div class="form-group">
-          <label>Chave Secreta (SK)</label>
-          <div style="position:relative">
-            <input type="password" id="cfg-sk" placeholder="Deixe em branco para manter a atual" style="padding-right:80px">
-            <button class="btn btn-ghost btn-sm" style="position:absolute;right:8px;top:50%;transform:translateY(-50%)" onclick="toggleSK()">👁 Ver</button>
+      <div class="section-header"><div class="section-title">🔑 Credenciais Pix</div></div>
+      <div class="panel"><div class="panel-body">
+        <div class="info-box warn">⚠️ Suas credenciais XFlow são usadas para receber as doações das suas campanhas. A Chave Secreta (SK) é <strong>armazenada com segurança</strong> e nunca é exibida.</div>
+
+        <!-- PK -->
+        <div style="margin-bottom:20px">
+          <div class="cred-label">Chave Pública (PK)</div>
+          <div class="field-row" id="cred-pk-row">
+            <div class="form-group" style="flex:1;margin:0">
+              <div class="view-val" id="cred-pk-view"></div>
+              <input type="text" id="cred-pk-input" placeholder="pk_live_..." style="display:none" autocomplete="off">
+            </div>
+            <button class="edit-btn" id="cred-pk-btn" onclick="toggleCredField('pk')">Alterar</button>
           </div>
-          <span class="hint">Deixe em branco para não alterar a chave secreta atual</span>
-        </div></div>
-        <button class="btn btn-primary" onclick="salvarCredenciais()">💾 Salvar Credenciais</button>
+        </div>
+
+        <!-- SK -->
+        <div style="margin-bottom:24px">
+          <div class="cred-label">Chave Secreta (SK) <span style="color:var(--danger);font-size:10px">⚠ nunca compartilhe</span></div>
+          <div class="field-row" id="cred-sk-row">
+            <div class="form-group" style="flex:1;margin:0">
+              <div class="view-val" id="cred-sk-view"></div>
+              <div style="position:relative;display:none" id="cred-sk-input-wrap">
+                <input type="password" id="cred-sk-input" placeholder="sk_live_..." autocomplete="new-password" style="padding-right:76px">
+                <button class="btn btn-ghost btn-sm" style="position:absolute;right:7px;top:50%;transform:translateY(-50%)" onclick="toggleSKView()">👁 Ver</button>
+              </div>
+            </div>
+            <button class="edit-btn" id="cred-sk-btn" onclick="toggleCredField('sk')">Alterar</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px" id="cred-save-row" style="display:none">
+          <button class="btn btn-primary" onclick="salvarCredenciais()">💾 Salvar credenciais</button>
+          <button class="btn btn-ghost" onclick="cancelarCredenciais()">Cancelar</button>
+        </div>
       </div></div>
+
+      <!-- Master: config global -->
+      <div id="cred-master-global" style="display:none;margin-top:20px">
+        <div class="panel"><div class="panel-body">
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--accent)">⚙️ Conta global (fallback)</div>
+          <div class="info-box">Esta conta é usada como fallback para campanhas sem dono ou dono sem credenciais configuradas.</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>PK global</label>
+              <input type="text" id="cfg-pk" placeholder="pk_live_..." autocomplete="off">
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label>SK global</label>
+              <div style="position:relative">
+                <input type="password" id="cfg-sk" placeholder="Deixe em branco para manter a atual" style="padding-right:80px" autocomplete="new-password">
+                <button class="btn btn-ghost btn-sm" style="position:absolute;right:8px;top:50%;transform:translateY(-50%)" onclick="toggleSK()">👁 Ver</button>
+              </div>
+              <span class="hint">Deixe em branco para não alterar a chave secreta</span>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="salvarConfigGlobal()">💾 Salvar conta global</button>
+        </div></div>
+      </div>
     </div>
 
+    <!-- ══ MARKETING ══ -->
     <div class="content" id="sec-marketing" style="display:none">
-      <div class="section-header"><div class="section-title">📊 Rastreamento & Marketing</div></div>
-      <div class="editor-wrap"><div class="editor-body">
+      <div class="section-header"><div class="section-title">📊 Marketing</div></div>
+      <div class="panel"><div class="panel-body">
         <div class="form-row">
           <div class="form-group">
             <label>Pixel do Facebook (ID)</label>
             <input type="text" id="cfg-pixelFb" placeholder="Ex: 1234567890123">
-            <span class="hint">Apenas o número do ID do Pixel</span>
           </div>
           <div class="form-group">
             <label>Google Analytics (ID)</label>
             <input type="text" id="cfg-ga" placeholder="Ex: G-XXXXXXXXXX">
           </div>
         </div>
-        <button class="btn btn-primary" onclick="salvarMarketing()">💾 Salvar Marketing</button>
+        <button class="btn btn-primary" onclick="salvarMarketing()">💾 Salvar</button>
       </div></div>
     </div>
 
@@ -230,28 +334,28 @@ tr:hover td{background:var(--surface2)}
     <div class="content" id="sec-usuarios" style="display:none">
       <div class="section-header">
         <div class="section-title">👥 Usuários Admin</div>
-        <button class="btn btn-primary btn-sm" onclick="abrirModalNovoUsuario()">＋ Novo usuário</button>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalNovoUsuario()">+ Novo usuário</button>
       </div>
-      <div class="editor-wrap">
-        <div class="info-box" style="margin-bottom:16px">ℹ️ Apenas o <strong>administrador principal</strong> pode gerenciar usuários. Cada usuário acessa o painel com suas próprias credenciais.</div>
-        <div id="usuarios-lista"><div style="text-align:center;padding:30px;color:var(--fg2)">Carregando…</div></div>
+      <div class="panel">
+        <div class="info-box" style="margin:16px 16px 0;border-radius:8px">ℹ️ Cada usuário vê e edita apenas as suas próprias campanhas. Apenas o administrador principal pode criar outros usuários.</div>
+        <div id="usuarios-lista" style="padding:16px"><div style="text-align:center;padding:30px;color:var(--fg3)">Carregando…</div></div>
       </div>
-      <!-- Modal novo/editar usuário -->
-      <div id="modal-usuario" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center">
-        <div style="background:var(--card);border-radius:16px;padding:28px;width:100%;max-width:420px;margin:16px;box-shadow:0 8px 40px rgba(0,0,0,.3)">
-          <div style="font-size:17px;font-weight:700;margin-bottom:20px" id="modal-usuario-titulo">Novo usuário</div>
+      <!-- Modal usuário -->
+      <div class="modal-overlay" id="modal-usuario">
+        <div class="modal-box">
+          <div class="modal-title" id="modal-usuario-titulo">Novo usuário</div>
           <input type="hidden" id="modal-usuario-id">
-          <div class="form-group" style="margin-bottom:14px">
+          <div class="form-group" style="margin-bottom:12px">
             <label>Usuário</label>
             <input type="text" id="modal-usuario-login" placeholder="Ex: joao123" autocomplete="off">
           </div>
-          <div class="form-group" style="margin-bottom:14px">
+          <div class="form-group" style="margin-bottom:12px">
             <label id="modal-senha-label">Senha</label>
             <input type="password" id="modal-usuario-senha" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
           </div>
           <div class="form-group" style="margin-bottom:20px">
             <label>Nível de acesso</label>
-            <select id="modal-usuario-role" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:10px;background:var(--input);color:var(--fg);font-size:14px">
+            <select id="modal-usuario-role">
               <option value="comum">Comum — acessa e edita campanhas</option>
               <option value="master">Master — pode criar outros usuários</option>
             </select>
@@ -264,36 +368,35 @@ tr:hover td{background:var(--surface2)}
       </div>
     </div>
 
-    <!-- ══ CAMPANHA EDITOR ══ -->
-    <!-- ══ CAMPANHAS: LISTA ══ -->
+    <!-- ══ CAMPANHAS ══ -->
     <div class="content" id="sec-campanha" style="display:none">
 
-      <!-- TELA: LISTA DE CAMPANHAS -->
+      <!-- LISTA -->
       <div id="camp-lista-view">
         <div class="section-header">
           <div class="section-title">🎗️ Campanhas</div>
-          <button class="btn btn-primary btn-sm" onclick="abrirCriarCampanha()">＋ Nova campanha</button>
+          <button class="btn btn-primary btn-sm" onclick="abrirCriarCampanha()">+ Nova campanha</button>
         </div>
-        <div id="camp-lista-loading" style="text-align:center;padding:40px;color:var(--fg2)">Carregando…</div>
+        <div id="camp-lista-loading" style="text-align:center;padding:40px;color:var(--fg3)">Carregando…</div>
         <div id="camp-lista-cards" style="display:none"></div>
       </div>
 
-      <!-- TELA: CRIAR NOVA CAMPANHA -->
+      <!-- CRIAR -->
       <div id="camp-criar-view" style="display:none">
         <div class="section-header">
           <div style="display:flex;align-items:center;gap:10px">
             <button class="btn btn-ghost btn-sm" onclick="voltarLista()">← Voltar</button>
-            <div class="section-title">➕ Nova Campanha</div>
+            <div class="section-title">Nova Campanha</div>
           </div>
         </div>
-        <div class="editor-wrap"><div class="editor-body">
+        <div class="panel"><div class="panel-body">
           <div class="form-row">
             <div class="form-group">
-              <label>Título da campanha *</label>
+              <label>Título *</label>
               <input type="text" id="nova-nome" placeholder="Ex: Ajude o João a se recuperar">
             </div>
             <div class="form-group">
-              <label>Slug / URL única *</label>
+              <label>Slug / URL *</label>
               <input type="text" id="nova-slug" placeholder="Ex: joao-recuperacao" oninput="sanitizeSlug(this)">
               <span class="hint" id="nova-slug-preview">Link: /c/<em>seu-slug</em></span>
             </div>
@@ -334,7 +437,7 @@ tr:hover td{background:var(--surface2)}
           <div class="form-row single">
             <div class="form-group">
               <label>Descrição completa</label>
-              <textarea id="nova-descricao" rows="8" placeholder="Conte a história completa da campanha…&#10;&#10;Use linha em branco para separar parágrafos."></textarea>
+              <textarea id="nova-descricao" rows="8" placeholder="Conte a história completa da campanha…"></textarea>
             </div>
           </div>
           <div class="form-row single">
@@ -346,8 +449,7 @@ tr:hover td{background:var(--surface2)}
           <div class="form-row single">
             <div class="form-group">
               <label>Vídeo (YouTube, Vimeo ou URL direta)</label>
-              <input type="url" id="nova-videoUrl" placeholder="https://youtube.com/watch?v=... ou https://vimeo.com/...">
-              <span class="hint">Suporta YouTube, Vimeo e links diretos de vídeo (mp4)</span>
+              <input type="url" id="nova-videoUrl" placeholder="https://youtube.com/watch?v=...">
             </div>
           </div>
           <div class="form-row single">
@@ -363,44 +465,41 @@ tr:hover td{background:var(--surface2)}
         </div></div>
       </div>
 
-      <!-- TELA: EDITOR DA CAMPANHA SELECIONADA -->
+      <!-- EDITOR -->
       <div id="camp-editor-view" style="display:none">
         <div class="section-header">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             <button class="btn btn-ghost btn-sm" onclick="voltarLista()">← Campanhas</button>
             <div class="section-title" id="ce-titulo-header">Editor</div>
-            <span id="ce-status-badge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--accent-bg);color:var(--accent)"></span>
+            <span id="ce-status-badge" class="badge badge-green"></span>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <a id="ce-link-ver" href="#" target="_blank" class="btn btn-ghost btn-sm">🔗 Ver site</a>
-            <button class="btn btn-ghost btn-sm" onclick="confirmarExcluirCampanha()" style="color:var(--danger);border-color:var(--danger)">🗑️ Excluir</button>
+            <button class="btn btn-danger btn-sm" onclick="confirmarExcluirCampanha()">🗑️ Excluir</button>
             <button class="btn btn-primary btn-sm" onclick="salvarCampanha()">💾 Salvar</button>
           </div>
         </div>
 
-        <div id="campanha-loading" style="text-align:center;padding:40px;color:var(--fg2);display:none">Salvando…</div>
+        <div id="campanha-loading" style="text-align:center;padding:40px;color:var(--fg3);display:none">Carregando…</div>
         <div id="campanha-editor">
-
-          <!-- ABAS DO EDITOR -->
-          <div class="tab-editor-nav">
-            <button class="tab-editor-btn active" onclick="showEditorTab('info',this)">📋 Informações</button>
-            <button class="tab-editor-btn" onclick="showEditorTab('midia',this)">🖼️ Mídia</button>
-            <button class="tab-editor-btn" onclick="showEditorTab('descricao',this)">📝 Descrição</button>
-            <button class="tab-editor-btn" onclick="showEditorTab('textos',this)">✍️ Textos</button>
-            <button class="tab-editor-btn" onclick="showEditorTab('atualizacoes',this)">📢 Atualizações</button>
-            <button class="tab-editor-btn" onclick="showEditorTab('perguntas',this)">❓ Q&amp;A</button>
-            <button class="tab-editor-btn" onclick="showEditorTab('valores',this)">💲 Valores</button>
-            <button class="tab-editor-btn" onclick="showEditorTab('extras',this)">⭐ Extras</button>
-            <button class="tab-editor-btn" onclick="showEditorTab('pagamento',this)">🔑 Pagamento</button>
+          <div class="tab-nav">
+            <button class="tab-btn active" onclick="showEditorTab('info',this)">📋 Info</button>
+            <button class="tab-btn" onclick="showEditorTab('midia',this)">🖼️ Mídia</button>
+            <button class="tab-btn" onclick="showEditorTab('descricao',this)">📝 Descrição</button>
+            <button class="tab-btn" onclick="showEditorTab('textos',this)">✍️ Textos</button>
+            <button class="tab-btn" onclick="showEditorTab('atualizacoes',this)">📢 Atualizações</button>
+            <button class="tab-btn" onclick="showEditorTab('perguntas',this)">❓ Q&amp;A</button>
+            <button class="tab-btn" onclick="showEditorTab('valores',this)">💲 Valores</button>
+            <button class="tab-btn" onclick="showEditorTab('extras',this)">⭐ Extras</button>
           </div>
 
-          <!-- ABA: INFORMAÇÕES -->
-          <div class="tab-editor-pane active" id="ceditor-info">
-            <div class="editor-wrap"><div class="editor-body">
+          <!-- ABA: INFO -->
+          <div class="tab-pane active" id="ceditor-info">
+            <div class="panel"><div class="panel-body">
               <div class="form-row">
                 <div class="form-group">
-                  <label>Título / Cabeçalho ✏️</label>
-                  <input type="text" id="ce-nome" placeholder="Ex: Ajude o Robson a cuidar da pequena Ester">
+                  <label>Título / Cabeçalho</label>
+                  <input type="text" id="ce-nome" placeholder="Ex: Ajude a pequena Ester">
                 </div>
                 <div class="form-group">
                   <label>Resumo curto</label>
@@ -409,7 +508,7 @@ tr:hover td{background:var(--surface2)}
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label>Slug / URL ✏️</label>
+                  <label>Slug / URL</label>
                   <input type="text" id="ce-slug" placeholder="Ex: ester-leucemia" oninput="sanitizeSlug(this)">
                   <span class="hint" id="ce-slug-preview">Link gerado: —</span>
                 </div>
@@ -420,11 +519,11 @@ tr:hover td{background:var(--surface2)}
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label>Localização / Estado ✏️</label>
+                  <label>Localização</label>
                   <input type="text" id="ce-localizacao" placeholder="Ex: Barcarena / PA">
                 </div>
                 <div class="form-group">
-                  <label>Categoria ✏️</label>
+                  <label>Categoria</label>
                   <select id="ce-categoria">
                     <option value="Solidariedade">Solidariedade</option>
                     <option value="Saúde">Saúde</option>
@@ -463,95 +562,85 @@ tr:hover td{background:var(--surface2)}
             </div></div>
           </div>
 
-          <!-- ABA: MÍDIA (foto + vídeo) -->
-          <div class="tab-editor-pane" id="ceditor-midia">
-            <div class="editor-wrap"><div class="editor-body">
+          <!-- ABA: MÍDIA -->
+          <div class="tab-pane" id="ceditor-midia">
+            <div class="panel"><div class="panel-body">
               <div class="form-group" style="margin-bottom:20px">
                 <label>Foto da campanha — URL</label>
                 <input type="url" id="ce-fotoUrl" placeholder="https://..." oninput="onFotoUrlChange()">
-                <img id="ce-fotoPreview" class="img-preview" alt="Preview da foto">
+                <img id="ce-fotoPreview" class="img-preview" alt="Preview">
               </div>
               <div class="form-group" style="margin-bottom:20px">
                 <label>Ou envie uma imagem do seu dispositivo</label>
                 <input type="file" id="ce-fotoFile" accept="image/*" onchange="previewFoto(this)" style="padding:8px">
-                <span class="hint">JPG, PNG, WebP — máx 2 MB. Substitui a URL acima.</span>
+                <span class="hint">JPG, PNG, WebP — máx 2 MB</span>
               </div>
-              <div class="section-divider"></div>
+              <div class="divider"></div>
               <div class="form-group">
                 <label>🎬 Vídeo da campanha</label>
                 <input type="url" id="ce-videoUrl" placeholder="https://youtube.com/watch?v=... ou https://vimeo.com/..." oninput="onVideoUrlChange()">
-                <span class="hint">Suporta YouTube, Vimeo e URL direta de vídeo (mp4). Aparece abaixo da foto no site.</span>
+                <span class="hint">Suporta YouTube, Vimeo e URL direta de vídeo (mp4)</span>
                 <div id="ce-videoPreview" style="margin-top:10px;border-radius:8px;overflow:hidden;display:none"></div>
               </div>
             </div></div>
           </div>
 
           <!-- ABA: DESCRIÇÃO -->
-          <div class="tab-editor-pane" id="ceditor-descricao">
-            <div class="editor-wrap"><div class="editor-body">
+          <div class="tab-pane" id="ceditor-descricao">
+            <div class="panel"><div class="panel-body">
               <div class="form-group" style="margin-bottom:20px">
-                <label>Descrição completa — Aba "Sobre" ✏️</label>
+                <label>Descrição completa — Aba "Sobre"</label>
                 <textarea id="ce-descricao" rows="18" placeholder="Texto completo da campanha.&#10;&#10;Use linha em branco para separar parágrafos." oninput="updateCharCount(this,'desc-count')"></textarea>
                 <div class="char-count" id="desc-count">0 caracteres</div>
-                <span class="hint">Linha em branco = novo parágrafo. Aparece na aba "Sobre" do site.</span>
               </div>
               <div class="form-group">
-                <label>Texto — Aba "Vakinha Premiada" ✏️</label>
+                <label>Texto — Aba "Vakinha Premiada"</label>
                 <textarea id="ce-vakinhaPremiada" rows="5" placeholder="Ex: Esta vaquinha concorre ao prêmio de R$ 10.000..."></textarea>
-                <span class="hint">Aparece na aba "Vakinha Premiada".</span>
               </div>
             </div></div>
           </div>
 
-          <!-- ABA: TEXTOS (checkout, upsell, agradecimento) -->
-          <div class="tab-editor-pane" id="ceditor-textos">
-            <div class="editor-wrap"><div class="editor-body">
-
-              <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)">🛒 Mini-card no Checkout (tela de doação)</div>
+          <!-- ABA: TEXTOS -->
+          <div class="tab-pane" id="ceditor-textos">
+            <div class="panel"><div class="panel-body">
+              <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px">🛒 Mini-card no Checkout</div>
               <div class="form-row single">
                 <div class="form-group">
                   <label>Nome exibido no checkout</label>
                   <input type="text" id="ce-checkoutNome" placeholder="Ex: Ajude o Robson e a pequena Ester">
-                  <span class="hint">Aparece no mini-card no topo da tela "Fazer uma doação". Se vazio, usa o título da campanha.</span>
+                  <span class="hint">Se vazio, usa o título da campanha.</span>
                 </div>
               </div>
-
-              <div class="section-divider"></div>
-              <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)">💚 Tela de Upsell ("Deseja adicionar mais?")</div>
+              <div class="divider"></div>
+              <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px">💚 Tela de Upsell</div>
               <div class="form-row">
                 <div class="form-group">
                   <label>Valor do upsell (R$)</label>
                   <input type="number" id="ce-upsellValor" placeholder="Ex: 3.99" min="0.5" step="0.5">
-                  <span class="hint">Valor adicional sugerido. Padrão: R$ 3,99</span>
                 </div>
                 <div class="form-group">
                   <label>Título do upsell</label>
                   <input type="text" id="ce-textoUpsellTitulo" placeholder="Ex: Deseja adicionar R$ 3,99 a mais?">
-                  <span class="hint">Se vazio, gerado automaticamente com o valor acima.</span>
                 </div>
               </div>
               <div class="form-row single">
                 <div class="form-group">
                   <label>Texto explicativo do upsell</label>
                   <textarea id="ce-textoUpsellSub" rows="3" placeholder="Ex: Esse valor extra ajuda nosso projeto a continuar&#10;ajudando mais vidas como a da Ester 🙏"></textarea>
-                  <span class="hint">Texto abaixo do título na tela de upsell.</span>
                 </div>
               </div>
-
-              <div class="section-divider"></div>
-              <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)">🙏 Tela de Agradecimento (após pagamento)</div>
+              <div class="divider"></div>
+              <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px">🙏 Tela de Agradecimento</div>
               <div class="form-row single">
                 <div class="form-group">
                   <label>Título principal</label>
                   <input type="text" id="ce-textoAgradecimento" placeholder="Ex: Que Deus abençoe você!">
-                  <span class="hint">Título grande verde no topo da tela de sucesso.</span>
                 </div>
               </div>
               <div class="form-row single">
                 <div class="form-group">
                   <label>Parágrafo 1 (destaque)</label>
-                  <textarea id="ce-textoAgradecimentoP1" rows="3" placeholder="Ex: Você acabou de fazer muito mais do que uma doação. Você deu esperança."></textarea>
-                  <span class="hint">Texto em destaque, pode usar &lt;strong&gt; para negrito. Ex: Você deu &lt;strong&gt;esperança&lt;/strong&gt;.</span>
+                  <textarea id="ce-textoAgradecimentoP1" rows="3" placeholder="Ex: Você acabou de fazer muito mais do que uma doação."></textarea>
                 </div>
               </div>
               <div class="form-row single">
@@ -566,18 +655,17 @@ tr:hover td{background:var(--surface2)}
                   <textarea id="ce-textoAgradecimentoP3" rows="3" placeholder="Ex: Obrigado por não ignorar. Você faz parte desta história."></textarea>
                 </div>
               </div>
-
             </div></div>
           </div>
 
           <!-- ABA: ATUALIZAÇÕES -->
-          <div class="tab-editor-pane" id="ceditor-atualizacoes">
-            <div class="editor-wrap"><div class="editor-body">
+          <div class="tab-pane" id="ceditor-atualizacoes">
+            <div class="panel"><div class="panel-body">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
                 <div style="font-size:14px;font-weight:600">Atualizações da campanha</div>
                 <button class="btn btn-ghost btn-sm" onclick="toggleAddAtualizacao()">+ Nova</button>
               </div>
-              <div id="add-atualizacao-box" class="add-item-box" style="display:none;margin-bottom:16px">
+              <div id="add-atualizacao-box" class="add-box" style="display:none;margin-bottom:16px">
                 <div class="form-group"><label>Título</label><input type="text" id="new-atu-titulo" placeholder="Ex: Resultado do exame desta semana"></div>
                 <div class="form-group"><label>Data</label><input type="text" id="new-atu-data" placeholder="Ex: 24/11/2026"></div>
                 <div class="form-group"><label>Texto</label><textarea id="new-atu-texto" rows="4" placeholder="Descreva a atualização…"></textarea></div>
@@ -587,18 +675,18 @@ tr:hover td{background:var(--surface2)}
                 </div>
               </div>
               <div id="atualizacoes-list"></div>
-              <div id="atualizacoes-vazio" style="text-align:center;padding:30px;color:var(--fg2)">Nenhuma atualização ainda</div>
+              <div id="atualizacoes-vazio" style="text-align:center;padding:30px;color:var(--fg3)">Nenhuma atualização ainda</div>
             </div></div>
           </div>
 
           <!-- ABA: Q&A -->
-          <div class="tab-editor-pane" id="ceditor-perguntas">
-            <div class="editor-wrap"><div class="editor-body">
+          <div class="tab-pane" id="ceditor-perguntas">
+            <div class="panel"><div class="panel-body">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
                 <div style="font-size:14px;font-weight:600">Perguntas &amp; Respostas</div>
                 <button class="btn btn-ghost btn-sm" onclick="toggleAddPergunta()">+ Nova</button>
               </div>
-              <div id="add-pergunta-box" class="add-item-box" style="display:none;margin-bottom:16px">
+              <div id="add-pergunta-box" class="add-box" style="display:none;margin-bottom:16px">
                 <div class="form-group"><label>Pergunta</label><input type="text" id="new-perg-pergunta" placeholder="Ex: O dinheiro vai realmente para o tratamento?"></div>
                 <div class="form-group"><label>Resposta</label><textarea id="new-perg-resposta" rows="3" placeholder="Resposta completa…"></textarea></div>
                 <div class="form-group"><label>Autor (opcional)</label><input type="text" id="new-perg-autor" placeholder="Ex: Ana Lima"></div>
@@ -608,24 +696,24 @@ tr:hover td{background:var(--surface2)}
                 </div>
               </div>
               <div id="perguntas-list"></div>
-              <div id="perguntas-vazio" style="text-align:center;padding:30px;color:var(--fg2)">Nenhuma pergunta ainda</div>
+              <div id="perguntas-vazio" style="text-align:center;padding:30px;color:var(--fg3)">Nenhuma pergunta ainda</div>
             </div></div>
           </div>
 
           <!-- ABA: VALORES -->
-          <div class="tab-editor-pane" id="ceditor-valores">
-            <div class="editor-wrap"><div class="editor-body">
+          <div class="tab-pane" id="ceditor-valores">
+            <div class="panel"><div class="panel-body">
               <div style="font-size:14px;font-weight:600;margin-bottom:4px">Botões de valor para doação</div>
-              <div style="font-size:12px;color:var(--fg2);margin-bottom:16px">Valores pré-definidos que o doador pode selecionar. Máximo 8.</div>
+              <div style="font-size:12px;color:var(--fg3);margin-bottom:16px">Valores pré-definidos. Máximo 8.</div>
               <div id="valores-chips" class="valores-grid"></div>
               <div style="display:flex;gap:8px;margin-top:14px;align-items:flex-end">
                 <div class="form-group" style="margin:0;flex:1">
                   <label>Novo valor (R$)</label>
                   <input type="number" id="new-valor" placeholder="Ex: 50" min="1" step="1" onkeydown="if(event.key==='Enter')adicionarValor()">
                 </div>
-                <button class="btn btn-ghost btn-sm" style="margin-bottom:1px" onclick="adicionarValor()">+ Adicionar</button>
+                <button class="btn btn-ghost btn-sm" onclick="adicionarValor()">+ Adicionar</button>
               </div>
-              <div class="section-divider"></div>
+              <div class="divider"></div>
               <div class="form-row">
                 <div class="form-group">
                   <label>Upsell ativo?</label>
@@ -639,9 +727,9 @@ tr:hover td{background:var(--surface2)}
                   <input type="text" id="ce-upsellTexto" placeholder="Ex: Contribua mais e ajude ainda mais!">
                 </div>
               </div>
-              <div class="section-divider"></div>
+              <div class="divider"></div>
               <div style="font-size:14px;font-weight:600;margin-bottom:4px">📊 Contadores de exibição</div>
-              <div style="font-size:12px;color:var(--fg2);margin-bottom:14px">Valor base exibido no site. O sistema soma as doações reais recebidas automaticamente. Use para configurar o ponto de partida dos contadores.</div>
+              <div style="font-size:12px;color:var(--fg3);margin-bottom:14px">Valor base exibido no site. O sistema soma as doações reais recebidas automaticamente.</div>
               <div class="form-row">
                 <div class="form-group">
                   <label>Arrecadado base (R$)</label>
@@ -663,53 +751,28 @@ tr:hover td{background:var(--surface2)}
           </div>
 
           <!-- ABA: EXTRAS -->
-          <div class="tab-editor-pane" id="ceditor-extras">
-            <div class="editor-wrap"><div class="editor-body">
-              <div style="font-size:14px;font-weight:600;margin-bottom:4px">Selos recebidos ✏️</div>
-              <div style="font-size:12px;color:var(--fg2);margin-bottom:12px">Conquistas e verificações exibidas no site</div>
+          <div class="tab-pane" id="ceditor-extras">
+            <div class="panel"><div class="panel-body">
+              <div style="font-size:14px;font-weight:600;margin-bottom:4px">Selos recebidos</div>
+              <div style="font-size:12px;color:var(--fg3);margin-bottom:12px">Conquistas e verificações exibidas no site</div>
               <div id="selos-list"></div>
               <div style="display:flex;gap:8px;margin-top:10px;align-items:flex-end">
                 <div class="form-group" style="margin:0;flex:1">
                   <label>Novo selo</label>
                   <input type="text" id="new-selo" placeholder="Ex: ✅ Campanha Verificada" onkeydown="if(event.key==='Enter')adicionarSelo()">
                 </div>
-                <button class="btn btn-ghost btn-sm" style="margin-bottom:1px" onclick="adicionarSelo()">+ Adicionar</button>
-              </div>
-            </div></div>
-          </div>
-
-          <!-- ABA: PAGAMENTO -->
-          <div class="tab-editor-pane" id="ceditor-pagamento">
-            <div class="editor-wrap"><div class="editor-body">
-              <div style="font-size:14px;font-weight:600;margin-bottom:4px">🔑 Credenciais de recebimento desta campanha</div>
-              <div style="font-size:12px;color:var(--fg2);margin-bottom:16px">Preencha apenas se esta campanha usa uma conta XFlow diferente da conta global. Deixe em branco para usar a conta padrão.</div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Public Key (PK)</label>
-                  <input type="text" id="ce-paymentPk" placeholder="pk_live_... (deixe em branco para usar a conta padrão)" autocomplete="off">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Secret Key (SK) <span style="color:var(--danger);font-size:11px">⚠️ Nunca compartilhe esta chave</span></label>
-                  <input type="password" id="ce-paymentSk" placeholder="sk_live_... (deixe em branco para usar a conta padrão)" autocomplete="new-password">
-                  <span class="hint">A Secret Key é armazenada com segurança e nunca aparece no frontend do site.</span>
-                </div>
-              </div>
-              <div style="background:#f0fdf4;border:1px solid #bbf0d0;border-radius:10px;padding:12px;margin-top:8px;font-size:12px;color:#1a6e2e;">
-                💡 <strong>Como funciona:</strong> cada campanha pode ter seu próprio recebedor Pix. Basta inserir as chaves XFlow da conta desejada. Os valores doados nesta campanha irão direto para essa conta.
+                <button class="btn btn-ghost btn-sm" onclick="adicionarSelo()">+ Adicionar</button>
               </div>
             </div></div>
           </div>
 
           <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
-            <button class="btn btn-ghost" onclick="confirmarExcluirCampanha()" style="color:var(--danger);border-color:var(--danger)">🗑️ Excluir campanha</button>
+            <button class="btn btn-danger btn-sm" onclick="confirmarExcluirCampanha()">🗑️ Excluir campanha</button>
             <button class="btn btn-ghost" onclick="carregarCampanhaEditor(campanhaAtual._id)">🔄 Descartar</button>
             <button class="btn btn-primary" onclick="salvarCampanha()">💾 Salvar campanha</button>
           </div>
-
-        </div><!-- /campanha-editor -->
-      </div><!-- /camp-editor-view -->
+        </div>
+      </div>
 
     </div><!-- /sec-campanha -->
 
@@ -722,7 +785,10 @@ tr:hover td{background:var(--surface2)}
 <script>
 var BASE = '';
 var TOKEN = '';
+var ADMIN_ROLE = 'comum';
+var ADMIN_USER_NAME = '';
 
+// ══ UTILIDADES ══
 function toast(msg, err){
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -731,16 +797,18 @@ function toast(msg, err){
   clearTimeout(t._t);
   t._t = setTimeout(function(){ t.style.display = 'none'; }, 3500);
 }
+function fmtBRL(val){ return 'R$ '+parseFloat(val||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function esc(s){ var d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+function updateCharCount(el, countId){ var c=document.getElementById(countId); if(c) c.textContent=el.value.length+' caracteres'; }
 
+// ══ AUTH ══
 async function doLogin(){
   var u = document.getElementById('loginUser').value.trim();
   var p = document.getElementById('loginPass').value;
   var err = document.getElementById('loginErr');
-  var btn = document.querySelector('#loginScreen button[onclick="doLogin()"]') ||
-            document.querySelector('#loginScreen button[type="submit"]');
   err.style.display = 'none';
   try {
-    var r = await fetch(BASE+'/admin/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u,senha:p})});
+    var r = await fetch(BASE+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({usuario:u,senha:p})});
     var d = await r.json();
     if(d.token){
       TOKEN = d.token;
@@ -749,861 +817,623 @@ async function doLogin(){
       iniciarApp(u);
     } else {
       var msg = d.error || 'Usuário ou senha incorretos';
-      if(r.status === 429){
-        msg = '🔒 Acesso bloqueado. Muitas tentativas incorretas. Aguarde 30 minutos.';
-        if(btn){ btn.disabled = true; setTimeout(function(){ btn.disabled = false; }, 5*60*1000); }
-      } else if(typeof d.tentativasRestantes === 'number' && d.tentativasRestantes > 0){
-        msg += ' (' + d.tentativasRestantes + ' tentativa' + (d.tentativasRestantes > 1 ? 's' : '') + ' restante' + (d.tentativasRestantes > 1 ? 's' : '') + ')';
-      } else if(typeof d.tentativasRestantes === 'number' && d.tentativasRestantes === 0){
+      if(r.status===429) msg = '🔒 Muitas tentativas. Aguarde 30 minutos.';
+      else if(typeof d.tentativasRestantes==='number' && d.tentativasRestantes>0)
+        msg += ' ('+d.tentativasRestantes+' tentativa'+(d.tentativasRestantes>1?'s':'')+' restante'+(d.tentativasRestantes>1?'s':'')+')';
+      else if(typeof d.tentativasRestantes==='number' && d.tentativasRestantes===0)
         msg = '🔒 Acesso bloqueado por 30 minutos.';
-        if(btn){ btn.disabled = true; setTimeout(function(){ btn.disabled = false; }, 5*60*1000); }
-      }
-      err.textContent = msg;
-      err.style.display = 'block';
+      err.textContent = msg; err.style.display = 'block';
     }
-  } catch(e){
-    err.textContent = 'Erro de conexão com o servidor';
-    err.style.display = 'block';
-  }
+  } catch(e){ err.textContent='Erro de conexão com o servidor'; err.style.display='block'; }
 }
 
 async function doLogout(){
-  await fetch(BASE+'/admin/logout', {method:'POST',headers:{'x-admin-token':TOKEN}}).catch(()=>{});
-  TOKEN = '';
+  await fetch(BASE+'/admin/logout',{method:'POST',headers:{'x-admin-token':TOKEN}}).catch(()=>{});
+  TOKEN='';
   localStorage.removeItem('adminToken');
-  document.getElementById('appScreen').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
 }
 
-var ADMIN_ROLE = 'comum';
-
 async function iniciarApp(user){
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('appScreen').style.display = 'block';
-  document.getElementById('topbarUser').textContent = '👤 ' + user;
-  // Busca role do usuário logado
+  ADMIN_USER_NAME = user;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appScreen').style.display='block';
+  document.getElementById('topbarUser').textContent='👤 '+user;
   try {
-    var r = await fetch(BASE+'/admin/me', {headers:{'x-admin-token':TOKEN}});
+    var r = await fetch(BASE+'/admin/me',{headers:{'x-admin-token':TOKEN}});
     var d = await r.json();
     ADMIN_ROLE = d.role || 'comum';
-  } catch(e) { ADMIN_ROLE = 'comum'; }
-  // Exibe nav de Usuários apenas para master
+  } catch(e){ ADMIN_ROLE='comum'; }
   var navU = document.getElementById('nav-usuarios');
-  if(navU) navU.style.display = ADMIN_ROLE === 'master' ? 'flex' : 'none';
+  if(navU) navU.style.display = ADMIN_ROLE==='master' ? 'flex' : 'none';
+  var credMasterGlobal = document.getElementById('cred-master-global');
+  if(credMasterGlobal) credMasterGlobal.style.display = ADMIN_ROLE==='master' ? 'block' : 'none';
   carregarConfig();
   carregarPagamentos();
 }
 
-var secTitles = {pagamentos:'💰 Pagamentos', credenciais:'🔑 Credenciais Pix', marketing:'📊 Marketing', campanha:'🎗️ Campanhas', usuarios:'👥 Usuários'};
-
+// ══ NAVEGAÇÃO ══
+var secTitles = {pagamentos:'💳 Pagamentos', credenciais:'🔑 Credenciais Pix', marketing:'📊 Marketing', campanha:'🎗️ Campanhas', usuarios:'👥 Usuários'};
 function showSection(id){
   ['pagamentos','credenciais','marketing','campanha','usuarios'].forEach(function(s){
-    var el = document.getElementById('sec-'+s);
-    if(el) el.style.display = s===id ? 'block' : 'none';
+    var el=document.getElementById('sec-'+s); if(el) el.style.display=s===id?'block':'none';
   });
-  document.getElementById('topbarTitle').textContent = secTitles[id] || '';
+  document.getElementById('topbarTitle').textContent=secTitles[id]||'';
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
-  var navEl = document.getElementById('nav-'+id);
-  if(navEl) navEl.classList.add('active');
+  var navEl=document.getElementById('nav-'+id); if(navEl) navEl.classList.add('active');
   if(id==='pagamentos') carregarPagamentos();
   if(id==='campanha') carregarListaCampanhas();
   if(id==='usuarios') carregarUsuarios();
+  if(id==='credenciais') carregarConfig();
 }
 
-// ═══════════════════════════════════════════
-// GERENCIAMENTO DE USUÁRIOS (só master)
-// ═══════════════════════════════════════════
-async function carregarUsuarios(){
-  var lista = document.getElementById('usuarios-lista');
-  lista.innerHTML = '<div style="text-align:center;padding:30px;color:var(--fg2)">Carregando…</div>';
-  try {
-    var r = await fetch(BASE+'/admin/usuarios', {headers:{'x-admin-token':TOKEN}});
-    var d = await r.json();
-    if(!d.usuarios || d.usuarios.length === 0){
-      lista.innerHTML = '<div style="text-align:center;padding:30px;color:var(--fg2)">Nenhum usuário cadastrado ainda.</div>';
-      return;
-    }
-    var html = '<table style="width:100%;border-collapse:collapse;font-size:13px">'
-      +'<thead><tr>'
-      +'<th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border)">Usuário</th>'
-      +'<th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border)">Nível</th>'
-      +'<th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border)">Status</th>'
-      +'<th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border)">Criado em</th>'
-      +'<th style="padding:10px 12px;border-bottom:1px solid var(--border)"></th>'
-      +'</tr></thead><tbody>';
-    d.usuarios.forEach(function(u){
-      var dt = u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-BR') : '—';
-      var roleBadge = u.role === 'master'
-        ? '<span style="background:#7c3aed22;color:#7c3aed;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">Master</span>'
-        : '<span style="background:#0ea5e922;color:#0ea5e9;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">Comum</span>';
-      var statusBadge = u.ativo
-        ? '<span style="background:#22c55e22;color:#22c55e;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">Ativo</span>'
-        : '<span style="background:#94a3b822;color:#94a3b8;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">Inativo</span>';
-      html += '<tr>'
-        +'<td style="padding:12px;border-bottom:1px solid var(--border)"><strong>'+esc(u.usuario)+'</strong></td>'
-        +'<td style="padding:12px;border-bottom:1px solid var(--border)">'+roleBadge+'</td>'
-        +'<td style="padding:12px;border-bottom:1px solid var(--border)">'+statusBadge+'</td>'
-        +'<td style="padding:12px;border-bottom:1px solid var(--border);color:var(--fg2)">'+dt+'</td>'
-        +'<td style="padding:12px;border-bottom:1px solid var(--border);text-align:right">'
-        +'<button class="btn btn-ghost btn-sm" onclick="abrirEditarUsuario(\''+u._id+'\',\''+esc(u.usuario)+'\',\''+u.role+'\')" style="margin-right:6px">✏️ Editar</button>'
-        +'<button class="btn btn-ghost btn-sm" onclick="excluirUsuario(\''+u._id+'\',\''+esc(u.usuario)+'\')" style="color:var(--danger);border-color:var(--danger)">🗑️</button>'
-        +'</td></tr>';
-    });
-    html += '</tbody></table>';
-    lista.innerHTML = html;
-  } catch(e){
-    lista.innerHTML = '<div style="text-align:center;padding:30px;color:var(--danger)">Erro ao carregar usuários.</div>';
+// ══ CREDENCIAIS PIX (per-admin) ══
+var credEditMode = { pk: false, sk: false };
+
+function toggleCredField(field){
+  credEditMode[field] = !credEditMode[field];
+  var btn = document.getElementById('cred-'+field+'-btn');
+  if(field === 'pk'){
+    var view = document.getElementById('cred-pk-view');
+    var input = document.getElementById('cred-pk-input');
+    view.style.display = credEditMode.pk ? 'none' : 'block';
+    input.style.display = credEditMode.pk ? 'block' : 'none';
+    if(credEditMode.pk){ input.value=''; input.focus(); }
+    btn.textContent = credEditMode.pk ? 'Cancelar' : 'Alterar';
+    btn.className = credEditMode.pk ? 'edit-btn active' : 'edit-btn';
+  } else {
+    var wrap = document.getElementById('cred-sk-input-wrap');
+    var view = document.getElementById('cred-sk-view');
+    view.style.display = credEditMode.sk ? 'none' : 'block';
+    wrap.style.display = credEditMode.sk ? 'block' : 'none';
+    if(credEditMode.sk){ document.getElementById('cred-sk-input').value=''; document.getElementById('cred-sk-input').focus(); }
+    btn.textContent = credEditMode.sk ? 'Cancelar' : 'Alterar';
+    btn.className = credEditMode.sk ? 'edit-btn active' : 'edit-btn';
   }
+  // Mostrar/ocultar botão salvar
+  var saveRow = document.getElementById('cred-save-row');
+  if(saveRow) saveRow.style.display = (credEditMode.pk || credEditMode.sk) ? 'flex' : 'none';
 }
 
-function abrirModalNovoUsuario(){
-  document.getElementById('modal-usuario-id').value = '';
-  document.getElementById('modal-usuario-login').value = '';
-  document.getElementById('modal-usuario-senha').value = '';
-  document.getElementById('modal-usuario-role').value = 'comum';
-  document.getElementById('modal-usuario-titulo').textContent = 'Novo usuário';
-  document.getElementById('modal-senha-label').textContent = 'Senha';
-  document.getElementById('modal-usuario-login').disabled = false;
-  var m = document.getElementById('modal-usuario');
-  m.style.display = 'flex';
+function cancelarCredenciais(){
+  if(credEditMode.pk) toggleCredField('pk');
+  if(credEditMode.sk) toggleCredField('sk');
 }
 
-function abrirEditarUsuario(id, login, role){
-  document.getElementById('modal-usuario-id').value = id;
-  document.getElementById('modal-usuario-login').value = login;
-  document.getElementById('modal-usuario-login').disabled = true; // não permite mudar o login
-  document.getElementById('modal-usuario-senha').value = '';
-  document.getElementById('modal-usuario-role').value = role || 'comum';
-  document.getElementById('modal-usuario-titulo').textContent = 'Editar usuário';
-  document.getElementById('modal-senha-label').textContent = 'Nova senha (deixe em branco para manter)';
-  var m = document.getElementById('modal-usuario');
-  m.style.display = 'flex';
+function toggleSKView(){
+  var i = document.getElementById('cred-sk-input');
+  i.type = i.type==='password' ? 'text' : 'password';
 }
-
-function fecharModalUsuario(){
-  document.getElementById('modal-usuario').style.display = 'none';
-}
-
-async function salvarUsuario(){
-  var id = document.getElementById('modal-usuario-id').value;
-  var login = document.getElementById('modal-usuario-login').value.trim();
-  var senha = document.getElementById('modal-usuario-senha').value;
-  var role = document.getElementById('modal-usuario-role').value;
-  if(!id && !login){ toast('Informe o nome de usuário', true); return; }
-  if(!id && !senha){ toast('Informe uma senha', true); return; }
-  try {
-    var url = id ? BASE+'/admin/usuarios/'+id : BASE+'/admin/usuarios';
-    var method = id ? 'PUT' : 'POST';
-    var body = { role };
-    if(!id) body.usuario = login;
-    if(senha) body.senha = senha;
-    var r = await fetch(url, {method, headers:{'Content-Type':'application/json','x-admin-token':TOKEN}, body:JSON.stringify(body)});
-    var d = await r.json();
-    if(d.ok){ toast(id ? '✅ Usuário atualizado!' : '✅ Usuário criado!'); fecharModalUsuario(); carregarUsuarios(); }
-    else toast(d.error || 'Erro ao salvar', true);
-  } catch(e){ toast('Erro de conexão', true); }
-}
-
-async function excluirUsuario(id, login){
-  if(!confirm('Excluir o usuário "'+login+'"? Esta ação não pode ser desfeita.')) return;
-  try {
-    var r = await fetch(BASE+'/admin/usuarios/'+id, {method:'DELETE', headers:{'x-admin-token':TOKEN}});
-    var d = await r.json();
-    if(d.ok){ toast('✅ Usuário excluído'); carregarUsuarios(); }
-    else toast(d.error || 'Erro ao excluir', true);
-  } catch(e){ toast('Erro de conexão', true); }
-}
-
-// ═══════════════════════════════════════════
-// MULTI-CAMPANHA
-// ═══════════════════════════════════════════
-var campanhaAtual = null;
-var atualizacoesData = [];
-var perguntasData = [];
-var valoresData = [];
-var selosData = [];
-
-// ── Navegação entre telas ──
-function mostrarVistaLista(){
-  document.getElementById('camp-lista-view').style.display = 'block';
-  document.getElementById('camp-criar-view').style.display = 'none';
-  document.getElementById('camp-editor-view').style.display = 'none';
-}
-function mostrarVistaCriar(){
-  document.getElementById('camp-lista-view').style.display = 'none';
-  document.getElementById('camp-criar-view').style.display = 'block';
-  document.getElementById('camp-editor-view').style.display = 'none';
-}
-function mostrarVistaEditor(){
-  document.getElementById('camp-lista-view').style.display = 'none';
-  document.getElementById('camp-criar-view').style.display = 'none';
-  document.getElementById('camp-editor-view').style.display = 'block';
-}
-function voltarLista(){
-  campanhaAtual = null;
-  mostrarVistaLista();
-  carregarListaCampanhas();
-}
-
-// ── Lista de campanhas ──
-async function carregarListaCampanhas(){
-  mostrarVistaLista();
-  var loading = document.getElementById('camp-lista-loading');
-  var cards = document.getElementById('camp-lista-cards');
-  loading.style.display = 'block';
-  cards.style.display = 'none';
-  try {
-    var r = await fetch(BASE+'/admin/campanhas', {headers:{'x-admin-token':TOKEN}});
-    if(r.status===401){ doLogout(); return; }
-    var d = await r.json();
-    var campanhas = (d.campanhas || []);
-    loading.style.display = 'none';
-    cards.style.display = 'block';
-    if(!campanhas.length){
-      cards.innerHTML = '<div style="text-align:center;padding:50px;color:var(--fg2)"><div style="font-size:40px;margin-bottom:12px">🎗️</div><div style="font-size:15px;font-weight:600;margin-bottom:8px">Nenhuma campanha criada</div><div style="font-size:13px">Clique em <strong>+ Nova campanha</strong> para começar</div></div>';
-      return;
-    }
-    cards.innerHTML = '';
-    campanhas.forEach(function(c){
-      var link = c.slug ? (window.location.origin+'/c/'+c.slug) : '(sem slug)';
-      var pct = c.meta > 0 ? Math.min(100, Math.round((c.arrecadado||0)/c.meta*100)) : 0;
-      var statusColor = c.status==='ativa' ? '#22c55e' : c.status==='pausada' ? '#f59e0b' : '#94a3b8';
-      var card = document.createElement('div');
-      card.className = 'editor-wrap';
-      card.style.marginBottom = '12px';
-      card.innerHTML = '<div class="editor-body" style="padding:16px">'
-        +'<div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">'
-        +(c.fotoBase64||c.fotoUrl ? '<img src="'+(c.fotoBase64||c.fotoUrl)+'" style="width:60px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display=\'none\'">' : '<div style="width:60px;height:60px;border-radius:8px;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🎗️</div>')
-        +'<div style="flex:1;min-width:0">'
-        +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">'
-        +'<strong style="font-size:15px">'+esc(c.nome||'Sem nome')+'</strong>'
-        +'<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:'+statusColor+'22;color:'+statusColor+'">'+esc(c.status||'ativa')+'</span>'
-        +'</div>'
-        +'<div style="font-size:12px;color:var(--fg2);margin-bottom:6px">'+esc(c.localizacao||'')+(c.categoria?' · '+esc(c.categoria):'')+'</div>'
-        +'<div style="font-size:12px;margin-bottom:6px"><strong>'+fmtBRL(c.arrecadado||0)+'</strong> <span style="color:var(--fg2)">de '+fmtBRL(c.meta||0)+' ('+pct+'%)</span></div>'
-        +'<div style="background:var(--border);border-radius:4px;height:4px;margin-bottom:8px"><div style="background:var(--accent);height:4px;border-radius:4px;width:'+pct+'%"></div></div>'
-        +(c.slug ? '<div style="font-size:11px;color:var(--fg2);word-break:break-all">🔗 <a href="'+link+'" target="_blank" style="color:var(--accent)">'+link+'</a></div>' : '<div style="font-size:11px;color:var(--fg2)">⚠️ Sem slug — defina um para ter link próprio</div>')
-        +'</div>'
-        +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
-        +'<button class="btn btn-primary btn-sm" onclick="abrirEditorCampanha(\''+c._id+'\')">✏️ Editar</button>'
-        +'<button class="btn btn-ghost btn-sm" onclick="confirmarExcluirCampanhaId(\''+c._id+'\',\''+esc(c.nome||'esta campanha')+'\')" style="color:var(--danger);border-color:var(--danger)">🗑️ Excluir</button>'
-        +'</div>'
-        +'</div>'
-        +'</div>';
-      cards.appendChild(card);
-    });
-  } catch(e){
-    loading.textContent = 'Erro ao carregar campanhas: '+e.message;
-    loading.style.display = 'block';
-    cards.style.display = 'none';
-  }
-}
-
-// ── Criar nova campanha ──
-function abrirCriarCampanha(){
-  // limpar form
-  ['nova-nome','nova-slug','nova-localizacao','nova-dataCriacao','nova-resumoCurto','nova-descricao','nova-fotoUrl','nova-videoUrl','nova-chavePix'].forEach(function(id){
-    var el = document.getElementById(id); if(el) el.value = '';
-  });
-  document.getElementById('nova-meta').value = '';
-  document.getElementById('nova-categoria').value = 'Solidariedade';
-  document.getElementById('nova-slug-preview').innerHTML = 'Link: /c/<em>seu-slug</em>';
-  mostrarVistaCriar();
-}
-
-async function criarCampanha(){
-  var nome = document.getElementById('nova-nome').value.trim();
-  var slug = document.getElementById('nova-slug').value.trim();
-  var meta = parseFloat(document.getElementById('nova-meta').value) || 0;
-  if(!nome) return toast('Informe o título da campanha', true);
-  if(!slug) return toast('Informe o slug (URL única)', true);
-  if(meta < 1) return toast('Informe uma meta válida', true);
-  var body = {
-    nome: nome,
-    slug: slug,
-    localizacao: document.getElementById('nova-localizacao').value.trim(),
-    categoria: document.getElementById('nova-categoria').value,
-    dataCriacao: document.getElementById('nova-dataCriacao').value.trim(),
-    resumoCurto: document.getElementById('nova-resumoCurto').value.trim(),
-    descricao: document.getElementById('nova-descricao').value.trim(),
-    fotoUrl: document.getElementById('nova-fotoUrl').value.trim() || '',
-    videoUrl: document.getElementById('nova-videoUrl').value.trim() || '',
-    chavePix: document.getElementById('nova-chavePix').value.trim() || '',
-    meta: meta,
-    status: 'ativa',
-    valores: [10,25,50,100,200],
-    arrecadado: 0
-  };
-  var btn = document.querySelector('#camp-criar-view .btn-primary');
-  if(btn){ btn.disabled=true; btn.textContent='Criando…'; }
-  try {
-    var r = await fetch(BASE+'/admin/campanhas', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','x-admin-token':TOKEN},
-      body: JSON.stringify(body)
-    });
-    var d = await r.json();
-    if(d.ok && d.campanha){
-      toast('✅ Campanha criada! Link: /c/'+slug);
-      campanhaAtual = d.campanha;
-      mostrarVistaLista();
-      carregarListaCampanhas();
-    } else {
-      toast(d.error || 'Erro ao criar campanha', true);
-    }
-  } catch(e){
-    toast('Erro: '+e.message, true);
-  } finally {
-    if(btn){ btn.disabled=false; btn.textContent='🚀 Criar campanha'; }
-  }
-}
-
-// ── Abrir editor de campanha existente ──
-async function abrirEditorCampanha(id){
-  mostrarVistaEditor();
-  document.getElementById('campanha-loading').style.display = 'block';
-  document.getElementById('campanha-editor').style.display = 'none';
-  try {
-    var r = await fetch(BASE+'/admin/campanhas', {headers:{'x-admin-token':TOKEN}});
-    if(r.status===401){ doLogout(); return; }
-    var d = await r.json();
-    var c = (d.campanhas||[]).find(function(x){ return x._id===id; });
-    if(!c){ toast('Campanha não encontrada', true); voltarLista(); return; }
-    campanhaAtual = c;
-    popularEditor(c);
-  } catch(e){
-    toast('Erro ao carregar: '+e.message, true);
-    voltarLista();
-  }
-}
-
-// ── Tab editor ──
-function showEditorTab(tab, btn){
-  document.querySelectorAll('#camp-editor-view .tab-editor-btn').forEach(function(b){ b.classList.remove('active'); });
-  document.querySelectorAll('#camp-editor-view .tab-editor-pane').forEach(function(p){ p.classList.remove('active'); });
-  document.getElementById('ceditor-'+tab).classList.add('active');
-  if(btn) btn.classList.add('active');
-}
-
-// ── Popular editor ──
-function popularEditor(c){
-  campanhaAtual = c;
-  // Header
-  document.getElementById('ce-titulo-header').textContent = c.nome || 'Campanha';
-  var badge = document.getElementById('ce-status-badge');
-  badge.textContent = c.status || 'ativa';
-  badge.style.background = c.status==='ativa' ? '#22c55e22' : c.status==='pausada' ? '#f59e0b22' : '#94a3b822';
-  badge.style.color = c.status==='ativa' ? '#22c55e' : c.status==='pausada' ? '#f59e0b' : '#94a3b8';
-  var linkVer = document.getElementById('ce-link-ver');
-  if(c.slug){ linkVer.href = '/c/'+c.slug; linkVer.style.display=''; }
-  else linkVer.style.display = 'none';
-  // Informações
-  document.getElementById('ce-nome').value = c.nome || '';
-  document.getElementById('ce-resumoCurto').value = c.resumoCurto || '';
-  document.getElementById('ce-localizacao').value = c.localizacao || '';
-  document.getElementById('ce-dataCriacao').value = c.dataCriacao || '';
-  document.getElementById('ce-meta').value = c.meta || '';
-  document.getElementById('ce-idPublico').value = c.idPublico || '';
-  document.getElementById('ce-slug').value = c.slug || '';
-  atualizarPreviewSlug();
-  var catSel = document.getElementById('ce-categoria');
-  catSel.value = c.categoria || 'Solidariedade';
-  if(!catSel.value && c.categoria){ var op=document.createElement('option'); op.value=c.categoria; op.textContent=c.categoria; catSel.appendChild(op); catSel.value=c.categoria; }
-  document.getElementById('ce-status').value = c.status || 'ativa';
-  document.getElementById('ce-chavePix').value = c.chavePix || '';
-  // Credenciais de pagamento da campanha
-  document.getElementById('ce-paymentPk').value = c.paymentPk || '';
-  // SK: o servidor nunca devolve o valor real — usa hasPaymentSk (booleano) para indicar se existe
-  var skInput = document.getElementById('ce-paymentSk');
-  skInput.value = '';
-  skInput.placeholder = c.hasPaymentSk ? '••••••••• (já configurada — deixe em branco para manter)' : 'sk_live_... (deixe em branco para usar a conta padrão)';
-  // Textos do checkout / upsell / agradecimento
-  document.getElementById('ce-checkoutNome').value = c.checkoutNome || '';
-  document.getElementById('ce-upsellValor').value = c.upsellValor != null ? c.upsellValor : 3.99;
-  document.getElementById('ce-textoUpsellTitulo').value = c.textoUpsellTitulo || '';
-  document.getElementById('ce-textoUpsellSub').value = c.textoUpsellSub || '';
-  document.getElementById('ce-textoAgradecimento').value = c.textoAgradecimento || '';
-  document.getElementById('ce-textoAgradecimentoP1').value = c.textoAgradecimentoP1 || '';
-  document.getElementById('ce-textoAgradecimentoP2').value = c.textoAgradecimentoP2 || '';
-  document.getElementById('ce-textoAgradecimentoP3').value = c.textoAgradecimentoP3 || '';
-  // Mídia — SEMPRE limpar o input de arquivo ao trocar de campanha
-  var fileInput = document.getElementById('ce-fotoFile');
-  if(fileInput) fileInput.value = '';           // remove arquivo da campanha anterior
-  document.getElementById('ce-fotoUrl').value = c.fotoUrl || '';
-  var prev = document.getElementById('ce-fotoPreview');
-  if(c.fotoBase64 || c.fotoUrl){ prev.src = c.fotoBase64||c.fotoUrl; prev.style.display='block'; }
-  else { prev.src=''; prev.style.display='none'; }
-  document.getElementById('ce-videoUrl').value = c.videoUrl || '';
-  onVideoUrlChange();
-  // Descrição
-  document.getElementById('ce-descricao').value = c.descricao || '';
-  updateCharCount(document.getElementById('ce-descricao'), 'desc-count');
-  document.getElementById('ce-vakinhaPremiada').value = c.vakinhaPremiada || '';
-  // Upsell
-  document.getElementById('ce-upsell').value = c.upsell ? 'true' : 'false';
-  document.getElementById('ce-upsellTexto').value = c.upsellTexto || '';
-  // Contadores base
-  document.getElementById('ce-arrecadadoBase').value = c.arrecadadoBase != null ? c.arrecadadoBase : '';
-  document.getElementById('ce-apoiadoresBase').value = c.apoiadoresBase != null ? c.apoiadoresBase : '';
-  document.getElementById('ce-coracoesBase').value   = c.coracoesBase   != null ? c.coracoesBase   : '';
-  // Listas
-  atualizacoesData = (c.atualizacoes || []).slice();
-  perguntasData = (c.perguntas || []).slice();
-  valoresData = (c.valores || [10,25,50,100,200]).slice();
-  selosData = (c.selos || []).slice();
-  renderAtualizacoes();
-  renderPerguntas();
-  renderValores();
-  renderSelos();
-  // resetar aba ativa
-  document.querySelectorAll('#camp-editor-view .tab-editor-btn').forEach(function(b,i){ b.classList.toggle('active', i===0); });
-  document.querySelectorAll('#camp-editor-view .tab-editor-pane').forEach(function(p,i){ p.classList.toggle('active', i===0); });
-  document.getElementById('campanha-loading').style.display = 'none';
-  document.getElementById('campanha-editor').style.display = 'block';
-}
-
-// ── Slug helpers ──
-function sanitizeSlug(input){
-  var v = input.value.toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g,'')
-    .replace(/[^a-z0-9-]/g,'-')
-    .replace(/-+/g,'-')
-    .replace(/^-|-$/g,'');
-  input.value = v;
-  atualizarPreviewSlug();
-}
-function atualizarPreviewSlug(){
-  var slug = document.getElementById('ce-slug');
-  var preview = document.getElementById('ce-slug-preview');
-  if(slug && preview){
-    var val = slug.value.trim();
-    preview.innerHTML = val ? 'Link: <a href="/c/'+val+'" target="_blank" style="color:var(--accent)">/c/'+val+'</a>' : 'Link: —';
-  }
-  var novaSlugPreview = document.getElementById('nova-slug-preview');
-  var novaSlug = document.getElementById('nova-slug');
-  if(novaSlug && novaSlugPreview){
-    var val2 = novaSlug.value.trim();
-    novaSlugPreview.innerHTML = val2 ? 'Link: <a href="/c/'+val2+'" target="_blank" style="color:var(--accent)">/c/'+val2+'</a>' : 'Link: /c/<em>seu-slug</em>';
-  }
-}
-
-// ── Foto URL change ──
-function onFotoUrlChange(){
-  var url = document.getElementById('ce-fotoUrl').value.trim();
-  var prev = document.getElementById('ce-fotoPreview');
-  if(url){ prev.src=url; prev.style.display='block'; }
-  else { prev.src=''; prev.style.display='none'; }
-}
-
-// ── Video preview ──
-function onVideoUrlChange(){
-  var vUrl = (document.getElementById('ce-videoUrl').value || '').trim();
-  var wrap = document.getElementById('ce-videoPreview');
-  if(!wrap) return;
-  wrap.innerHTML = '';
-  wrap.style.display = 'none';
-  if(!vUrl) return;
-  var ytMatch = vUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
-  var viMatch = vUrl.match(/vimeo\.com\/(\d+)/);
-  if(ytMatch){
-    wrap.innerHTML = '<iframe src="https://www.youtube.com/embed/'+ytMatch[1]+'" width="100%" height="200" frameborder="0" allowfullscreen style="border-radius:8px"></iframe>';
-    wrap.style.display = 'block';
-  } else if(viMatch){
-    wrap.innerHTML = '<iframe src="https://player.vimeo.com/video/'+viMatch[1]+'" width="100%" height="200" frameborder="0" allowfullscreen style="border-radius:8px"></iframe>';
-    wrap.style.display = 'block';
-  } else if(vUrl.match(/\.(mp4|webm|ogg)(\?.*)?$/i)){
-    wrap.innerHTML = '<video src="'+vUrl+'" controls style="width:100%;border-radius:8px;max-height:200px"></video>';
-    wrap.style.display = 'block';
-  }
-}
-
-// ── Excluir campanha (da lista) ──
-async function confirmarExcluirCampanhaId(id, nome){
-  if(!confirm('Tem certeza que deseja EXCLUIR a campanha "'+nome+'"?\n\nEsta ação não pode ser desfeita!')) return;
-  try {
-    var r = await fetch(BASE+'/admin/campanhas/'+id, {method:'DELETE', headers:{'x-admin-token':TOKEN}});
-    var d = await r.json();
-    if(d.ok){ toast('Campanha excluída'); carregarListaCampanhas(); }
-    else toast(d.error||'Erro ao excluir', true);
-  } catch(e){ toast('Erro: '+e.message, true); }
-}
-
-// ── Excluir campanha (do editor) ──
-async function confirmarExcluirCampanha(){
-  if(!campanhaAtual) return;
-  if(!confirm('Tem certeza que deseja EXCLUIR "'+campanhaAtual.nome+'"?\n\nEsta ação não pode ser desfeita!')) return;
-  try {
-    var r = await fetch(BASE+'/admin/campanhas/'+campanhaAtual._id, {method:'DELETE', headers:{'x-admin-token':TOKEN}});
-    var d = await r.json();
-    if(d.ok){ toast('Campanha excluída'); voltarLista(); }
-    else toast(d.error||'Erro ao excluir', true);
-  } catch(e){ toast('Erro: '+e.message, true); }
-}
-
-// ── Carrega lista quando entra na seção (compat) ──
-function carregarCampanhaEditor(){ carregarListaCampanhas(); }
-
-// ── ATUALIZAÇÕES ──
-function renderAtualizacoes(){
-  var list = document.getElementById('atualizacoes-list');
-  var vazio = document.getElementById('atualizacoes-vazio');
-  list.innerHTML = '';
-  if(!atualizacoesData.length){ vazio.style.display='block'; return; }
-  vazio.style.display = 'none';
-  atualizacoesData.forEach(function(a, i){
-    var div = document.createElement('div');
-    div.className = 'list-item-row';
-    div.style.flexDirection = 'column';
-    div.style.alignItems = 'flex-start';
-    div.style.gap = '6px';
-    div.innerHTML = '<div style="display:flex;width:100%;align-items:center;gap:8px">'
-      +'<span style="flex:1;font-weight:600;font-size:13px">'+esc(a.titulo||'Sem título')+'</span>'
-      +'<span style="font-size:11px;color:var(--fg2)">'+esc(a.data||'')+'</span>'
-      +'<button class="list-item-btn" title="Editar" onclick="editarAtualizacao('+i+')">✏️</button>'
-      +'<button class="list-item-btn" title="Remover" onclick="removerAtualizacao('+i+')">🗑️</button>'
-      +'</div>'
-      +'<div style="font-size:12px;color:var(--fg2);line-height:1.4">'+esc((a.texto||'').slice(0,100)+(a.texto&&a.texto.length>100?'…':''))+'</div>';
-    list.appendChild(div);
-  });
-}
-function toggleAddAtualizacao(){
-  var box = document.getElementById('add-atualizacao-box');
-  box.style.display = box.style.display==='none' ? 'block' : 'none';
-  if(box.style.display==='block'){ document.getElementById('new-atu-titulo').value=''; document.getElementById('new-atu-data').value=''; document.getElementById('new-atu-texto').value=''; document.getElementById('new-atu-titulo').focus(); }
-}
-function adicionarAtualizacao(){
-  var t=document.getElementById('new-atu-titulo').value.trim();
-  var d=document.getElementById('new-atu-data').value.trim();
-  var tx=document.getElementById('new-atu-texto').value.trim();
-  if(!t) return toast('Informe o título da atualização', true);
-  atualizacoesData.unshift({titulo:t,data:d,texto:tx});
-  toggleAddAtualizacao();
-  renderAtualizacoes();
-  toast('Atualização adicionada — salve para confirmar');
-}
-function removerAtualizacao(i){
-  if(!confirm('Remover esta atualização?')) return;
-  atualizacoesData.splice(i,1);
-  renderAtualizacoes();
-}
-function editarAtualizacao(i){
-  var a = atualizacoesData[i];
-  document.getElementById('new-atu-titulo').value = a.titulo||'';
-  document.getElementById('new-atu-data').value = a.data||'';
-  document.getElementById('new-atu-texto').value = a.texto||'';
-  document.getElementById('add-atualizacao-box').style.display = 'block';
-  atualizacoesData.splice(i,1);
-  renderAtualizacoes();
-  document.getElementById('new-atu-titulo').focus();
-}
-
-// ── PERGUNTAS ──
-function renderPerguntas(){
-  var list = document.getElementById('perguntas-list');
-  var vazio = document.getElementById('perguntas-vazio');
-  list.innerHTML = '';
-  if(!perguntasData.length){ vazio.style.display='block'; return; }
-  vazio.style.display = 'none';
-  perguntasData.forEach(function(p, i){
-    var div = document.createElement('div');
-    div.className = 'list-item-row';
-    div.style.flexDirection = 'column';
-    div.style.alignItems = 'flex-start';
-    div.style.gap = '6px';
-    div.innerHTML = '<div style="display:flex;width:100%;align-items:center;gap:8px">'
-      +'<span style="flex:1;font-weight:600;font-size:13px">❓ '+esc(p.pergunta||'Sem pergunta')+'</span>'
-      +(p.autor?'<span style="font-size:11px;color:var(--fg2)">'+esc(p.autor)+'</span>':'')
-      +'<button class="list-item-btn" title="Editar" onclick="editarPergunta('+i+')">✏️</button>'
-      +'<button class="list-item-btn" title="Remover" onclick="removerPergunta('+i+')">🗑️</button>'
-      +'</div>'
-      +'<div style="font-size:12px;color:var(--fg2);line-height:1.4">↩ '+esc((p.resposta||'').slice(0,100)+(p.resposta&&p.resposta.length>100?'…':''))+'</div>';
-    list.appendChild(div);
-  });
-}
-function toggleAddPergunta(){
-  var box = document.getElementById('add-pergunta-box');
-  box.style.display = box.style.display==='none' ? 'block' : 'none';
-  if(box.style.display==='block'){ document.getElementById('new-perg-pergunta').value=''; document.getElementById('new-perg-resposta').value=''; document.getElementById('new-perg-autor').value=''; document.getElementById('new-perg-pergunta').focus(); }
-}
-function adicionarPergunta(){
-  var p=document.getElementById('new-perg-pergunta').value.trim();
-  var r=document.getElementById('new-perg-resposta').value.trim();
-  var a=document.getElementById('new-perg-autor').value.trim();
-  if(!p) return toast('Informe a pergunta', true);
-  if(!r) return toast('Informe a resposta', true);
-  perguntasData.push({pergunta:p,resposta:r,autor:a});
-  toggleAddPergunta();
-  renderPerguntas();
-  toast('Pergunta adicionada — salve para confirmar');
-}
-function removerPergunta(i){
-  if(!confirm('Remover esta pergunta?')) return;
-  perguntasData.splice(i,1);
-  renderPerguntas();
-}
-function editarPergunta(i){
-  var p = perguntasData[i];
-  document.getElementById('new-perg-pergunta').value = p.pergunta||'';
-  document.getElementById('new-perg-resposta').value = p.resposta||'';
-  document.getElementById('new-perg-autor').value = p.autor||'';
-  document.getElementById('add-pergunta-box').style.display = 'block';
-  perguntasData.splice(i,1);
-  renderPerguntas();
-  document.getElementById('new-perg-pergunta').focus();
-}
-
-// ── VALORES ──
-function renderValores(){
-  var grid = document.getElementById('valores-chips');
-  grid.innerHTML = '';
-  valoresData.forEach(function(v, i){
-    var chip = document.createElement('div');
-    chip.className = 'valor-chip';
-    chip.innerHTML = '<span>R$ '+parseFloat(v).toLocaleString('pt-BR')+'</span>'
-      +'<button onclick="removerValor('+i+')" title="Remover">×</button>';
-    grid.appendChild(chip);
-  });
-}
-function adicionarValor(){
-  var v = parseFloat(document.getElementById('new-valor').value);
-  if(!v||v<1) return toast('Informe um valor válido', true);
-  if(valoresData.length>=8) return toast('Máximo 8 valores', true);
-  valoresData.push(v);
-  valoresData.sort(function(a,b){return a-b;});
-  document.getElementById('new-valor').value = '';
-  renderValores();
-}
-function removerValor(i){
-  valoresData.splice(i,1);
-  renderValores();
-}
-
-// ── SELOS ──
-function renderSelos(){
-  var list = document.getElementById('selos-list');
-  list.innerHTML = '';
-  selosData.forEach(function(s, i){
-    var div = document.createElement('div');
-    div.className = 'list-item-row';
-    div.style.padding = '8px 12px';
-    div.innerHTML = '<span style="flex:1">'+esc(s)+'</span>'
-      +'<button class="list-item-btn" onclick="removerSelo('+i+')">🗑️</button>';
-    list.appendChild(div);
-  });
-}
-function adicionarSelo(){
-  var s = document.getElementById('new-selo').value.trim();
-  if(!s) return toast('Informe o selo', true);
-  selosData.push(s);
-  document.getElementById('new-selo').value='';
-  renderSelos();
-}
-function removerSelo(i){
-  selosData.splice(i,1);
-  renderSelos();
-}
-
-// ── FOTO ──
-function previewFoto(input){
-  var file = input.files && input.files[0];
-  if(!file) return;
-  if(file.size > 2*1024*1024){ toast('Imagem muito grande (máx 2MB)', true); input.value=''; return; }
-  var reader = new FileReader();
-  reader.onload = function(e){
-    var prev = document.getElementById('ce-fotoPreview');
-    prev.src = e.target.result;
-    prev.style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-}
-
-// ── SALVAR CAMPANHA ──
-async function salvarCampanha(){
-  if(!campanhaAtual) return toast('Campanha não carregada', true);
-  var btn = event && event.target;
-  if(btn){ btn.disabled=true; btn.textContent='Salvando…'; }
-  try {
-    var fotoBase64 = null, fotoMime = null, fotoUrl = null;
-    var fileInput = document.getElementById('ce-fotoFile');
-    if(fileInput && fileInput.files && fileInput.files[0]){
-      var file = fileInput.files[0];
-      fotoBase64 = await new Promise(function(res){ var r=new FileReader(); r.onload=function(e){ res(e.target.result); }; r.readAsDataURL(file); });
-      fotoMime = file.type;
-    } else {
-      fotoUrl = document.getElementById('ce-fotoUrl').value.trim() || null;
-    }
-    var slugVal = (document.getElementById('ce-slug').value || '').trim()
-      .toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
-      .replace(/[^a-z0-9-]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
-    var body = {
-      nome: document.getElementById('ce-nome').value.trim(),
-      resumoCurto: document.getElementById('ce-resumoCurto').value.trim(),
-      localizacao: document.getElementById('ce-localizacao').value.trim(),
-      categoria: document.getElementById('ce-categoria').value,
-      dataCriacao: document.getElementById('ce-dataCriacao').value.trim(),
-      meta: parseFloat(document.getElementById('ce-meta').value)||0,
-      idPublico: document.getElementById('ce-idPublico').value.trim(),
-      slug: slugVal,
-      status: document.getElementById('ce-status').value,
-      descricao: document.getElementById('ce-descricao').value,
-      vakinhaPremiada: document.getElementById('ce-vakinhaPremiada').value.trim(),
-      chavePix: document.getElementById('ce-chavePix').value.trim(),
-      videoUrl: (document.getElementById('ce-videoUrl').value || '').trim(),
-      checkoutNome: document.getElementById('ce-checkoutNome').value.trim(),
-      upsell: document.getElementById('ce-upsell').value === 'true',
-      upsellTexto: document.getElementById('ce-upsellTexto').value.trim(),
-      upsellValor: parseFloat(document.getElementById('ce-upsellValor').value) || 3.99,
-      textoUpsellTitulo: document.getElementById('ce-textoUpsellTitulo').value.trim(),
-      textoUpsellSub: document.getElementById('ce-textoUpsellSub').value.trim(),
-      textoAgradecimento: document.getElementById('ce-textoAgradecimento').value.trim(),
-      textoAgradecimentoP1: document.getElementById('ce-textoAgradecimentoP1').value.trim(),
-      textoAgradecimentoP2: document.getElementById('ce-textoAgradecimentoP2').value.trim(),
-      textoAgradecimentoP3: document.getElementById('ce-textoAgradecimentoP3').value.trim(),
-      arrecadadoBase: parseFloat(document.getElementById('ce-arrecadadoBase').value) || 0,
-      apoiadoresBase: parseInt(document.getElementById('ce-apoiadoresBase').value)   || 0,
-      coracoesBase:   parseInt(document.getElementById('ce-coracoesBase').value)     || 0,
-      paymentPk: document.getElementById('ce-paymentPk').value.trim(),
-      // SK só envia se foi digitada (campo vazio = manter a existente no servidor)
-      ...(document.getElementById('ce-paymentSk').value.trim() ? { paymentSk: document.getElementById('ce-paymentSk').value.trim() } : {}),
-      valores: valoresData,
-      atualizacoes: atualizacoesData,
-      perguntas: perguntasData,
-      selos: selosData,
-    };
-    if(fotoBase64){ body.fotoBase64=fotoBase64; body.fotoMime=fotoMime; }
-    else if(fotoUrl !== null){ body.fotoUrl=fotoUrl; }
-    var r = await fetch(BASE+'/admin/campanhas/'+campanhaAtual._id, {
-      method: 'PUT',
-      headers: {'Content-Type':'application/json','x-admin-token':TOKEN},
-      body: JSON.stringify(body)
-    });
-    var d = await r.json();
-    if(d.ok || d.campanha){
-      toast('✅ Campanha salva com sucesso!');
-      campanhaAtual = d.campanha || campanhaAtual;
-      // atualizar header com novo nome/status/link
-      document.getElementById('ce-titulo-header').textContent = campanhaAtual.nome || 'Campanha';
-      var linkVer = document.getElementById('ce-link-ver');
-      if(campanhaAtual.slug){ linkVer.href='/c/'+campanhaAtual.slug; linkVer.style.display=''; }
-    } else {
-      toast(d.error || 'Erro ao salvar', true);
-    }
-  } catch(e){
-    toast('Erro: '+e.message, true);
-  } finally {
-    if(btn){ btn.disabled=false; btn.textContent='💾 Salvar campanha'; }
-  }
-}
-
-function updateCharCount(el, countId){
-  var c = document.getElementById(countId);
-  if(c) c.textContent = el.value.length + ' caracteres';
-}
-
-async function carregarPagamentos(){
-  var tbody = document.getElementById('pagamentos-tbody');
-  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--fg2);padding:30px">Carregando…</td></tr>';
-  try {
-    var r = await fetch(BASE + '/admin/pagamentos', {headers:{'x-admin-token':TOKEN}});
-    if(r.status===401){ doLogout(); return; }
-    var d = await r.json();
-    var pagamentos = d.pagamentos || [];
-    if(!pagamentos.length){
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--fg2);padding:30px">Nenhum pagamento encontrado</td></tr>';
-      document.getElementById('pagamentos-info').textContent = '';
-      return;
-    }
-    tbody.innerHTML = '';
-    pagamentos.forEach(function(p){
-      var statusClass = p.status==='paid'||p.status==='approved'||p.status==='completed' ? 'pill-paid'
-        : p.status==='failed'||p.status==='cancelled' ? 'pill-fail' : 'pill-pend';
-      var statusLabel = {paid:'Pago',completed:'Pago',approved:'Pago',pending:'Pendente',failed:'Falhou',cancelled:'Cancelado'}[p.status] || p.status;
-      var data = p.createdAt ? new Date(p.createdAt).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
-      var tr = document.createElement('tr');
-      tr.innerHTML = '<td>'+data+'</td>'
-        +'<td><strong>'+fmtBRL((p.amountCents||0)/100)+'</strong></td>'
-        +'<td><span class="pill '+statusClass+'">'+statusLabel+'</span></td>'
-        +'<td style="font-size:11px;color:var(--fg2)">'+esc((p.chargeId||p._id||'').slice(0,16))+'…</td>';
-      tbody.appendChild(tr);
-    });
-    document.getElementById('pagamentos-info').textContent = pagamentos.length + ' registro(s) · use Exportar CSV para ver todos';
-  } catch(e){
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--fg2);padding:30px">Erro ao carregar pagamentos</td></tr>';
-  }
-}
-
-function exportarCSV(){
-  var rows = [['Data','Valor','Status','ID']];
-  document.querySelectorAll('#pagamentos-tbody tr').forEach(function(tr){
-    var tds = tr.querySelectorAll('td');
-    if(tds.length>1) rows.push(Array.from(tds).map(function(td){ return '"'+td.textContent.replace(/"/g,'""')+'"'; }));
-  });
-  var csv = rows.map(function(r){ return r.join(','); }).join('\n');
-  var blob = new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'pagamentos.csv';
-  a.click();
-}
-
-async function carregarConfig(){
-  try {
-    var r = await fetch(BASE+'/admin/config', {headers:{'x-admin-token':TOKEN}});
-    if(r.status===401){ doLogout(); return; }
-    var cfg = await r.json();
-    if(cfg.pagamento){
-      document.getElementById('cfg-pk').value = cfg.pagamento.pk || '';
-      if(cfg.pagamento.sk_masked) document.getElementById('cfg-sk').placeholder = cfg.pagamento.sk_masked+' (manter)';
-    }
-    if(cfg.marketing){
-      document.getElementById('cfg-pixelFb').value = cfg.marketing.pixelFacebook || '';
-      document.getElementById('cfg-ga').value = cfg.marketing.googleAnalytics || '';
-    }
-    var dot = document.getElementById('dbDot');
-    var lbl = document.getElementById('dbLabel');
-    if(cfg._db){ dot.className='db-dot'; lbl.textContent='MongoDB ativo'; }
-    else { dot.className='db-dot off'; lbl.textContent='Memória (sem banco)'; }
-  } catch(e){}
-}
-
-async function salvarCredenciais(){
-  var body = {pagamento:{pk:document.getElementById('cfg-pk').value.trim(),sk:document.getElementById('cfg-sk').value.trim()}};
-  try {
-    var r = await fetch(BASE+'/admin/config',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});
-    var d = await r.json();
-    if(d.ok){ toast('✅ Credenciais salvas!'); document.getElementById('cfg-sk').value=''; carregarConfig(); }
-    else toast(d.error||'Erro', true);
-  } catch(e){ toast('Erro de conexão', true); }
-}
-
-async function salvarMarketing(){
-  var body = {marketing:{pixelFacebook:document.getElementById('cfg-pixelFb').value.trim(),googleAnalytics:document.getElementById('cfg-ga').value.trim()}};
-  try {
-    var r = await fetch(BASE+'/admin/config',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});
-    var d = await r.json();
-    if(d.ok) toast('✅ Marketing salvo!');
-    else toast(d.error||'Erro', true);
-  } catch(e){ toast('Erro de conexão', true); }
-}
-
 function toggleSK(){
   var i = document.getElementById('cfg-sk');
   i.type = i.type==='password' ? 'text' : 'password';
 }
 
-function fmtBRL(val){
-  return 'R$ '+parseFloat(val||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+async function salvarCredenciais(){
+  var body = { pagamento: {} };
+  if(credEditMode.pk){
+    var pk = document.getElementById('cred-pk-input').value.trim();
+    if(pk) body.pagamento.pk = pk;
+  }
+  if(credEditMode.sk){
+    var sk = document.getElementById('cred-sk-input').value.trim();
+    if(sk) body.pagamento.sk = sk;
+  }
+  if(!body.pagamento.pk && !body.pagamento.sk){ toast('Preencha ao menos um campo', true); return; }
+  try {
+    var r = await fetch(BASE+'/admin/config',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});
+    var d = await r.json();
+    if(d.ok){ toast('✅ Credenciais salvas!'); cancelarCredenciais(); carregarConfig(); }
+    else toast(d.error||'Erro', true);
+  } catch(e){ toast('Erro de conexão', true); }
 }
-function esc(s){ var d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
 
-window.onload = function(){
-  TOKEN = localStorage.getItem('adminToken') || '';
+async function salvarConfigGlobal(){
+  var body = {pagamento:{pk:document.getElementById('cfg-pk').value.trim(),sk:document.getElementById('cfg-sk').value.trim()}};
+  // Forçar role master para rota config (server verifica)
+  try {
+    var r = await fetch(BASE+'/admin/config',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});
+    var d = await r.json();
+    if(d.ok){ toast('✅ Conta global salva!'); document.getElementById('cfg-sk').value=''; carregarConfig(); }
+    else toast(d.error||'Erro', true);
+  } catch(e){ toast('Erro de conexão', true); }
+}
+
+async function carregarConfig(){
+  try {
+    var r = await fetch(BASE+'/admin/config',{headers:{'x-admin-token':TOKEN}});
+    if(r.status===401){ doLogout(); return; }
+    var cfg = await r.json();
+    // Atualiza view das credenciais do próprio admin
+    if(cfg.pagamento){
+      var pkView = document.getElementById('cred-pk-view');
+      if(pkView){
+        if(cfg.pagamento.pk){ pkView.textContent=cfg.pagamento.pk; pkView.className='view-val'; }
+        else { pkView.textContent='Não configurada'; pkView.className='view-val empty'; }
+      }
+      var skView = document.getElementById('cred-sk-view');
+      if(skView){
+        if(cfg.pagamento.hasPaymentSk||cfg.pagamento.sk_masked){ skView.textContent='••••••••••••••••••••'; skView.className='view-val'; }
+        else { skView.textContent='Não configurada'; skView.className='view-val empty'; }
+      }
+      // Para master: preencher campos globais também
+      if(ADMIN_ROLE==='master'){
+        var cfgPk = document.getElementById('cfg-pk');
+        if(cfgPk && cfg.pagamento.pk) cfgPk.value=cfg.pagamento.pk;
+        var cfgSk = document.getElementById('cfg-sk');
+        if(cfgSk && cfg.pagamento.sk_masked) cfgSk.placeholder=cfg.pagamento.sk_masked+' (manter)';
+      }
+    }
+    if(cfg.marketing){
+      var pf = document.getElementById('cfg-pixelFb'); if(pf) pf.value=cfg.marketing.pixelFacebook||'';
+      var ga = document.getElementById('cfg-ga'); if(ga) ga.value=cfg.marketing.googleAnalytics||'';
+    }
+    var dot=document.getElementById('dbDot'), lbl=document.getElementById('dbLabel');
+    if(cfg._db){ dot.className='db-dot'; lbl.textContent='MongoDB ativo'; }
+    else { dot.className='db-dot off'; lbl.textContent='Memória'; }
+  } catch(e){}
+}
+
+async function salvarMarketing(){
+  var body={marketing:{pixelFacebook:document.getElementById('cfg-pixelFb').value.trim(),googleAnalytics:document.getElementById('cfg-ga').value.trim()}};
+  try {
+    var r=await fetch(BASE+'/admin/config',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});
+    var d=await r.json();
+    if(d.ok) toast('✅ Marketing salvo!'); else toast(d.error||'Erro',true);
+  } catch(e){ toast('Erro de conexão',true); }
+}
+
+// ══ USUÁRIOS (só master) ══
+async function carregarUsuarios(){
+  var lista=document.getElementById('usuarios-lista');
+  lista.innerHTML='<div style="text-align:center;padding:30px;color:var(--fg3)">Carregando…</div>';
+  try {
+    var r=await fetch(BASE+'/admin/usuarios',{headers:{'x-admin-token':TOKEN}});
+    var d=await r.json();
+    if(!d.usuarios||!d.usuarios.length){ lista.innerHTML='<div style="text-align:center;padding:30px;color:var(--fg3)">Nenhum usuário cadastrado ainda.</div>'; return; }
+    var html='<div class="table-wrap"><table>'
+      +'<thead><tr><th>Usuário</th><th>Nível</th><th>Status</th><th>Criado</th><th></th></tr></thead><tbody>';
+    d.usuarios.forEach(function(u){
+      var dt=u.createdAt?new Date(u.createdAt).toLocaleDateString('pt-BR'):'—';
+      var roleBadge=u.role==='master'?'<span class="badge badge-purple">Master</span>':'<span class="badge badge-gray">Comum</span>';
+      var statusBadge=u.ativo?'<span class="badge badge-green">Ativo</span>':'<span class="badge badge-gray">Inativo</span>';
+      html+='<tr>'
+        +'<td><strong>'+esc(u.usuario)+'</strong></td>'
+        +'<td>'+roleBadge+'</td>'
+        +'<td>'+statusBadge+'</td>'
+        +'<td style="color:var(--fg3)">'+dt+'</td>'
+        +'<td style="text-align:right">'
+        +'<button class="btn btn-ghost btn-sm" onclick="abrirEditarUsuario(\''+u._id+'\',\''+esc(u.usuario)+'\',\''+u.role+'\')" style="margin-right:6px">✏️</button>'
+        +'<button class="btn btn-danger btn-sm" onclick="excluirUsuario(\''+u._id+'\',\''+esc(u.usuario)+'\')">🗑️</button>'
+        +'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+    lista.innerHTML=html;
+  } catch(e){ lista.innerHTML='<div style="text-align:center;padding:30px;color:var(--danger)">Erro ao carregar usuários.</div>'; }
+}
+
+function abrirModalNovoUsuario(){
+  document.getElementById('modal-usuario-id').value='';
+  document.getElementById('modal-usuario-login').value='';
+  document.getElementById('modal-usuario-senha').value='';
+  document.getElementById('modal-usuario-role').value='comum';
+  document.getElementById('modal-usuario-titulo').textContent='Novo usuário';
+  document.getElementById('modal-senha-label').textContent='Senha';
+  document.getElementById('modal-usuario-login').disabled=false;
+  document.getElementById('modal-usuario').classList.add('open');
+}
+function abrirEditarUsuario(id,login,role){
+  document.getElementById('modal-usuario-id').value=id;
+  document.getElementById('modal-usuario-login').value=login;
+  document.getElementById('modal-usuario-login').disabled=true;
+  document.getElementById('modal-usuario-senha').value='';
+  document.getElementById('modal-usuario-role').value=role||'comum';
+  document.getElementById('modal-usuario-titulo').textContent='Editar usuário';
+  document.getElementById('modal-senha-label').textContent='Nova senha (deixe em branco para manter)';
+  document.getElementById('modal-usuario').classList.add('open');
+}
+function fecharModalUsuario(){ document.getElementById('modal-usuario').classList.remove('open'); }
+
+async function salvarUsuario(){
+  var id=document.getElementById('modal-usuario-id').value;
+  var login=document.getElementById('modal-usuario-login').value.trim();
+  var senha=document.getElementById('modal-usuario-senha').value;
+  var role=document.getElementById('modal-usuario-role').value;
+  if(!id&&!login){ toast('Informe o nome de usuário',true); return; }
+  if(!id&&!senha){ toast('Informe uma senha',true); return; }
+  try {
+    var url=id?BASE+'/admin/usuarios/'+id:BASE+'/admin/usuarios';
+    var method=id?'PUT':'POST';
+    var body={role};
+    if(!id) body.usuario=login;
+    if(senha) body.senha=senha;
+    var r=await fetch(url,{method,headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});
+    var d=await r.json();
+    if(d.ok){ toast(id?'✅ Usuário atualizado!':'✅ Usuário criado!'); fecharModalUsuario(); carregarUsuarios(); }
+    else toast(d.error||'Erro ao salvar',true);
+  } catch(e){ toast('Erro de conexão',true); }
+}
+
+async function excluirUsuario(id,login){
+  if(!confirm('Excluir o usuário "'+login+'"? Esta ação não pode ser desfeita.')) return;
+  try {
+    var r=await fetch(BASE+'/admin/usuarios/'+id,{method:'DELETE',headers:{'x-admin-token':TOKEN}});
+    var d=await r.json();
+    if(d.ok){ toast('✅ Usuário excluído'); carregarUsuarios(); }
+    else toast(d.error||'Erro ao excluir',true);
+  } catch(e){ toast('Erro de conexão',true); }
+}
+
+// ══ MULTI-CAMPANHA ══
+var campanhaAtual=null, atualizacoesData=[], perguntasData=[], valoresData=[], selosData=[];
+
+function mostrarVistaLista(){ document.getElementById('camp-lista-view').style.display='block'; document.getElementById('camp-criar-view').style.display='none'; document.getElementById('camp-editor-view').style.display='none'; }
+function mostrarVistaCriar(){ document.getElementById('camp-lista-view').style.display='none'; document.getElementById('camp-criar-view').style.display='block'; document.getElementById('camp-editor-view').style.display='none'; }
+function mostrarVistaEditor(){ document.getElementById('camp-lista-view').style.display='none'; document.getElementById('camp-criar-view').style.display='none'; document.getElementById('camp-editor-view').style.display='block'; }
+function voltarLista(){ campanhaAtual=null; mostrarVistaLista(); carregarListaCampanhas(); }
+
+async function carregarListaCampanhas(){
+  mostrarVistaLista();
+  var loading=document.getElementById('camp-lista-loading');
+  var cards=document.getElementById('camp-lista-cards');
+  loading.style.display='block'; cards.style.display='none';
+  try {
+    var r=await fetch(BASE+'/admin/campanhas',{headers:{'x-admin-token':TOKEN}});
+    if(r.status===401){ doLogout(); return; }
+    var d=await r.json();
+    var campanhas=(d.campanhas||[]);
+    loading.style.display='none'; cards.style.display='block';
+    if(!campanhas.length){
+      cards.innerHTML='<div style="text-align:center;padding:50px;color:var(--fg3)"><div style="font-size:40px;margin-bottom:12px">🎗️</div><div style="font-size:15px;font-weight:700;margin-bottom:8px">Nenhuma campanha criada</div><div style="font-size:13px">Clique em <strong>+ Nova campanha</strong> para começar</div></div>';
+      return;
+    }
+    cards.innerHTML='';
+    campanhas.forEach(function(c){
+      var link=c.slug?(window.location.origin+'/c/'+c.slug):'(sem slug)';
+      var pct=c.meta>0?Math.min(100,Math.round((c.arrecadado||0)/c.meta*100)):0;
+      var statusColor=c.status==='ativa'?'var(--accent)':c.status==='pausada'?'var(--warn)':'var(--fg3)';
+      var thumbEl=c.fotoBase64||c.fotoUrl
+        ?'<img src="'+(c.fotoBase64||c.fotoUrl)+'" style="width:62px;height:62px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display=\'none\'">'
+        :'<div style="width:62px;height:62px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🎗️</div>';
+      var div=document.createElement('div');
+      div.className='camp-card';
+      div.innerHTML=thumbEl
+        +'<div class="camp-card-info">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+        +'<strong style="font-size:14px">'+esc(c.nome||'Sem nome')+'</strong>'
+        +'<span class="badge" style="background:'+statusColor+'18;color:'+statusColor+'">'+esc(c.status||'ativa')+'</span>'
+        +'</div>'
+        +'<div style="font-size:11px;color:var(--fg3);margin-bottom:6px">'+esc(c.localizacao||'')+(c.categoria?' · '+esc(c.categoria):'')+'</div>'
+        +'<div style="font-size:12px;margin-bottom:6px"><strong>'+fmtBRL(c.arrecadado||0)+'</strong> <span style="color:var(--fg3)">de '+fmtBRL(c.meta||0)+' ('+pct+'%)</span></div>'
+        +'<div class="progress"><div class="progress-bar" style="width:'+pct+'%"></div></div>'
+        +(c.slug?'<div style="font-size:11px;color:var(--fg3)">🔗 <a href="'+link+'" target="_blank" style="color:var(--accent)">'+link+'</a></div>':'<div style="font-size:11px;color:var(--fg3)">⚠️ Sem slug</div>')
+        +'</div>'
+        +'<div class="camp-card-actions">'
+        +'<button class="btn btn-primary btn-sm" onclick="abrirEditorCampanha(\''+c._id+'\')">✏️ Editar</button>'
+        +'<button class="btn btn-danger btn-sm" onclick="confirmarExcluirCampanhaId(\''+c._id+'\',\''+esc(c.nome||'esta campanha')+'\')">🗑️</button>'
+        +'</div>';
+      cards.appendChild(div);
+    });
+  } catch(e){ loading.textContent='Erro ao carregar: '+e.message; loading.style.display='block'; cards.style.display='none'; }
+}
+
+function abrirCriarCampanha(){
+  ['nova-nome','nova-slug','nova-localizacao','nova-dataCriacao','nova-resumoCurto','nova-descricao','nova-fotoUrl','nova-videoUrl','nova-chavePix'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('nova-meta').value='';
+  document.getElementById('nova-categoria').value='Solidariedade';
+  document.getElementById('nova-slug-preview').innerHTML='Link: /c/<em>seu-slug</em>';
+  mostrarVistaCriar();
+}
+
+async function criarCampanha(){
+  var nome=document.getElementById('nova-nome').value.trim();
+  var slug=document.getElementById('nova-slug').value.trim();
+  var meta=parseFloat(document.getElementById('nova-meta').value)||0;
+  if(!nome) return toast('Informe o título da campanha',true);
+  if(!slug) return toast('Informe o slug (URL única)',true);
+  if(meta<1) return toast('Informe uma meta válida',true);
+  var body={nome,slug,localizacao:document.getElementById('nova-localizacao').value.trim(),categoria:document.getElementById('nova-categoria').value,dataCriacao:document.getElementById('nova-dataCriacao').value.trim(),resumoCurto:document.getElementById('nova-resumoCurto').value.trim(),descricao:document.getElementById('nova-descricao').value.trim(),fotoUrl:document.getElementById('nova-fotoUrl').value.trim()||'',videoUrl:document.getElementById('nova-videoUrl').value.trim()||'',chavePix:document.getElementById('nova-chavePix').value.trim()||'',meta,status:'ativa',valores:[10,25,50,100,200],arrecadado:0};
+  var btn=document.querySelector('#camp-criar-view .btn-primary');
+  if(btn){ btn.disabled=true; btn.textContent='Criando…'; }
+  try {
+    var r=await fetch(BASE+'/admin/campanhas',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});
+    var d=await r.json();
+    if(d.ok&&d.campanha){ toast('✅ Campanha criada! Link: /c/'+slug); voltarLista(); }
+    else toast(d.error||'Erro ao criar campanha',true);
+  } catch(e){ toast('Erro: '+e.message,true); }
+  finally { if(btn){ btn.disabled=false; btn.textContent='🚀 Criar campanha'; } }
+}
+
+async function abrirEditorCampanha(id){
+  mostrarVistaEditor();
+  document.getElementById('campanha-loading').style.display='block';
+  document.getElementById('campanha-editor').style.display='none';
+  try {
+    var r=await fetch(BASE+'/admin/campanhas',{headers:{'x-admin-token':TOKEN}});
+    if(r.status===401){ doLogout(); return; }
+    var d=await r.json();
+    var c=(d.campanhas||[]).find(function(x){ return x._id===id; });
+    if(!c){ toast('Campanha não encontrada',true); voltarLista(); return; }
+    campanhaAtual=c; popularEditor(c);
+  } catch(e){ toast('Erro ao carregar: '+e.message,true); voltarLista(); }
+}
+
+function showEditorTab(tab,btn){
+  document.querySelectorAll('#camp-editor-view .tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('#camp-editor-view .tab-pane').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('ceditor-'+tab).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+function popularEditor(c){
+  campanhaAtual=c;
+  document.getElementById('ce-titulo-header').textContent=c.nome||'Campanha';
+  var badge=document.getElementById('ce-status-badge');
+  badge.textContent=c.status||'ativa';
+  var col=c.status==='ativa'?'var(--accent)':c.status==='pausada'?'var(--warn)':'var(--fg3)';
+  badge.style.background=col+'18'; badge.style.color=col;
+  var linkVer=document.getElementById('ce-link-ver');
+  if(c.slug){ linkVer.href='/c/'+c.slug; linkVer.style.display=''; } else linkVer.style.display='none';
+  document.getElementById('ce-nome').value=c.nome||'';
+  document.getElementById('ce-resumoCurto').value=c.resumoCurto||'';
+  document.getElementById('ce-localizacao').value=c.localizacao||'';
+  document.getElementById('ce-dataCriacao').value=c.dataCriacao||'';
+  document.getElementById('ce-meta').value=c.meta||'';
+  document.getElementById('ce-idPublico').value=c.idPublico||'';
+  document.getElementById('ce-slug').value=c.slug||'';
+  atualizarPreviewSlug();
+  var catSel=document.getElementById('ce-categoria');
+  catSel.value=c.categoria||'Solidariedade';
+  if(!catSel.value&&c.categoria){ var op=document.createElement('option'); op.value=c.categoria; op.textContent=c.categoria; catSel.appendChild(op); catSel.value=c.categoria; }
+  document.getElementById('ce-status').value=c.status||'ativa';
+  document.getElementById('ce-chavePix').value=c.chavePix||'';
+  document.getElementById('ce-checkoutNome').value=c.checkoutNome||'';
+  document.getElementById('ce-upsellValor').value=c.upsellValor!=null?c.upsellValor:3.99;
+  document.getElementById('ce-textoUpsellTitulo').value=c.textoUpsellTitulo||'';
+  document.getElementById('ce-textoUpsellSub').value=c.textoUpsellSub||'';
+  document.getElementById('ce-textoAgradecimento').value=c.textoAgradecimento||'';
+  document.getElementById('ce-textoAgradecimentoP1').value=c.textoAgradecimentoP1||'';
+  document.getElementById('ce-textoAgradecimentoP2').value=c.textoAgradecimentoP2||'';
+  document.getElementById('ce-textoAgradecimentoP3').value=c.textoAgradecimentoP3||'';
+  var fileInput=document.getElementById('ce-fotoFile'); if(fileInput) fileInput.value='';
+  document.getElementById('ce-fotoUrl').value=c.fotoUrl||'';
+  var prev=document.getElementById('ce-fotoPreview');
+  if(c.fotoBase64||c.fotoUrl){ prev.src=c.fotoBase64||c.fotoUrl; prev.style.display='block'; }
+  else { prev.src=''; prev.style.display='none'; }
+  document.getElementById('ce-videoUrl').value=c.videoUrl||'';
+  onVideoUrlChange();
+  document.getElementById('ce-descricao').value=c.descricao||'';
+  updateCharCount(document.getElementById('ce-descricao'),'desc-count');
+  document.getElementById('ce-vakinhaPremiada').value=c.vakinhaPremiada||'';
+  document.getElementById('ce-upsell').value=c.upsell?'true':'false';
+  document.getElementById('ce-upsellTexto').value=c.upsellTexto||'';
+  document.getElementById('ce-arrecadadoBase').value=c.arrecadadoBase!=null?c.arrecadadoBase:'';
+  document.getElementById('ce-apoiadoresBase').value=c.apoiadoresBase!=null?c.apoiadoresBase:'';
+  document.getElementById('ce-coracoesBase').value=c.coracoesBase!=null?c.coracoesBase:'';
+  atualizacoesData=(c.atualizacoes||[]).slice();
+  perguntasData=(c.perguntas||[]).slice();
+  valoresData=(c.valores||[10,25,50,100,200]).slice();
+  selosData=(c.selos||[]).slice();
+  renderAtualizacoes(); renderPerguntas(); renderValores(); renderSelos();
+  document.querySelectorAll('#camp-editor-view .tab-btn').forEach(function(b,i){ b.classList.toggle('active',i===0); });
+  document.querySelectorAll('#camp-editor-view .tab-pane').forEach(function(p,i){ p.classList.toggle('active',i===0); });
+  document.getElementById('campanha-loading').style.display='none';
+  document.getElementById('campanha-editor').style.display='block';
+}
+
+function sanitizeSlug(input){
+  var v=input.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9-]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+  input.value=v; atualizarPreviewSlug();
+}
+function atualizarPreviewSlug(){
+  var slug=document.getElementById('ce-slug'), preview=document.getElementById('ce-slug-preview');
+  if(slug&&preview){ var val=slug.value.trim(); preview.innerHTML=val?'Link: <a href="/c/'+val+'" target="_blank" style="color:var(--accent)">/c/'+val+'</a>':'Link: —'; }
+  var ns=document.getElementById('nova-slug'), nsp=document.getElementById('nova-slug-preview');
+  if(ns&&nsp){ var v2=ns.value.trim(); nsp.innerHTML=v2?'Link: <a href="/c/'+v2+'" target="_blank" style="color:var(--accent)">/c/'+v2+'</a>':'Link: /c/<em>seu-slug</em>'; }
+}
+
+function onFotoUrlChange(){
+  var url=document.getElementById('ce-fotoUrl').value.trim();
+  var prev=document.getElementById('ce-fotoPreview');
+  if(url){ prev.src=url; prev.style.display='block'; } else { prev.src=''; prev.style.display='none'; }
+}
+
+function onVideoUrlChange(){
+  var vUrl=(document.getElementById('ce-videoUrl').value||'').trim();
+  var wrap=document.getElementById('ce-videoPreview');
+  if(!wrap) return;
+  wrap.innerHTML=''; wrap.style.display='none';
+  if(!vUrl) return;
+  var ytMatch=vUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+  var viMatch=vUrl.match(/vimeo\.com\/(\d+)/);
+  if(ytMatch){ wrap.innerHTML='<iframe src="https://www.youtube.com/embed/'+ytMatch[1]+'" width="100%" height="200" frameborder="0" allowfullscreen style="border-radius:8px"></iframe>'; wrap.style.display='block'; }
+  else if(viMatch){ wrap.innerHTML='<iframe src="https://player.vimeo.com/video/'+viMatch[1]+'" width="100%" height="200" frameborder="0" allowfullscreen style="border-radius:8px"></iframe>'; wrap.style.display='block'; }
+  else if(vUrl.match(/\.(mp4|webm|ogg)(\?.*)?$/i)){ wrap.innerHTML='<video src="'+vUrl+'" controls style="width:100%;border-radius:8px;max-height:200px"></video>'; wrap.style.display='block'; }
+}
+
+async function confirmarExcluirCampanhaId(id,nome){
+  if(!confirm('Tem certeza que deseja EXCLUIR a campanha "'+nome+'"?\n\nEsta ação não pode ser desfeita!')) return;
+  try { var r=await fetch(BASE+'/admin/campanhas/'+id,{method:'DELETE',headers:{'x-admin-token':TOKEN}}); var d=await r.json(); if(d.ok){ toast('Campanha excluída'); carregarListaCampanhas(); } else toast(d.error||'Erro ao excluir',true); } catch(e){ toast('Erro: '+e.message,true); }
+}
+async function confirmarExcluirCampanha(){
+  if(!campanhaAtual) return;
+  if(!confirm('Tem certeza que deseja EXCLUIR "'+campanhaAtual.nome+'"?\n\nEsta ação não pode ser desfeita!')) return;
+  try { var r=await fetch(BASE+'/admin/campanhas/'+campanhaAtual._id,{method:'DELETE',headers:{'x-admin-token':TOKEN}}); var d=await r.json(); if(d.ok){ toast('Campanha excluída'); voltarLista(); } else toast(d.error||'Erro ao excluir',true); } catch(e){ toast('Erro: '+e.message,true); }
+}
+
+function carregarCampanhaEditor(){ carregarListaCampanhas(); }
+
+// ATUALIZAÇÕES
+function renderAtualizacoes(){
+  var list=document.getElementById('atualizacoes-list'), vazio=document.getElementById('atualizacoes-vazio');
+  list.innerHTML='';
+  if(!atualizacoesData.length){ vazio.style.display='block'; return; }
+  vazio.style.display='none';
+  atualizacoesData.forEach(function(a,i){
+    var div=document.createElement('div'); div.className='list-row'; div.style.flexDirection='column'; div.style.alignItems='flex-start'; div.style.gap='4px';
+    div.innerHTML='<div style="display:flex;width:100%;align-items:center;gap:8px">'+'<span style="flex:1;font-weight:600;font-size:13px">'+esc(a.titulo||'Sem título')+'</span>'+'<span style="font-size:11px;color:var(--fg3)">'+esc(a.data||'')+'</span>'+'<button class="list-row-btn" onclick="editarAtualizacao('+i+')">✏️</button>'+'<button class="list-row-btn" onclick="removerAtualizacao('+i+')">🗑️</button>'+'</div>'+'<div style="font-size:12px;color:var(--fg3);line-height:1.4">'+esc((a.texto||'').slice(0,100)+(a.texto&&a.texto.length>100?'…':''))+'</div>';
+    list.appendChild(div);
+  });
+}
+function toggleAddAtualizacao(){ var box=document.getElementById('add-atualizacao-box'); box.style.display=box.style.display==='none'?'block':'none'; if(box.style.display==='block'){ document.getElementById('new-atu-titulo').value=''; document.getElementById('new-atu-data').value=''; document.getElementById('new-atu-texto').value=''; document.getElementById('new-atu-titulo').focus(); } }
+function adicionarAtualizacao(){ var t=document.getElementById('new-atu-titulo').value.trim(), d=document.getElementById('new-atu-data').value.trim(), tx=document.getElementById('new-atu-texto').value.trim(); if(!t) return toast('Informe o título',true); atualizacoesData.unshift({titulo:t,data:d,texto:tx}); toggleAddAtualizacao(); renderAtualizacoes(); toast('Atualização adicionada — salve para confirmar'); }
+function removerAtualizacao(i){ if(!confirm('Remover esta atualização?')) return; atualizacoesData.splice(i,1); renderAtualizacoes(); }
+function editarAtualizacao(i){ var a=atualizacoesData[i]; document.getElementById('new-atu-titulo').value=a.titulo||''; document.getElementById('new-atu-data').value=a.data||''; document.getElementById('new-atu-texto').value=a.texto||''; document.getElementById('add-atualizacao-box').style.display='block'; atualizacoesData.splice(i,1); renderAtualizacoes(); document.getElementById('new-atu-titulo').focus(); }
+
+// PERGUNTAS
+function renderPerguntas(){
+  var list=document.getElementById('perguntas-list'), vazio=document.getElementById('perguntas-vazio');
+  list.innerHTML='';
+  if(!perguntasData.length){ vazio.style.display='block'; return; }
+  vazio.style.display='none';
+  perguntasData.forEach(function(p,i){
+    var div=document.createElement('div'); div.className='list-row'; div.style.flexDirection='column'; div.style.alignItems='flex-start'; div.style.gap='4px';
+    div.innerHTML='<div style="display:flex;width:100%;align-items:center;gap:8px">'+'<span style="flex:1;font-weight:600;font-size:13px">❓ '+esc(p.pergunta||'Sem pergunta')+'</span>'+(p.autor?'<span style="font-size:11px;color:var(--fg3)">'+esc(p.autor)+'</span>':'')+'<button class="list-row-btn" onclick="editarPergunta('+i+')">✏️</button>'+'<button class="list-row-btn" onclick="removerPergunta('+i+')">🗑️</button>'+'</div>'+'<div style="font-size:12px;color:var(--fg3);line-height:1.4">↩ '+esc((p.resposta||'').slice(0,100)+(p.resposta&&p.resposta.length>100?'…':''))+'</div>';
+    list.appendChild(div);
+  });
+}
+function toggleAddPergunta(){ var box=document.getElementById('add-pergunta-box'); box.style.display=box.style.display==='none'?'block':'none'; if(box.style.display==='block'){ document.getElementById('new-perg-pergunta').value=''; document.getElementById('new-perg-resposta').value=''; document.getElementById('new-perg-autor').value=''; document.getElementById('new-perg-pergunta').focus(); } }
+function adicionarPergunta(){ var p=document.getElementById('new-perg-pergunta').value.trim(), r=document.getElementById('new-perg-resposta').value.trim(), a=document.getElementById('new-perg-autor').value.trim(); if(!p) return toast('Informe a pergunta',true); if(!r) return toast('Informe a resposta',true); perguntasData.push({pergunta:p,resposta:r,autor:a}); toggleAddPergunta(); renderPerguntas(); toast('Pergunta adicionada — salve para confirmar'); }
+function removerPergunta(i){ if(!confirm('Remover esta pergunta?')) return; perguntasData.splice(i,1); renderPerguntas(); }
+function editarPergunta(i){ var p=perguntasData[i]; document.getElementById('new-perg-pergunta').value=p.pergunta||''; document.getElementById('new-perg-resposta').value=p.resposta||''; document.getElementById('new-perg-autor').value=p.autor||''; document.getElementById('add-pergunta-box').style.display='block'; perguntasData.splice(i,1); renderPerguntas(); document.getElementById('new-perg-pergunta').focus(); }
+
+// VALORES
+function renderValores(){
+  var grid=document.getElementById('valores-chips'); grid.innerHTML='';
+  valoresData.forEach(function(v,i){
+    var chip=document.createElement('div'); chip.className='chip';
+    chip.innerHTML='<span>R$ '+parseFloat(v).toLocaleString('pt-BR')+'</span>'+'<button onclick="removerValor('+i+')" title="Remover">×</button>';
+    grid.appendChild(chip);
+  });
+}
+function adicionarValor(){ var v=parseFloat(document.getElementById('new-valor').value); if(!v||v<1) return toast('Informe um valor válido',true); if(valoresData.length>=8) return toast('Máximo 8 valores',true); valoresData.push(v); valoresData.sort(function(a,b){return a-b;}); document.getElementById('new-valor').value=''; renderValores(); }
+function removerValor(i){ valoresData.splice(i,1); renderValores(); }
+
+// SELOS
+function renderSelos(){
+  var list=document.getElementById('selos-list'); list.innerHTML='';
+  selosData.forEach(function(s,i){
+    var div=document.createElement('div'); div.className='list-row'; div.style.padding='8px 12px';
+    div.innerHTML='<span style="flex:1">'+esc(s)+'</span>'+'<button class="list-row-btn" onclick="removerSelo('+i+')">🗑️</button>';
+    list.appendChild(div);
+  });
+}
+function adicionarSelo(){ var s=document.getElementById('new-selo').value.trim(); if(!s) return toast('Informe o selo',true); selosData.push(s); document.getElementById('new-selo').value=''; renderSelos(); }
+function removerSelo(i){ selosData.splice(i,1); renderSelos(); }
+
+// FOTO
+function previewFoto(input){
+  var file=input.files&&input.files[0];
+  if(!file) return;
+  if(file.size>2*1024*1024){ toast('Imagem muito grande (máx 2MB)',true); input.value=''; return; }
+  var reader=new FileReader();
+  reader.onload=function(e){ var prev=document.getElementById('ce-fotoPreview'); prev.src=e.target.result; prev.style.display='block'; };
+  reader.readAsDataURL(file);
+}
+
+// SALVAR CAMPANHA
+async function salvarCampanha(){
+  if(!campanhaAtual) return toast('Campanha não carregada',true);
+  var btn=event&&event.target;
+  if(btn){ btn.disabled=true; btn.textContent='Salvando…'; }
+  try {
+    var fotoBase64=null, fotoMime=null, fotoUrl=null;
+    var fileInput=document.getElementById('ce-fotoFile');
+    if(fileInput&&fileInput.files&&fileInput.files[0]){
+      var file=fileInput.files[0];
+      fotoBase64=await new Promise(function(res){ var r=new FileReader(); r.onload=function(e){ res(e.target.result); }; r.readAsDataURL(file); });
+      fotoMime=file.type;
+    } else { fotoUrl=document.getElementById('ce-fotoUrl').value.trim()||null; }
+    var slugVal=(document.getElementById('ce-slug').value||'').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9-]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+    var body={
+      nome:document.getElementById('ce-nome').value.trim(),
+      resumoCurto:document.getElementById('ce-resumoCurto').value.trim(),
+      localizacao:document.getElementById('ce-localizacao').value.trim(),
+      categoria:document.getElementById('ce-categoria').value,
+      dataCriacao:document.getElementById('ce-dataCriacao').value.trim(),
+      meta:parseFloat(document.getElementById('ce-meta').value)||0,
+      idPublico:document.getElementById('ce-idPublico').value.trim(),
+      slug:slugVal,
+      status:document.getElementById('ce-status').value,
+      descricao:document.getElementById('ce-descricao').value,
+      vakinhaPremiada:document.getElementById('ce-vakinhaPremiada').value.trim(),
+      chavePix:document.getElementById('ce-chavePix').value.trim(),
+      videoUrl:(document.getElementById('ce-videoUrl').value||'').trim(),
+      checkoutNome:document.getElementById('ce-checkoutNome').value.trim(),
+      upsell:document.getElementById('ce-upsell').value==='true',
+      upsellTexto:document.getElementById('ce-upsellTexto').value.trim(),
+      upsellValor:parseFloat(document.getElementById('ce-upsellValor').value)||3.99,
+      textoUpsellTitulo:document.getElementById('ce-textoUpsellTitulo').value.trim(),
+      textoUpsellSub:document.getElementById('ce-textoUpsellSub').value.trim(),
+      textoAgradecimento:document.getElementById('ce-textoAgradecimento').value.trim(),
+      textoAgradecimentoP1:document.getElementById('ce-textoAgradecimentoP1').value.trim(),
+      textoAgradecimentoP2:document.getElementById('ce-textoAgradecimentoP2').value.trim(),
+      textoAgradecimentoP3:document.getElementById('ce-textoAgradecimentoP3').value.trim(),
+      arrecadadoBase:parseFloat(document.getElementById('ce-arrecadadoBase').value)||0,
+      apoiadoresBase:parseInt(document.getElementById('ce-apoiadoresBase').value)||0,
+      coracoesBase:parseInt(document.getElementById('ce-coracoesBase').value)||0,
+      valores:valoresData, atualizacoes:atualizacoesData, perguntas:perguntasData, selos:selosData
+    };
+    if(fotoBase64){ body.fotoBase64=fotoBase64; body.fotoMime=fotoMime; }
+    else if(fotoUrl!==null){ body.fotoUrl=fotoUrl; }
+    var r=await fetch(BASE+'/admin/campanhas/'+campanhaAtual._id,{method:'PUT',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});
+    var d=await r.json();
+    if(d.ok||d.campanha){
+      toast('✅ Campanha salva com sucesso!');
+      campanhaAtual=d.campanha||campanhaAtual;
+      document.getElementById('ce-titulo-header').textContent=campanhaAtual.nome||'Campanha';
+      var linkVer=document.getElementById('ce-link-ver');
+      if(campanhaAtual.slug){ linkVer.href='/c/'+campanhaAtual.slug; linkVer.style.display=''; }
+    } else toast(d.error||'Erro ao salvar',true);
+  } catch(e){ toast('Erro: '+e.message,true); }
+  finally { if(btn){ btn.disabled=false; btn.textContent='💾 Salvar campanha'; } }
+}
+
+// PAGAMENTOS
+async function carregarPagamentos(){
+  var tbody=document.getElementById('pagamentos-tbody');
+  tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--fg3);padding:30px">Carregando…</td></tr>';
+  try {
+    var r=await fetch(BASE+'/admin/pagamentos',{headers:{'x-admin-token':TOKEN}});
+    if(r.status===401){ doLogout(); return; }
+    var d=await r.json();
+    var pagamentos=d.pagamentos||[];
+    if(!pagamentos.length){
+      tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--fg3);padding:30px">Nenhum pagamento encontrado</td></tr>';
+      document.getElementById('pagamentos-info').textContent=''; return;
+    }
+    tbody.innerHTML='';
+    pagamentos.forEach(function(p){
+      var statusClass=p.status==='paid'||p.status==='approved'||p.status==='completed'?'pill-paid':p.status==='failed'||p.status==='cancelled'?'pill-fail':'pill-pend';
+      var statusLabel={paid:'Pago',completed:'Pago',approved:'Pago',pending:'Pendente',failed:'Falhou',cancelled:'Cancelado'}[p.status]||p.status;
+      var data=p.createdAt?new Date(p.createdAt).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td>'+data+'</td>'+'<td><strong>'+fmtBRL((p.amountCents||0)/100)+'</strong></td>'+'<td style="color:var(--fg2)">'+esc(p.donorName||'Anônimo')+'</td>'+'<td><span class="pill '+statusClass+'">'+statusLabel+'</span></td>'+'<td style="font-size:11px;color:var(--fg3)">'+esc((p.chargeId||p._id||'').slice(0,16))+'…</td>';
+      tbody.appendChild(tr);
+    });
+    document.getElementById('pagamentos-info').textContent=pagamentos.length+' registro(s) · use Exportar CSV para ver todos';
+  } catch(e){ tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--fg3);padding:30px">Erro ao carregar</td></tr>'; }
+}
+
+function exportarCSV(){
+  var rows=[['Data','Valor','Doador','Status','ID']];
+  document.querySelectorAll('#pagamentos-tbody tr').forEach(function(tr){
+    var tds=tr.querySelectorAll('td');
+    if(tds.length>1) rows.push(Array.from(tds).map(function(td){ return '"'+td.textContent.replace(/"/g,'""')+'"'; }));
+  });
+  var csv=rows.map(function(r){ return r.join(','); }).join('\n');
+  var blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='pagamentos.csv'; a.click();
+}
+
+// INIT
+window.onload=function(){
+  TOKEN=localStorage.getItem('adminToken')||'';
   if(TOKEN){
     fetch(BASE+'/admin/config',{headers:{'x-admin-token':TOKEN}})
-      .then(function(r){
-        if(r.ok){ iniciarApp(localStorage.getItem('adminUser')||'Admin'); }
-        else { TOKEN=''; localStorage.removeItem('adminToken'); }
-      }).catch(function(){});
+      .then(function(r){ if(r.ok) iniciarApp(localStorage.getItem('adminUser')||'Admin'); else { TOKEN=''; localStorage.removeItem('adminToken'); } })
+      .catch(function(){});
   }
 };
 </script>

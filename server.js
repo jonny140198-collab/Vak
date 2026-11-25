@@ -104,6 +104,7 @@ const ConfigModel = mongoose.model('Config', configSchema);
 
 // ─── Schema: Campanha ─────────────────────────────────────────────
 const campanhaSchema = new mongoose.Schema({
+  owner:        { type: String, default: '' },  // username do admin dono da campanha
   nome:         { type: String, default: 'Nova Campanha' },
   resumoCurto:  { type: String, default: '' },
   descricao:    { type: String, default: '' },
@@ -131,9 +132,6 @@ const campanhaSchema = new mongoose.Schema({
   textoAgradecimentoP3: { type: String, default: '' },  // 3º parágrafo
   textoUpsellTitulo:    { type: String, default: '' },  // "Deseja adicionar R$..."
   textoUpsellSub:       { type: String, default: '' },  // subtexto do upsell
-  // Credenciais de pagamento próprias (sobrepõem o global quando preenchidas)
-  paymentPk:    { type: String, default: '' },  // Public Key XFlow do dono da campanha
-  paymentSk:    { type: String, default: '' },  // Secret Key XFlow — NUNCA exposta ao frontend
   arrecadado:        { type: Number, default: 0 },
   arrecadadoBase:    { type: Number, default: 0 },   // valor base de exibição (histórico externo)
   apoiadoresBase:    { type: Number, default: 0 },   // apoiadores base de exibição
@@ -305,10 +303,12 @@ async function salvarConfigNoBanco() {
 // ─── Auth ─────────────────────────────────────────────────────────
 // ─── Schema: AdminUser ────────────────────────────────────────────
 const adminUserSchema = new mongoose.Schema({
-  usuario:   { type: String, required: true, unique: true },
-  senhaHash: { type: String, required: true },
-  role:      { type: String, default: 'comum', enum: ['master', 'comum'] },
-  ativo:     { type: Boolean, default: true }
+  usuario:    { type: String, required: true, unique: true },
+  senhaHash:  { type: String, required: true },
+  role:       { type: String, default: 'comum', enum: ['master', 'comum'] },
+  ativo:      { type: Boolean, default: true },
+  paymentPk:  { type: String, default: '' },  // Public Key XFlow do admin
+  paymentSk:  { type: String, default: '' }   // Secret Key XFlow — NUNCA exposta ao frontend
 }, { timestamps: true, versionKey: false });
 const AdminUserModel = mongoose.model('AdminUser', adminUserSchema);
 
@@ -397,7 +397,7 @@ app.get('/admin/me', authMiddleware, (req, res) => {
 // ─── CRUD de usuários admin (só master) ──────────────────────────
 app.get('/admin/usuarios', authMiddleware, masterOnly, async (req, res) => {
   try {
-    const lista = await AdminUserModel.find().select('-senhaHash').sort({ createdAt: 1 });
+    const lista = await AdminUserModel.find().select('-senhaHash -paymentSk').sort({ createdAt: 1 });
     res.json({ usuarios: lista });
   } catch(e) { res.status(500).json({ error: 'Erro ao listar usuários' }); }
 });
@@ -439,11 +439,31 @@ app.delete('/admin/usuarios/:id', authMiddleware, masterOnly, async (req, res) =
 });
 
 // ─── Config global (credenciais / marketing) ──────────────────────
-app.get('/admin/config', authMiddleware, (req, res) => {
+app.get('/admin/config', authMiddleware, async (req, res) => {
+  // Para admins comuns: retorna as credenciais DO PRÓPRIO admin (não as globais)
+  if (req.adminRole !== 'master') {
+    try {
+      const u = dbConectado ? await AdminUserModel.findOne({ usuario: req.adminUser }) : null;
+      return res.json({
+        pagamento: {
+          pk: u ? u.paymentPk : '',
+          hasPaymentSk: u ? !!u.paymentSk : false
+        },
+        marketing: CONFIG.marketing,
+        _db: dbConectado
+      });
+    } catch(e) {
+      return res.json({ pagamento: { pk: '', hasPaymentSk: false }, marketing: CONFIG.marketing, _db: dbConectado });
+    }
+  }
+  // Master: retorna config global
   const cfg = JSON.parse(JSON.stringify(CONFIG));
   if (cfg.pagamento?.sk) {
+    cfg.pagamento.hasPaymentSk = true;
     cfg.pagamento.sk_masked = cfg.pagamento.sk.slice(0, 10) + '••••••••••••••••';
     delete cfg.pagamento.sk;
+  } else {
+    cfg.pagamento.hasPaymentSk = false;
   }
   cfg._db = dbConectado;
   res.json(cfg);
@@ -451,6 +471,19 @@ app.get('/admin/config', authMiddleware, (req, res) => {
 
 app.post('/admin/config', authMiddleware, async (req, res) => {
   const body = req.body;
+  // Admins comuns salvam credenciais apenas na sua própria conta no banco
+  if (req.adminRole !== 'master') {
+    if (!dbConectado) return res.status(503).json({ error: 'Banco de dados não disponível' });
+    try {
+      const campos = {};
+      if (body.pagamento?.pk) campos.paymentPk = body.pagamento.pk;
+      if (body.pagamento?.sk && !body.pagamento.sk.includes('•')) campos.paymentSk = body.pagamento.sk;
+      if (Object.keys(campos).length === 0) return res.json({ ok: true });
+      await AdminUserModel.findOneAndUpdate({ usuario: req.adminUser }, { $set: campos });
+      return res.json({ ok: true, persistido: true });
+    } catch(e) { return res.status(500).json({ error: 'Erro ao salvar credenciais' }); }
+  }
+  // Master: salva config global
   if (body.pagamento) {
     if (body.pagamento.pk) CONFIG.pagamento.pk = body.pagamento.pk;
     if (body.pagamento.sk && !body.pagamento.sk.includes('•')) CONFIG.pagamento.sk = body.pagamento.sk;
@@ -465,15 +498,17 @@ app.post('/admin/config', authMiddleware, async (req, res) => {
 // Listar
 app.get('/admin/campanhas', authMiddleware, async (req, res) => {
   try {
-    if (!dbConectado) return res.json({ campanhas: CAMPANHAS_MEM });
-    // Busca com SK para saber se existe, mas remove antes de enviar
-    const campanhas = await CampanhaModel.find().sort({ ordemExibicao: 1, createdAt: 1 });
-    const result = campanhas.map(c => {
-      const obj = c.toObject();
-      obj.hasPaymentSk = !!obj.paymentSk;  // indica se SK existe (booleano seguro)
-      delete obj.paymentSk;                // nunca expõe o valor real
-      return obj;
-    });
+    if (!dbConectado) {
+      // Em memória: master vê tudo, comum vê apenas as suas
+      const lista = req.adminRole === 'master'
+        ? CAMPANHAS_MEM
+        : CAMPANHAS_MEM.filter(c => c.owner === req.adminUser);
+      return res.json({ campanhas: lista });
+    }
+    // Master vê todas; comum vê apenas as suas
+    const filtro = req.adminRole === 'master' ? {} : { owner: req.adminUser };
+    const campanhas = await CampanhaModel.find(filtro).sort({ ordemExibicao: 1, createdAt: 1 });
+    const result = campanhas.map(c => c.toObject());
     res.json({ campanhas: result });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao listar campanhas' });
@@ -498,7 +533,7 @@ app.post('/admin/campanhas', authMiddleware, async (req, res) => {
     const slug = req.body.slug || '';
     const videoUrl = req.body.videoUrl || '';
     const selos = req.body.selos || [];
-    const c = await CampanhaModel.create({ nome, resumoCurto, descricao, localizacao, categoria, dataCriacao,
+    const c = await CampanhaModel.create({ owner: req.adminUser, nome, resumoCurto, descricao, localizacao, categoria, dataCriacao,
                                            meta, status, chavePix, fotoUrl, fotoBase64, fotoMime,
                                            slug, videoUrl, selos,
                                            valores, upsell, upsellTexto, perguntas, atualizacoes });
@@ -513,16 +548,26 @@ app.put('/admin/campanhas/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     const campos = req.body;
+    // Nunca permite alterar o campo owner via PUT
+    delete campos.owner;
     if (!dbConectado) {
       const idx = CAMPANHAS_MEM.findIndex(c => c._id === id);
       if (idx < 0) return res.status(404).json({ error: 'Não encontrada' });
+      // Verifica propriedade para admins comuns
+      if (req.adminRole !== 'master' && CAMPANHAS_MEM[idx].owner !== req.adminUser)
+        return res.status(403).json({ error: 'Sem permissão para editar esta campanha' });
       CAMPANHAS_MEM[idx] = { ...CAMPANHAS_MEM[idx], ...campos };
       return res.json({ ok: true });
     }
+    // Para admins comuns: verifica ownership antes de atualizar
+    if (req.adminRole !== 'master') {
+      const existing = await CampanhaModel.findById(id);
+      if (!existing) return res.status(404).json({ error: 'Campanha não encontrada' });
+      if (existing.owner !== req.adminUser) return res.status(403).json({ error: 'Sem permissão para editar esta campanha' });
+    }
     const c = await CampanhaModel.findByIdAndUpdate(id, { $set: campos }, { new: true, runValidators: false });
     if (!c) return res.status(404).json({ error: 'Campanha não encontrada' });
-    const obj = c.toObject(); obj.hasPaymentSk = !!obj.paymentSk; delete obj.paymentSk;
-    res.json({ ok: true, campanha: obj });
+    res.json({ ok: true, campanha: c.toObject() });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao atualizar campanha' });
   }
@@ -533,8 +578,16 @@ app.delete('/admin/campanhas/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     if (!dbConectado) {
+      if (req.adminRole !== 'master') {
+        const c = CAMPANHAS_MEM.find(x => x._id === id);
+        if (c && c.owner !== req.adminUser) return res.status(403).json({ error: 'Sem permissão' });
+      }
       CAMPANHAS_MEM = CAMPANHAS_MEM.filter(c => c._id !== id);
       return res.json({ ok: true });
+    }
+    if (req.adminRole !== 'master') {
+      const existing = await CampanhaModel.findById(id);
+      if (existing && existing.owner !== req.adminUser) return res.status(403).json({ error: 'Sem permissão para excluir esta campanha' });
     }
     await CampanhaModel.findByIdAndDelete(id);
     res.json({ ok: true });
@@ -650,7 +703,7 @@ app.post('/criar-cobranca', async (req, res) => {
     if (!amountCents || !Number.isInteger(amountCents) || amountCents < 100 || amountCents > 1000000)
       return res.status(400).json({ error: 'Valor inválido. Mínimo R$ 1,00 e máximo R$ 10.000,00' });
 
-    // Buscar campanha para obter nome e credenciais próprias
+    // Buscar campanha para obter nome e credenciais do admin dono
     let campanhaNome = 'Doação';
     let campanhaPK = CONFIG.pagamento.pk;
     let campanhaSK = CONFIG.pagamento.sk;
@@ -659,14 +712,18 @@ app.post('/criar-cobranca', async (req, res) => {
         const c = await CampanhaModel.findById(campanhaId);
         if (c) {
           campanhaNome = c.nome;
-          if (c.paymentPk && c.paymentSk) { campanhaPK = c.paymentPk; campanhaSK = c.paymentSk; }
+          // Buscar credenciais do admin dono da campanha
+          if (c.owner) {
+            const adminDono = await AdminUserModel.findOne({ usuario: c.owner });
+            if (adminDono && adminDono.paymentPk && adminDono.paymentSk) {
+              campanhaPK = adminDono.paymentPk;
+              campanhaSK = adminDono.paymentSk;
+            }
+          }
         }
       } else {
         const c = CAMPANHAS_MEM.find(x => x._id === campanhaId);
-        if (c) {
-          campanhaNome = c.nome;
-          if (c.paymentPk && c.paymentSk) { campanhaPK = c.paymentPk; campanhaSK = c.paymentSk; }
-        }
+        if (c) campanhaNome = c.nome;
       }
     }
 
@@ -728,7 +785,14 @@ app.get('/status-cobranca/:id', async (req, res) => {
       const pag = await PagamentoModel.findOne({ chargeId: id });
       if (pag && pag.campanhaId) {
         const c = await CampanhaModel.findById(pag.campanhaId);
-        if (c && c.paymentPk && c.paymentSk) { PK = c.paymentPk; SK = c.paymentSk; }
+        // Buscar credenciais do admin dono da campanha
+        if (c && c.owner) {
+          const adminDono = await AdminUserModel.findOne({ usuario: c.owner });
+          if (adminDono && adminDono.paymentPk && adminDono.paymentSk) {
+            PK = adminDono.paymentPk;
+            SK = adminDono.paymentSk;
+          }
+        }
       }
     }
     if (!PK || !SK) return res.status(500).json({ error: 'Credenciais não configuradas' });
