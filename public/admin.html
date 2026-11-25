@@ -938,7 +938,9 @@ function popularEditor(c){
   document.getElementById('ce-textoAgradecimentoP1').value = c.textoAgradecimentoP1 || '';
   document.getElementById('ce-textoAgradecimentoP2').value = c.textoAgradecimentoP2 || '';
   document.getElementById('ce-textoAgradecimentoP3').value = c.textoAgradecimentoP3 || '';
-  // Mídia
+  // Mídia — SEMPRE limpar o input de arquivo ao trocar de campanha
+  var fileInput = document.getElementById('ce-fotoFile');
+  if(fileInput) fileInput.value = '';           // remove arquivo da campanha anterior
   document.getElementById('ce-fotoUrl').value = c.fotoUrl || '';
   var prev = document.getElementById('ce-fotoPreview');
   if(c.fotoBase64 || c.fotoUrl){ prev.src = c.fotoBase64||c.fotoUrl; prev.style.display='block'; }
