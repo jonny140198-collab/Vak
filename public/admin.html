@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Painel Admin</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
   --bg:#080808; --card:#111; --card2:#181818; --border:#222; --border2:#2a2a2a;
@@ -141,6 +142,30 @@ tr:hover td{background:var(--card2)}
 .progress{background:var(--border);border-radius:4px;height:4px;margin:7px 0}
 .progress-bar{background:var(--accent);height:4px;border-radius:4px;transition:width .3s}
 
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:22px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 16px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent-bg),transparent 60%);opacity:.4;pointer-events:none}
+.stat-label{font-size:10px;font-weight:700;color:var(--fg3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px}
+.stat-val{font-size:22px;font-weight:800;letter-spacing:-.5px;color:var(--fg)}
+.stat-val.green{color:var(--accent)}
+.stat-sub{font-size:11px;color:var(--fg3);margin-top:4px}
+.stat-icon{position:absolute;right:14px;top:14px;font-size:22px;opacity:.25}
+
+/* ── CHART CONTAINER ── */
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:22px}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.chart-title{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.chart-wrap{position:relative;height:220px}
+.periodo-tabs{display:flex;gap:4px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:3px}
+.periodo-btn{padding:4px 12px;font-size:11px;font-weight:600;color:var(--fg3);border:none;background:none;border-radius:6px;cursor:pointer;transition:all .12s;font-family:inherit}
+.periodo-btn.active{background:var(--card);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+
+/* ── FILTRO CAMPANHA ── */
+.pag-filtros{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.pag-filtros select{background:var(--input);border:1.5px solid var(--input-border);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--fg);outline:none;font-family:inherit}
+.pag-filtros select:focus{border-color:var(--accent)}
+
 /* ── CREDENCIAIS PIX (per-admin, locked style) ── */
 .cred-block{background:var(--card2);border:1px solid var(--border2);border-radius:9px;padding:16px}
 .cred-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
@@ -233,17 +258,70 @@ tr:hover td{background:var(--card2)}
     <!-- ══ PAGAMENTOS ══ -->
     <div class="content" id="sec-pagamentos">
       <div class="section-header">
-        <div class="section-title">Pagamentos recentes</div>
+        <div class="section-title">💳 Pagamentos</div>
         <button class="btn btn-ghost btn-sm" onclick="exportarCSV()">↓ Exportar CSV</button>
       </div>
+
+      <!-- STAT CARDS -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">Total arrecadado</div>
+          <div class="stat-val green" id="stat-total">—</div>
+          <div class="stat-sub" id="stat-count">— doações</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-label">Hoje</div>
+          <div class="stat-val" id="stat-hoje">—</div>
+          <div class="stat-sub">últimas 24h</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📆</div>
+          <div class="stat-label">Esta semana</div>
+          <div class="stat-val" id="stat-semana">—</div>
+          <div class="stat-sub">últimos 7 dias</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-label">Ticket médio</div>
+          <div class="stat-val" id="stat-ticket">—</div>
+          <div class="stat-sub">por doação</div>
+        </div>
+      </div>
+
+      <!-- GRÁFICO EVOLUÇÃO -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">📈 Evolução de arrecadação</div>
+          <div class="periodo-tabs">
+            <button class="periodo-btn active" onclick="setPeriodo('7d',this)">7d</button>
+            <button class="periodo-btn" onclick="setPeriodo('30d',this)">30d</button>
+            <button class="periodo-btn" onclick="setPeriodo('90d',this)">90d</button>
+            <button class="periodo-btn" onclick="setPeriodo('all',this)">Tudo</button>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="pagamentos-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- FILTROS + TABELA -->
       <div class="panel">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border)">
+          <div class="pag-filtros">
+            <select id="filtro-campanha" onchange="filtrarPagamentos()">
+              <option value="">Todas as campanhas</option>
+            </select>
+            <span style="font-size:12px;color:var(--fg3)" id="pagamentos-info"></span>
+          </div>
+        </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Data</th><th>Valor</th><th>Doador</th><th>Status</th><th>ID</th></tr></thead>
+            <thead><tr><th>Data/Hora</th><th>Valor</th><th>Doador</th><th>Campanha</th><th>Status</th></tr></thead>
             <tbody id="pagamentos-tbody"><tr><td colspan="5" style="text-align:center;color:var(--fg3);padding:30px">Carregando…</td></tr></tbody>
           </table>
         </div>
-        <div style="padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--fg3)" id="pagamentos-info"></div>
       </div>
     </div>
 
@@ -1390,37 +1468,193 @@ async function salvarCampanha(){
   finally { if(btn){ btn.disabled=false; btn.textContent='💾 Salvar campanha'; } }
 }
 
-// PAGAMENTOS
+// PAGAMENTOS ──────────────────────────────────────────────────────
+var _pagamentosCache = [];
+var _pagPeriodo = '7d';
+var _pagChart = null;
+
 async function carregarPagamentos(){
   var tbody=document.getElementById('pagamentos-tbody');
   tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--fg3);padding:30px">Carregando…</td></tr>';
   try {
-    var r=await fetch(BASE+'/admin/pagamentos',{headers:{'x-admin-token':TOKEN}});
+    var url=BASE+'/admin/pagamentos?periodo='+_pagPeriodo;
+    var r=await fetch(url,{headers:{'x-admin-token':TOKEN}});
     if(r.status===401){ doLogout(); return; }
     var d=await r.json();
-    var pagamentos=d.pagamentos||[];
-    if(!pagamentos.length){
-      tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--fg3);padding:30px">Nenhum pagamento encontrado</td></tr>';
-      document.getElementById('pagamentos-info').textContent=''; return;
-    }
-    tbody.innerHTML='';
-    pagamentos.forEach(function(p){
-      var statusClass=p.status==='paid'||p.status==='approved'||p.status==='completed'?'pill-paid':p.status==='failed'||p.status==='cancelled'?'pill-fail':'pill-pend';
-      var statusLabel={paid:'Pago',completed:'Pago',approved:'Pago',pending:'Pendente',failed:'Falhou',cancelled:'Cancelado'}[p.status]||p.status;
-      var data=p.createdAt?new Date(p.createdAt).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
-      var tr=document.createElement('tr');
-      tr.innerHTML='<td>'+data+'</td>'+'<td><strong>'+fmtBRL((p.amountCents||0)/100)+'</strong></td>'+'<td style="color:var(--fg2)">'+esc(p.donorName||'Anônimo')+'</td>'+'<td><span class="pill '+statusClass+'">'+statusLabel+'</span></td>'+'<td style="font-size:11px;color:var(--fg3)">'+esc((p.chargeId||p._id||'').slice(0,16))+'…</td>';
-      tbody.appendChild(tr);
+    _pagamentosCache = d.pagamentos||[];
+    var stats = d.stats||{};
+
+    // Atualizar stat cards
+    document.getElementById('stat-total').textContent  = fmtBRL(stats.total||0);
+    document.getElementById('stat-count').textContent  = (stats.count||0)+' doação'+(stats.count!==1?'s':'');
+    document.getElementById('stat-hoje').textContent   = fmtBRL(stats.hoje||0);
+    document.getElementById('stat-semana').textContent = fmtBRL(stats.semana||0);
+    document.getElementById('stat-ticket').textContent = fmtBRL(stats.ticketMedio||0);
+
+    // Montar seletor de campanhas
+    var sel = document.getElementById('filtro-campanha');
+    var prev = sel.value;
+    sel.innerHTML = '<option value="">Todas as campanhas</option>';
+    var camps = {};
+    _pagamentosCache.forEach(function(p){ if(p.campanhaId&&p.campanhaNome) camps[p.campanhaId]=p.campanhaNome; });
+    Object.entries(camps).forEach(function(e){
+      var o=document.createElement('option'); o.value=e[0]; o.textContent=e[1]; sel.appendChild(o);
     });
-    document.getElementById('pagamentos-info').textContent=pagamentos.length+' registro(s) · use Exportar CSV para ver todos';
-  } catch(e){ tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--fg3);padding:30px">Erro ao carregar</td></tr>'; }
+    if(prev) sel.value=prev;
+
+    // Renderizar gráfico
+    renderizarGrafico(stats.porDia||[]);
+
+    // Renderizar tabela
+    renderizarTabelaPagamentos(_pagamentosCache, sel.value);
+
+  } catch(e){
+    document.getElementById('pagamentos-tbody').innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--fg3);padding:30px">Erro ao carregar</td></tr>';
+    console.error(e);
+  }
+}
+
+function filtrarPagamentos(){
+  var filtro = document.getElementById('filtro-campanha').value;
+  var lista = filtro ? _pagamentosCache.filter(function(p){ return p.campanhaId&&p.campanhaId.toString()===filtro; }) : _pagamentosCache;
+  renderizarTabelaPagamentos(lista, filtro);
+}
+
+function renderizarTabelaPagamentos(lista, filtroId){
+  var tbody=document.getElementById('pagamentos-tbody');
+  var info=document.getElementById('pagamentos-info');
+  if(!lista.length){
+    tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--fg3);padding:30px">Nenhum pagamento no período</td></tr>';
+    info.textContent=''; return;
+  }
+  tbody.innerHTML='';
+  lista.forEach(function(p){
+    var statusClass=p.status==='paid'||p.status==='approved'||p.status==='completed'?'pill-paid':p.status==='failed'||p.status==='cancelled'?'pill-fail':'pill-pend';
+    var statusLabel={paid:'Pago',completed:'Pago',approved:'Pago',pending:'Pendente',failed:'Falhou',cancelled:'Cancelado'}[p.status]||p.status;
+    var data=p.createdAt?new Date(p.createdAt).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td style="font-size:12px;color:var(--fg2)">'+data+'</td>'
+      +'<td><strong style="color:var(--accent)">'+fmtBRL((p.amountCents||0)/100)+'</strong></td>'
+      +'<td style="color:var(--fg2)">'+esc(p.donorName||'Anônimo')+'</td>'
+      +'<td style="font-size:12px;color:var(--fg3)">'+esc(p.campanhaNome||'—')+'</td>'
+      +'<td><span class="pill '+statusClass+'">'+statusLabel+'</span></td>';
+    tbody.appendChild(tr);
+  });
+  info.textContent=lista.length+' registro'+(lista.length!==1?'s':'')+(lista.length<_pagamentosCache.length?' (filtrado)':'');
+}
+
+function renderizarGrafico(porDia){
+  var ctx=document.getElementById('pagamentos-chart');
+  if(!ctx) return;
+  if(_pagChart){ _pagChart.destroy(); _pagChart=null; }
+
+  // Filtrar dias com base no período atual
+  var dias={'7d':7,'30d':30,'90d':90,'all':porDia.length}[_pagPeriodo]||30;
+  var dados=porDia.slice(-dias);
+  if(!dados.length) return;
+
+  var labels=dados.map(function(d){
+    var dt=new Date(d.data+'T12:00:00');
+    return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  });
+  var valores=dados.map(function(d){ return d.valor; });
+
+  // Acumulado
+  var acumulado=[]; var soma=0;
+  valores.forEach(function(v){ soma+=v; acumulado.push(+soma.toFixed(2)); });
+
+  _pagChart=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:labels,
+      datasets:[
+        {
+          label:'Diário (R$)',
+          type:'bar',
+          data:valores,
+          backgroundColor:'rgba(34,197,94,0.25)',
+          borderColor:'rgba(34,197,94,0.6)',
+          borderWidth:1,
+          borderRadius:4,
+          yAxisID:'y'
+        },
+        {
+          label:'Acumulado (R$)',
+          type:'line',
+          data:acumulado,
+          borderColor:'#22c55e',
+          backgroundColor:'rgba(34,197,94,0.06)',
+          borderWidth:2.5,
+          pointRadius:0,
+          pointHoverRadius:5,
+          pointHoverBackgroundColor:'#22c55e',
+          tension:0.4,
+          fill:true,
+          yAxisID:'y2'
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{
+          labels:{color:'#888',font:{size:11,family:'Inter'},boxWidth:12,padding:16}
+        },
+        tooltip:{
+          backgroundColor:'#111',
+          borderColor:'#222',
+          borderWidth:1,
+          titleColor:'#f0f0f0',
+          bodyColor:'#888',
+          titleFont:{family:'Inter',weight:'700'},
+          bodyFont:{family:'Inter'},
+          callbacks:{
+            label:function(ctx){
+              return ' '+ctx.dataset.label+': '+fmtBRL(ctx.raw);
+            }
+          }
+        }
+      },
+      scales:{
+        x:{
+          ticks:{color:'#555',font:{size:10,family:'Inter'},maxRotation:0,maxTicksLimit:10},
+          grid:{color:'rgba(255,255,255,0.03)'},
+          border:{color:'#222'}
+        },
+        y:{
+          position:'left',
+          ticks:{color:'#555',font:{size:10,family:'Inter'},callback:function(v){ return 'R$ '+v.toLocaleString('pt-BR'); }},
+          grid:{color:'rgba(255,255,255,0.04)'},
+          border:{color:'#222'},
+          beginAtZero:true
+        },
+        y2:{
+          position:'right',
+          ticks:{color:'rgba(34,197,94,0.6)',font:{size:10,family:'Inter'},callback:function(v){ return 'R$ '+v.toLocaleString('pt-BR'); }},
+          grid:{display:false},
+          border:{color:'transparent'},
+          beginAtZero:true
+        }
+      }
+    }
+  });
+}
+
+function setPeriodo(p, btn){
+  _pagPeriodo=p;
+  document.querySelectorAll('.periodo-btn').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  carregarPagamentos();
 }
 
 function exportarCSV(){
-  var rows=[['Data','Valor','Doador','Status','ID']];
-  document.querySelectorAll('#pagamentos-tbody tr').forEach(function(tr){
-    var tds=tr.querySelectorAll('td');
-    if(tds.length>1) rows.push(Array.from(tds).map(function(td){ return '"'+td.textContent.replace(/"/g,'""')+'"'; }));
+  var rows=[['Data','Valor','Doador','Campanha','Status']];
+  _pagamentosCache.forEach(function(p){
+    var data=p.createdAt?new Date(p.createdAt).toLocaleString('pt-BR'):'';
+    var valor=fmtBRL((p.amountCents||0)/100);
+    rows.push(['"'+data+'"','"'+valor+'"','"'+(p.donorName||'').replace(/"/g,'""')+'"','"'+(p.campanhaNome||'').replace(/"/g,'""')+'"','"'+p.status+'"']);
   });
   var csv=rows.map(function(r){ return r.join(','); }).join('\n');
   var blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});

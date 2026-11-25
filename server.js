@@ -680,20 +680,102 @@ app.post('/webhook/xflow', async (req, res) => {
   }
 });
 
-// ─── Histórico de pagamentos (apenas reais: paid/completed/approved) ─
+// ─── Histórico de pagamentos (isolado por admin) ──────────────────
 app.get('/admin/pagamentos', authMiddleware, async (req, res) => {
   try {
-    if (!dbConectado) return res.json({ pagamentos: [] });
-    const { campanhaId } = req.query;
-    // Filtrar apenas pagamentos com status confirmado pela XFlow (pagamentos reais)
+    if (!dbConectado) return res.json({ pagamentos: [], stats: {} });
+    const { campanhaId, periodo } = req.query;
+
+    // Montar filtro de campanhas visíveis pelo admin logado
+    let campanhaIds = null;
+    if (req.adminRole !== 'master') {
+      // Busca IDs das campanhas que pertencem a este admin
+      const minhasCampanhas = await CampanhaModel.find({ owner: req.adminUser }).select('_id').lean();
+      campanhaIds = minhasCampanhas.map(c => c._id);
+      // Admin sem campanhas → retorna vazio
+      if (!campanhaIds.length) return res.json({ pagamentos: [], stats: buildStats([]) });
+    }
+
+    // Filtro base: status confirmado pela XFlow
     const filtroStatus = { status: { $in: ['paid', 'completed', 'approved'] } };
-    const filtro = campanhaId ? { campanhaId, ...filtroStatus } : filtroStatus;
-    const pagamentos = await PagamentoModel.find(filtro).sort({ createdAt: -1 }).limit(200);
-    res.json({ pagamentos });
+
+    // Filtro por campanha específica (respeita isolamento)
+    let filtro = { ...filtroStatus };
+    if (campanhaId) {
+      // Garante que o campanhaId pedido pertence a este admin (se comum)
+      if (campanhaIds && !campanhaIds.some(id => id.toString() === campanhaId)) {
+        return res.status(403).json({ error: 'Sem permissão para ver esta campanha' });
+      }
+      filtro.campanhaId = campanhaId;
+    } else if (campanhaIds) {
+      filtro.campanhaId = { $in: campanhaIds };
+    }
+
+    // Filtro de período
+    if (periodo && periodo !== 'all') {
+      const dias = { '7d': 7, '30d': 30, '90d': 90 }[periodo] || 30;
+      filtro.createdAt = { $gte: new Date(Date.now() - dias * 86400000) };
+    }
+
+    const pagamentos = await PagamentoModel.find(filtro).sort({ createdAt: -1 }).limit(500).lean();
+
+    // Enriquecer com nome da campanha
+    const campMap = {};
+    if (campanhaIds) {
+      const camps = await CampanhaModel.find({ _id: { $in: campanhaIds } }).select('_id nome slug').lean();
+      camps.forEach(c => { campMap[c._id.toString()] = c; });
+    } else {
+      const ids = [...new Set(pagamentos.map(p => p.campanhaId?.toString()).filter(Boolean))];
+      if (ids.length) {
+        const camps = await CampanhaModel.find({ _id: { $in: ids } }).select('_id nome slug').lean();
+        camps.forEach(c => { campMap[c._id.toString()] = c; });
+      }
+    }
+    const pagamentosEnriquecidos = pagamentos.map(p => ({
+      ...p,
+      campanhaNome: campMap[p.campanhaId?.toString()]?.nome || null,
+      campanhaSlug: campMap[p.campanhaId?.toString()]?.slug || null,
+    }));
+
+    res.json({ pagamentos: pagamentosEnriquecidos, stats: buildStats(pagamentos) });
   } catch (err) {
+    console.error('Erro pagamentos:', err);
     res.status(500).json({ error: 'Erro ao listar pagamentos' });
   }
 });
+
+function buildStats(pagamentos) {
+  if (!pagamentos.length) return { total: 0, count: 0, ticketMedio: 0, hoje: 0, semana: 0, porDia: [] };
+  const agora = Date.now();
+  const inicioDia   = new Date(); inicioDia.setHours(0,0,0,0);
+  const inicioSemana = new Date(agora - 7 * 86400000);
+  let total = 0, hoje = 0, semana = 0;
+  const porDiaMap = {};
+  pagamentos.forEach(p => {
+    const v = (p.amountCents || 0) / 100;
+    total += v;
+    const dt = new Date(p.createdAt);
+    if (dt >= inicioDia) hoje += v;
+    if (dt >= inicioSemana) semana += v;
+    const chave = dt.toISOString().slice(0, 10);
+    porDiaMap[chave] = (porDiaMap[chave] || 0) + v;
+  });
+  // Gera array dos últimos 30 dias (mesmo sem pagamento)
+  const porDia = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(agora - i * 86400000);
+    const k = d.toISOString().slice(0, 10);
+    porDia.push({ data: k, valor: +(porDiaMap[k] || 0).toFixed(2) });
+  }
+  return {
+    total: +total.toFixed(2),
+    count: pagamentos.length,
+    ticketMedio: +(total / pagamentos.length).toFixed(2),
+    hoje: +hoje.toFixed(2),
+    semana: +semana.toFixed(2),
+    porDia
+  };
+}
 
 // ─── Rota Pix (criar cobrança) ────────────────────────────────────
 app.post('/criar-cobranca', async (req, res) => {
