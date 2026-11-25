@@ -350,6 +350,7 @@ tr:hover td{background:var(--surface2)}
             <button class="tab-editor-btn" onclick="showEditorTab('perguntas',this)">❓ Q&amp;A</button>
             <button class="tab-editor-btn" onclick="showEditorTab('valores',this)">💲 Valores</button>
             <button class="tab-editor-btn" onclick="showEditorTab('extras',this)">⭐ Extras</button>
+            <button class="tab-editor-btn" onclick="showEditorTab('pagamento',this)">🔑 Pagamento</button>
           </div>
 
           <!-- ABA: INFORMAÇÕES -->
@@ -632,6 +633,30 @@ tr:hover td{background:var(--surface2)}
                   <input type="text" id="new-selo" placeholder="Ex: ✅ Campanha Verificada" onkeydown="if(event.key==='Enter')adicionarSelo()">
                 </div>
                 <button class="btn btn-ghost btn-sm" style="margin-bottom:1px" onclick="adicionarSelo()">+ Adicionar</button>
+              </div>
+            </div></div>
+          </div>
+
+          <!-- ABA: PAGAMENTO -->
+          <div class="tab-editor-pane" id="ceditor-pagamento">
+            <div class="editor-wrap"><div class="editor-body">
+              <div style="font-size:14px;font-weight:600;margin-bottom:4px">🔑 Credenciais de recebimento desta campanha</div>
+              <div style="font-size:12px;color:var(--fg2);margin-bottom:16px">Preencha apenas se esta campanha usa uma conta XFlow diferente da conta global. Deixe em branco para usar a conta padrão.</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Public Key (PK)</label>
+                  <input type="text" id="ce-paymentPk" placeholder="pk_live_... (deixe em branco para usar a conta padrão)" autocomplete="off">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Secret Key (SK) <span style="color:var(--danger);font-size:11px">⚠️ Nunca compartilhe esta chave</span></label>
+                  <input type="password" id="ce-paymentSk" placeholder="sk_live_... (deixe em branco para usar a conta padrão)" autocomplete="new-password">
+                  <span class="hint">A Secret Key é armazenada com segurança e nunca aparece no frontend do site.</span>
+                </div>
+              </div>
+              <div style="background:#f0fdf4;border:1px solid #bbf0d0;border-radius:10px;padding:12px;margin-top:8px;font-size:12px;color:#1a6e2e;">
+                💡 <strong>Como funciona:</strong> cada campanha pode ter seu próprio recebedor Pix. Basta inserir as chaves XFlow da conta desejada. Os valores doados nesta campanha irão direto para essa conta.
               </div>
             </div></div>
           </div>
@@ -929,6 +954,12 @@ function popularEditor(c){
   if(!catSel.value && c.categoria){ var op=document.createElement('option'); op.value=c.categoria; op.textContent=c.categoria; catSel.appendChild(op); catSel.value=c.categoria; }
   document.getElementById('ce-status').value = c.status || 'ativa';
   document.getElementById('ce-chavePix').value = c.chavePix || '';
+  // Credenciais de pagamento da campanha
+  document.getElementById('ce-paymentPk').value = c.paymentPk || '';
+  // SK: o servidor nunca devolve o valor real — usa hasPaymentSk (booleano) para indicar se existe
+  var skInput = document.getElementById('ce-paymentSk');
+  skInput.value = '';
+  skInput.placeholder = c.hasPaymentSk ? '••••••••• (já configurada — deixe em branco para manter)' : 'sk_live_... (deixe em branco para usar a conta padrão)';
   // Textos do checkout / upsell / agradecimento
   document.getElementById('ce-checkoutNome').value = c.checkoutNome || '';
   document.getElementById('ce-upsellValor').value = c.upsellValor != null ? c.upsellValor : 3.99;
@@ -1274,6 +1305,9 @@ async function salvarCampanha(){
       arrecadadoBase: parseFloat(document.getElementById('ce-arrecadadoBase').value) || 0,
       apoiadoresBase: parseInt(document.getElementById('ce-apoiadoresBase').value)   || 0,
       coracoesBase:   parseInt(document.getElementById('ce-coracoesBase').value)     || 0,
+      paymentPk: document.getElementById('ce-paymentPk').value.trim(),
+      // SK só envia se foi digitada (campo vazio = manter a existente no servidor)
+      ...(document.getElementById('ce-paymentSk').value.trim() ? { paymentSk: document.getElementById('ce-paymentSk').value.trim() } : {}),
       valores: valoresData,
       atualizacoes: atualizacoesData,
       perguntas: perguntasData,

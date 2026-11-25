@@ -131,6 +131,9 @@ const campanhaSchema = new mongoose.Schema({
   textoAgradecimentoP3: { type: String, default: '' },  // 3º parágrafo
   textoUpsellTitulo:    { type: String, default: '' },  // "Deseja adicionar R$..."
   textoUpsellSub:       { type: String, default: '' },  // subtexto do upsell
+  // Credenciais de pagamento próprias (sobrepõem o global quando preenchidas)
+  paymentPk:    { type: String, default: '' },  // Public Key XFlow do dono da campanha
+  paymentSk:    { type: String, default: '' },  // Secret Key XFlow — NUNCA exposta ao frontend
   arrecadado:        { type: Number, default: 0 },
   arrecadadoBase:    { type: Number, default: 0 },   // valor base de exibição (histórico externo)
   apoiadoresBase:    { type: Number, default: 0 },   // apoiadores base de exibição
@@ -380,8 +383,15 @@ app.post('/admin/config', authMiddleware, async (req, res) => {
 app.get('/admin/campanhas', authMiddleware, async (req, res) => {
   try {
     if (!dbConectado) return res.json({ campanhas: CAMPANHAS_MEM });
+    // Busca com SK para saber se existe, mas remove antes de enviar
     const campanhas = await CampanhaModel.find().sort({ ordemExibicao: 1, createdAt: 1 });
-    res.json({ campanhas });
+    const result = campanhas.map(c => {
+      const obj = c.toObject();
+      obj.hasPaymentSk = !!obj.paymentSk;  // indica se SK existe (booleano seguro)
+      delete obj.paymentSk;                // nunca expõe o valor real
+      return obj;
+    });
+    res.json({ campanhas: result });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao listar campanhas' });
   }
@@ -428,7 +438,8 @@ app.put('/admin/campanhas/:id', authMiddleware, async (req, res) => {
     }
     const c = await CampanhaModel.findByIdAndUpdate(id, { $set: campos }, { new: true, runValidators: false });
     if (!c) return res.status(404).json({ error: 'Campanha não encontrada' });
-    res.json({ ok: true, campanha: c });
+    const obj = c.toObject(); obj.hasPaymentSk = !!obj.paymentSk; delete obj.paymentSk;
+    res.json({ ok: true, campanha: obj });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao atualizar campanha' });
   }
@@ -454,9 +465,10 @@ app.get('/campanha-ativa', async (req, res) => {
   try {
     if (!dbConectado) {
       const ativa = CAMPANHAS_MEM.find(c => c.status === 'ativa') || CAMPANHAS_MEM[0];
-      return res.json({ campanha: ativa, marketing: CONFIG.marketing });
+      const { paymentSk: _sk, ...pub } = ativa || {};
+      return res.json({ campanha: pub, marketing: CONFIG.marketing });
     }
-    const c = await CampanhaModel.findOne({ status: 'ativa' }).sort({ ordemExibicao: 1, createdAt: 1 });
+    const c = await CampanhaModel.findOne({ status: 'ativa' }).select('-paymentSk').sort({ ordemExibicao: 1, createdAt: 1 });
     if (!c) return res.json({ campanha: null, marketing: CONFIG.marketing });
     res.json({ campanha: c, marketing: CONFIG.marketing });
   } catch (err) {
@@ -470,9 +482,10 @@ app.get('/campanha-por-slug/:slug', async (req, res) => {
     const { slug } = req.params;
     if (!dbConectado) {
       const c = CAMPANHAS_MEM.find(x => x.slug === slug) || null;
-      return res.json({ campanha: c, marketing: CONFIG.marketing });
+      const { paymentSk: _sk, ...pub } = c || {};
+      return res.json({ campanha: c ? pub : null, marketing: CONFIG.marketing });
     }
-    const c = await CampanhaModel.findOne({ slug });
+    const c = await CampanhaModel.findOne({ slug }).select('-paymentSk');
     res.json({ campanha: c || null, marketing: CONFIG.marketing });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao buscar campanha' });
@@ -554,22 +567,30 @@ app.post('/criar-cobranca', async (req, res) => {
     if (!amountCents || !Number.isInteger(amountCents) || amountCents < 100 || amountCents > 1000000)
       return res.status(400).json({ error: 'Valor inválido. Mínimo R$ 1,00 e máximo R$ 10.000,00' });
 
-    const PK = CONFIG.pagamento.pk;
-    const SK = CONFIG.pagamento.sk;
-    if (!PK || !SK)
-      return res.status(500).json({ error: 'Credenciais de pagamento não configuradas' });
-
-    // Buscar nome da campanha
-    let campanhaNome = 'Ajude a Pequena Ester';
+    // Buscar campanha para obter nome e credenciais próprias
+    let campanhaNome = 'Doação';
+    let campanhaPK = CONFIG.pagamento.pk;
+    let campanhaSK = CONFIG.pagamento.sk;
     if (campanhaId) {
       if (dbConectado) {
         const c = await CampanhaModel.findById(campanhaId);
-        if (c) campanhaNome = c.nome;
+        if (c) {
+          campanhaNome = c.nome;
+          if (c.paymentPk && c.paymentSk) { campanhaPK = c.paymentPk; campanhaSK = c.paymentSk; }
+        }
       } else {
         const c = CAMPANHAS_MEM.find(x => x._id === campanhaId);
-        if (c) campanhaNome = c.nome;
+        if (c) {
+          campanhaNome = c.nome;
+          if (c.paymentPk && c.paymentSk) { campanhaPK = c.paymentPk; campanhaSK = c.paymentSk; }
+        }
       }
     }
+
+    const PK = campanhaPK;
+    const SK = campanhaSK;
+    if (!PK || !SK)
+      return res.status(500).json({ error: 'Credenciais de pagamento não configuradas para esta campanha' });
 
     const creds = Buffer.from(`${PK}:${SK}`).toString('base64');
     const response = await fetch('https://app.xflowpayments.com/api/v1/charges', {
@@ -617,8 +638,16 @@ app.post('/criar-cobranca', async (req, res) => {
 app.get('/status-cobranca/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const PK = CONFIG.pagamento.pk;
-    const SK = CONFIG.pagamento.sk;
+    // Descobrir credenciais corretas: busca o pagamento, depois a campanha
+    let PK = CONFIG.pagamento.pk;
+    let SK = CONFIG.pagamento.sk;
+    if (dbConectado) {
+      const pag = await PagamentoModel.findOne({ chargeId: id });
+      if (pag && pag.campanhaId) {
+        const c = await CampanhaModel.findById(pag.campanhaId);
+        if (c && c.paymentPk && c.paymentSk) { PK = c.paymentPk; SK = c.paymentSk; }
+      }
+    }
     if (!PK || !SK) return res.status(500).json({ error: 'Credenciais não configuradas' });
 
     const creds = Buffer.from(`${PK}:${SK}`).toString('base64');
