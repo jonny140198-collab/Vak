@@ -303,21 +303,42 @@ async function salvarConfigNoBanco() {
 }
 
 // ─── Auth ─────────────────────────────────────────────────────────
+// ─── Schema: AdminUser ────────────────────────────────────────────
+const adminUserSchema = new mongoose.Schema({
+  usuario:   { type: String, required: true, unique: true },
+  senhaHash: { type: String, required: true },
+  role:      { type: String, default: 'comum', enum: ['master', 'comum'] },
+  ativo:     { type: Boolean, default: true }
+}, { timestamps: true, versionKey: false });
+const AdminUserModel = mongoose.model('AdminUser', adminUserSchema);
+
+// ─── Auth ─────────────────────────────────────────────────────────
 const ADMIN_USER = process.env.ADMIN_USER || 'garciaST';
 const ADMIN_PASS_HASH = crypto.createHash('sha256').update(process.env.ADMIN_PASS || 'Lu!131020').digest('hex');
-const sessions = new Map();
-const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // sessão expira em 8h
+const sessions = new Map(); // token -> { user, role, at }
+const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 
 function makeToken() { return crypto.randomBytes(32).toString('hex'); }
+function hashSenha(s) { return crypto.createHash('sha256').update(s).digest('hex'); }
+
 function authMiddleware(req, res, next) {
   const token = req.headers['x-admin-token'] || req.query.token;
   if (token && sessions.has(token)) {
     const sess = sessions.get(token);
-    // Verifica expiração da sessão
-    if (Date.now() - sess.at < SESSION_TTL_MS) return next();
-    sessions.delete(token); // sessão expirada
+    if (Date.now() - sess.at < SESSION_TTL_MS) {
+      req.adminUser = sess.user;
+      req.adminRole = sess.role || 'comum';
+      return next();
+    }
+    sessions.delete(token);
   }
   res.status(401).json({ error: 'Não autorizado' });
+}
+
+// Middleware exclusivo para o admin master
+function masterOnly(req, res, next) {
+  if (req.adminRole === 'master') return next();
+  res.status(403).json({ error: 'Acesso restrito ao administrador principal' });
 }
 
 // Limpeza de sessões expiradas a cada hora
@@ -328,31 +349,93 @@ setInterval(() => {
   }
 }, 60 * 60 * 1000);
 
-app.post('/admin/login', (req, res) => {
+app.post('/admin/login', async (req, res) => {
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
-  // Verifica rate limit antes de qualquer coisa
   if (!checkLoginRateLimit(ip)) {
     return res.status(429).json({ error: 'Muitas tentativas. Aguarde 30 minutos.' });
   }
   const { usuario, senha } = req.body;
-  const senhaHash = crypto.createHash('sha256').update(senha || '').digest('hex');
+  const senhaHash = hashSenha(senha || '');
+
+  // 1) Verifica admin master (variáveis de ambiente)
   if (usuario === ADMIN_USER && senhaHash === ADMIN_PASS_HASH) {
-    // Login bem-sucedido: limpa tentativas do IP
     loginAttempts.delete(ip);
     const token = makeToken();
-    sessions.set(token, { user: usuario, at: Date.now() });
-    res.json({ ok: true, token });
-  } else {
-    recordLoginFailure(ip);
-    const entry = loginAttempts.get(ip);
-    const restantes = Math.max(0, MAX_LOGIN_ATTEMPTS - (entry?.count || 0));
-    res.status(401).json({ error: 'Usuário ou senha incorretos', tentativasRestantes: restantes });
+    sessions.set(token, { user: usuario, role: 'master', at: Date.now() });
+    return res.json({ ok: true, token, role: 'master' });
   }
+
+  // 2) Verifica admins cadastrados no banco
+  if (dbConectado) {
+    try {
+      const u = await AdminUserModel.findOne({ usuario, ativo: true });
+      if (u && u.senhaHash === senhaHash) {
+        loginAttempts.delete(ip);
+        const token = makeToken();
+        sessions.set(token, { user: usuario, role: u.role || 'comum', at: Date.now() });
+        return res.json({ ok: true, token, role: u.role || 'comum' });
+      }
+    } catch(e) { /* ignora erro de DB e cai no 401 */ }
+  }
+
+  recordLoginFailure(ip);
+  const entry = loginAttempts.get(ip);
+  const restantes = Math.max(0, MAX_LOGIN_ATTEMPTS - (entry?.count || 0));
+  res.status(401).json({ error: 'Usuário ou senha incorretos', tentativasRestantes: restantes });
 });
 
 app.post('/admin/logout', authMiddleware, (req, res) => {
   sessions.delete(req.headers['x-admin-token']);
   res.json({ ok: true });
+});
+
+// Retorna dados do usuário logado
+app.get('/admin/me', authMiddleware, (req, res) => {
+  res.json({ usuario: req.adminUser, role: req.adminRole });
+});
+
+// ─── CRUD de usuários admin (só master) ──────────────────────────
+app.get('/admin/usuarios', authMiddleware, masterOnly, async (req, res) => {
+  try {
+    const lista = await AdminUserModel.find().select('-senhaHash').sort({ createdAt: 1 });
+    res.json({ usuarios: lista });
+  } catch(e) { res.status(500).json({ error: 'Erro ao listar usuários' }); }
+});
+
+app.post('/admin/usuarios', authMiddleware, masterOnly, async (req, res) => {
+  try {
+    const { usuario, senha, role } = req.body;
+    if (!usuario || !senha) return res.status(400).json({ error: 'Usuário e senha obrigatórios' });
+    if (senha.length < 6)   return res.status(400).json({ error: 'Senha mínima de 6 caracteres' });
+    if (usuario === ADMIN_USER) return res.status(400).json({ error: 'Nome de usuário reservado' });
+    const existe = await AdminUserModel.findOne({ usuario });
+    if (existe) return res.status(400).json({ error: 'Usuário já existe' });
+    const u = await AdminUserModel.create({ usuario, senhaHash: hashSenha(senha), role: role || 'comum' });
+    res.json({ ok: true, usuario: { _id: u._id, usuario: u.usuario, role: u.role, ativo: u.ativo } });
+  } catch(e) { res.status(500).json({ error: 'Erro ao criar usuário' }); }
+});
+
+app.put('/admin/usuarios/:id', authMiddleware, masterOnly, async (req, res) => {
+  try {
+    const { senha, role, ativo } = req.body;
+    const campos = {};
+    if (senha) {
+      if (senha.length < 6) return res.status(400).json({ error: 'Senha mínima de 6 caracteres' });
+      campos.senhaHash = hashSenha(senha);
+    }
+    if (role)   campos.role  = role;
+    if (ativo !== undefined) campos.ativo = ativo;
+    const u = await AdminUserModel.findByIdAndUpdate(req.params.id, { $set: campos }, { new: true }).select('-senhaHash');
+    if (!u) return res.status(404).json({ error: 'Usuário não encontrado' });
+    res.json({ ok: true, usuario: u });
+  } catch(e) { res.status(500).json({ error: 'Erro ao atualizar usuário' }); }
+});
+
+app.delete('/admin/usuarios/:id', authMiddleware, masterOnly, async (req, res) => {
+  try {
+    await AdminUserModel.findByIdAndDelete(req.params.id);
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({ error: 'Erro ao excluir usuário' }); }
 });
 
 // ─── Config global (credenciais / marketing) ──────────────────────

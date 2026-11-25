@@ -155,6 +155,9 @@ tr:hover td{background:var(--surface2)}
     <div class="nav-item" id="nav-marketing" onclick="showSection('marketing')">
       <span class="nav-icon">📊</span> Marketing
     </div>
+    <div class="nav-item" id="nav-usuarios" onclick="showSection('usuarios')" style="display:none">
+      <span class="nav-icon">👥</span> Usuários
+    </div>
     <div class="sidebar-footer">
       <div class="db-status">
         <div class="db-dot" id="dbDot"></div>
@@ -221,6 +224,44 @@ tr:hover td{background:var(--surface2)}
         </div>
         <button class="btn btn-primary" onclick="salvarMarketing()">💾 Salvar Marketing</button>
       </div></div>
+    </div>
+
+    <!-- ══ USUÁRIOS (só master) ══ -->
+    <div class="content" id="sec-usuarios" style="display:none">
+      <div class="section-header">
+        <div class="section-title">👥 Usuários Admin</div>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalNovoUsuario()">＋ Novo usuário</button>
+      </div>
+      <div class="editor-wrap">
+        <div class="info-box" style="margin-bottom:16px">ℹ️ Apenas o <strong>administrador principal</strong> pode gerenciar usuários. Cada usuário acessa o painel com suas próprias credenciais.</div>
+        <div id="usuarios-lista"><div style="text-align:center;padding:30px;color:var(--fg2)">Carregando…</div></div>
+      </div>
+      <!-- Modal novo/editar usuário -->
+      <div id="modal-usuario" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center">
+        <div style="background:var(--card);border-radius:16px;padding:28px;width:100%;max-width:420px;margin:16px;box-shadow:0 8px 40px rgba(0,0,0,.3)">
+          <div style="font-size:17px;font-weight:700;margin-bottom:20px" id="modal-usuario-titulo">Novo usuário</div>
+          <input type="hidden" id="modal-usuario-id">
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Usuário</label>
+            <input type="text" id="modal-usuario-login" placeholder="Ex: joao123" autocomplete="off">
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label id="modal-senha-label">Senha</label>
+            <input type="password" id="modal-usuario-senha" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+          </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label>Nível de acesso</label>
+            <select id="modal-usuario-role" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:10px;background:var(--input);color:var(--fg);font-size:14px">
+              <option value="comum">Comum — acessa e edita campanhas</option>
+              <option value="master">Master — pode criar outros usuários</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end">
+            <button class="btn btn-ghost" onclick="fecharModalUsuario()">Cancelar</button>
+            <button class="btn btn-primary" onclick="salvarUsuario()">💾 Salvar</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ══ CAMPANHA EDITOR ══ -->
@@ -734,18 +775,29 @@ async function doLogout(){
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
-function iniciarApp(user){
+var ADMIN_ROLE = 'comum';
+
+async function iniciarApp(user){
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appScreen').style.display = 'block';
   document.getElementById('topbarUser').textContent = '👤 ' + user;
+  // Busca role do usuário logado
+  try {
+    var r = await fetch(BASE+'/admin/me', {headers:{'x-admin-token':TOKEN}});
+    var d = await r.json();
+    ADMIN_ROLE = d.role || 'comum';
+  } catch(e) { ADMIN_ROLE = 'comum'; }
+  // Exibe nav de Usuários apenas para master
+  var navU = document.getElementById('nav-usuarios');
+  if(navU) navU.style.display = ADMIN_ROLE === 'master' ? 'flex' : 'none';
   carregarConfig();
   carregarPagamentos();
 }
 
-var secTitles = {pagamentos:'💰 Pagamentos', credenciais:'🔑 Credenciais Pix', marketing:'📊 Marketing', campanha:'🎗️ Campanhas'};
+var secTitles = {pagamentos:'💰 Pagamentos', credenciais:'🔑 Credenciais Pix', marketing:'📊 Marketing', campanha:'🎗️ Campanhas', usuarios:'👥 Usuários'};
 
 function showSection(id){
-  ['pagamentos','credenciais','marketing','campanha'].forEach(function(s){
+  ['pagamentos','credenciais','marketing','campanha','usuarios'].forEach(function(s){
     var el = document.getElementById('sec-'+s);
     if(el) el.style.display = s===id ? 'block' : 'none';
   });
@@ -755,6 +807,111 @@ function showSection(id){
   if(navEl) navEl.classList.add('active');
   if(id==='pagamentos') carregarPagamentos();
   if(id==='campanha') carregarListaCampanhas();
+  if(id==='usuarios') carregarUsuarios();
+}
+
+// ═══════════════════════════════════════════
+// GERENCIAMENTO DE USUÁRIOS (só master)
+// ═══════════════════════════════════════════
+async function carregarUsuarios(){
+  var lista = document.getElementById('usuarios-lista');
+  lista.innerHTML = '<div style="text-align:center;padding:30px;color:var(--fg2)">Carregando…</div>';
+  try {
+    var r = await fetch(BASE+'/admin/usuarios', {headers:{'x-admin-token':TOKEN}});
+    var d = await r.json();
+    if(!d.usuarios || d.usuarios.length === 0){
+      lista.innerHTML = '<div style="text-align:center;padding:30px;color:var(--fg2)">Nenhum usuário cadastrado ainda.</div>';
+      return;
+    }
+    var html = '<table style="width:100%;border-collapse:collapse;font-size:13px">'
+      +'<thead><tr>'
+      +'<th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border)">Usuário</th>'
+      +'<th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border)">Nível</th>'
+      +'<th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border)">Status</th>'
+      +'<th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border)">Criado em</th>'
+      +'<th style="padding:10px 12px;border-bottom:1px solid var(--border)"></th>'
+      +'</tr></thead><tbody>';
+    d.usuarios.forEach(function(u){
+      var dt = u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-BR') : '—';
+      var roleBadge = u.role === 'master'
+        ? '<span style="background:#7c3aed22;color:#7c3aed;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">Master</span>'
+        : '<span style="background:#0ea5e922;color:#0ea5e9;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">Comum</span>';
+      var statusBadge = u.ativo
+        ? '<span style="background:#22c55e22;color:#22c55e;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">Ativo</span>'
+        : '<span style="background:#94a3b822;color:#94a3b8;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">Inativo</span>';
+      html += '<tr>'
+        +'<td style="padding:12px;border-bottom:1px solid var(--border)"><strong>'+esc(u.usuario)+'</strong></td>'
+        +'<td style="padding:12px;border-bottom:1px solid var(--border)">'+roleBadge+'</td>'
+        +'<td style="padding:12px;border-bottom:1px solid var(--border)">'+statusBadge+'</td>'
+        +'<td style="padding:12px;border-bottom:1px solid var(--border);color:var(--fg2)">'+dt+'</td>'
+        +'<td style="padding:12px;border-bottom:1px solid var(--border);text-align:right">'
+        +'<button class="btn btn-ghost btn-sm" onclick="abrirEditarUsuario(\''+u._id+'\',\''+esc(u.usuario)+'\',\''+u.role+'\')" style="margin-right:6px">✏️ Editar</button>'
+        +'<button class="btn btn-ghost btn-sm" onclick="excluirUsuario(\''+u._id+'\',\''+esc(u.usuario)+'\')" style="color:var(--danger);border-color:var(--danger)">🗑️</button>'
+        +'</td></tr>';
+    });
+    html += '</tbody></table>';
+    lista.innerHTML = html;
+  } catch(e){
+    lista.innerHTML = '<div style="text-align:center;padding:30px;color:var(--danger)">Erro ao carregar usuários.</div>';
+  }
+}
+
+function abrirModalNovoUsuario(){
+  document.getElementById('modal-usuario-id').value = '';
+  document.getElementById('modal-usuario-login').value = '';
+  document.getElementById('modal-usuario-senha').value = '';
+  document.getElementById('modal-usuario-role').value = 'comum';
+  document.getElementById('modal-usuario-titulo').textContent = 'Novo usuário';
+  document.getElementById('modal-senha-label').textContent = 'Senha';
+  document.getElementById('modal-usuario-login').disabled = false;
+  var m = document.getElementById('modal-usuario');
+  m.style.display = 'flex';
+}
+
+function abrirEditarUsuario(id, login, role){
+  document.getElementById('modal-usuario-id').value = id;
+  document.getElementById('modal-usuario-login').value = login;
+  document.getElementById('modal-usuario-login').disabled = true; // não permite mudar o login
+  document.getElementById('modal-usuario-senha').value = '';
+  document.getElementById('modal-usuario-role').value = role || 'comum';
+  document.getElementById('modal-usuario-titulo').textContent = 'Editar usuário';
+  document.getElementById('modal-senha-label').textContent = 'Nova senha (deixe em branco para manter)';
+  var m = document.getElementById('modal-usuario');
+  m.style.display = 'flex';
+}
+
+function fecharModalUsuario(){
+  document.getElementById('modal-usuario').style.display = 'none';
+}
+
+async function salvarUsuario(){
+  var id = document.getElementById('modal-usuario-id').value;
+  var login = document.getElementById('modal-usuario-login').value.trim();
+  var senha = document.getElementById('modal-usuario-senha').value;
+  var role = document.getElementById('modal-usuario-role').value;
+  if(!id && !login){ toast('Informe o nome de usuário', true); return; }
+  if(!id && !senha){ toast('Informe uma senha', true); return; }
+  try {
+    var url = id ? BASE+'/admin/usuarios/'+id : BASE+'/admin/usuarios';
+    var method = id ? 'PUT' : 'POST';
+    var body = { role };
+    if(!id) body.usuario = login;
+    if(senha) body.senha = senha;
+    var r = await fetch(url, {method, headers:{'Content-Type':'application/json','x-admin-token':TOKEN}, body:JSON.stringify(body)});
+    var d = await r.json();
+    if(d.ok){ toast(id ? '✅ Usuário atualizado!' : '✅ Usuário criado!'); fecharModalUsuario(); carregarUsuarios(); }
+    else toast(d.error || 'Erro ao salvar', true);
+  } catch(e){ toast('Erro de conexão', true); }
+}
+
+async function excluirUsuario(id, login){
+  if(!confirm('Excluir o usuário "'+login+'"? Esta ação não pode ser desfeita.')) return;
+  try {
+    var r = await fetch(BASE+'/admin/usuarios/'+id, {method:'DELETE', headers:{'x-admin-token':TOKEN}});
+    var d = await r.json();
+    if(d.ok){ toast('✅ Usuário excluído'); carregarUsuarios(); }
+    else toast(d.error || 'Erro ao excluir', true);
+  } catch(e){ toast('Erro de conexão', true); }
 }
 
 // ═══════════════════════════════════════════
