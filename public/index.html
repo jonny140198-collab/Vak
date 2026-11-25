@@ -653,9 +653,25 @@ function selectValue(v){
     b.classList.toggle('selected',b.textContent==='R$ '+v);
   });
   document.getElementById('customValue').value='';
+  updatePayBtn();
+  // Mostra o bloco de nome + confirmar inline (igual ao "outro valor")
+  document.getElementById('customConfirmBlock').style.display='block';
+  // Scroll suave até o botão
+  setTimeout(function(){
+    var el=document.getElementById('customConfirmBlock');
+    if(el) el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  },80);
+}
+
+// Versão silenciosa usada no carregamento da campanha (não abre o bloco de confirmação)
+function selectValueSilent(v){
+  selectedValue=v;
+  document.querySelectorAll('.value-btn').forEach(function(b){
+    b.classList.toggle('selected',b.textContent==='R$ '+v);
+  });
+  document.getElementById('customValue').value='';
   document.getElementById('customConfirmBlock').style.display='none';
   updatePayBtn();
-  mostrarConfirmacao();
 }
 
 function onCustomInput(v){
@@ -1145,7 +1161,7 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
             wrap.appendChild(btn);
           });
           var defaultVal = c.valores[1] || c.valores[0];
-          if(defaultVal) selectValue(defaultVal);
+          if(defaultVal) selectValueSilent(defaultVal);
         }
       }
 
