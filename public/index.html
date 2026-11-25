@@ -373,9 +373,8 @@
     <!-- Upsell R$3,99 -->
     <div id="payStepUpsell" style="display:none;padding:24px;text-align:center;">
       <div style="font-size:40px;margin-bottom:12px;">💚</div>
-      <p style="font-size:17px;font-weight:700;color:#282828;margin-bottom:10px;">Deseja adicionar R$ 3,99 a mais?</p>
-      <p style="font-size:14px;color:#666;margin-bottom:6px;">Esse valor extra ajuda nosso projeto a continuar</p>
-      <p style="font-size:14px;color:#666;margin-bottom:20px;">ajudando mais vidas como a da Ester 🙏</p>
+      <p id="upsellTituloTxt" style="font-size:17px;font-weight:700;color:#282828;margin-bottom:10px;">Deseja adicionar R$ 3,99 a mais?</p>
+      <p id="upsellSubTxt" style="font-size:14px;color:#666;margin-bottom:20px;">Esse valor extra ajuda nosso projeto a continuar ajudando mais vidas como a da Ester 🙏</p>
       <div style="background:#f0fdf4;border-radius:12px;padding:12px;margin-bottom:20px;">
         <span style="font-size:13px;color:#555;">Total com acréscimo: </span>
         <span id="upsellValorTexto" style="font-size:20px;font-weight:800;color:#24ca68;">R$ 28,99</span>
@@ -1237,10 +1236,17 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
       if(c.upsell){
         var upsellValor = c.upsellValor || 3.99;
         window._upsellValor = upsellValor; // usado no cálculo do total
-        var upsellTit = document.querySelector('#payStepUpsell p:nth-of-type(1)');
-        var upsellSub = document.querySelector('#payStepUpsell p:nth-of-type(2)');
-        if(upsellTit && c.textoUpsellTitulo) upsellTit.textContent = c.textoUpsellTitulo;
-        else if(upsellTit) upsellTit.textContent = 'Deseja adicionar R$ '+upsellValor.toFixed(2).replace('.',',') + ' a mais?';
+        var upsellTit = document.getElementById('upsellTituloTxt');
+        var upsellSub = document.getElementById('upsellSubTxt');
+        if(upsellTit) upsellTit.textContent = c.textoUpsellTitulo || ('Deseja adicionar R$ '+upsellValor.toFixed(2).replace('.',',') + ' a mais?');
+        if(upsellSub && c.textoUpsellSub) upsellSub.innerHTML = c.textoUpsellSub;
+      } else {
+        // upsell desativado mas ainda atualiza o valor padrão no título
+        var upsellValor = c.upsellValor || 3.99;
+        window._upsellValor = upsellValor;
+        var upsellTit = document.getElementById('upsellTituloTxt');
+        var upsellSub = document.getElementById('upsellSubTxt');
+        if(upsellTit) upsellTit.textContent = c.textoUpsellTitulo || ('Deseja adicionar R$ '+upsellValor.toFixed(2).replace('.',',') + ' a mais?');
         if(upsellSub && c.textoUpsellSub) upsellSub.innerHTML = c.textoUpsellSub;
       }
 
