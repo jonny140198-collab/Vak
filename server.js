@@ -1016,19 +1016,21 @@ app.post('/dar-coracao', async (req, res) => {
       method: 'POST',
       headers: { 'Authorization': `Basic ${creds}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        amount: amountCents,
-        description: `Coração para campanha ${campanha.slug || campanha._id}`,
-        customer: { name: nome },
-        payment_method: 'pix',
-        expires_in: 3600
+        amountCents,
+        description: `Coração — ${campanha.titulo || campanha.slug || 'campanha'}`,
+        customer: {
+          name: nome,
+          email: 'doador@vakinha.com.br',
+          document: '00000000000'
+        },
+        external_reference: `coracao-${Date.now()}`
       })
     });
+    const data = await response.json();
     if (!response.ok) {
-      const errText = await response.text();
-      console.error('XFlow /dar-coracao erro:', errText);
+      console.error('XFlow /dar-coracao erro:', JSON.stringify(data));
       return res.status(502).json({ error: 'Erro ao criar cobrança' });
     }
-    const data = await response.json();
 
     // Salvar no histórico com tipo='coracao'
     if (dbConectado) {
