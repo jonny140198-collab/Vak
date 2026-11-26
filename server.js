@@ -137,7 +137,20 @@ const campanhaSchema = new mongoose.Schema({
   apoiadoresBase:    { type: Number, default: 0 },   // apoiadores base de exibição
   coracoesBase:      { type: Number, default: 0 },   // corações base de exibição
   ordemExibicao: { type: Number, default: 0 },
-  vakinhaPremiada: { type: String, default: '' },
+  vakinhaPremiada: {
+    descricao:         { type: String, default: 'Cada ação nesta campanha pode garantir números da sorte para concorrer a prêmios mensais!' },
+    doadoresNumeroso:  { type: Number, default: 0 },   // "X pessoas já doaram e receberam números da sorte"
+    doadoresTurbinado: { type: Number, default: 0 },   // "X doadores turbinaram sua doação"
+    compradoresCoracao:{ type: Number, default: 0 },   // "X pessoas compraram corações"
+    doadoresSemResgate:{ type: Number, default: 0 },   // "X pessoas doaram e não resgataram"
+    doadoresExtra:     { type: Number, default: 0 },   // "X doadores, além de ajudar, garantiram números extras"
+    ganhadores:        { type: Number, default: 0 },   // "X pessoas já ganharam o prêmio"
+    premioValor:       { type: String, default: 'R$ 15 MIL' },
+    linkDoar:          { type: String, default: '' },
+    linkTurbinar:      { type: String, default: '' },
+    linkCoracao:       { type: String, default: '' },
+    linkResgatar:      { type: String, default: '' }
+  },
   selos:        { type: [String], default: [] },
   perguntas: [{
     pergunta: { type: String, default: '' },
@@ -570,6 +583,35 @@ app.put('/admin/campanhas/:id', authMiddleware, async (req, res) => {
     res.json({ ok: true, campanha: c.toObject() });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao atualizar campanha' });
+  }
+});
+
+// Atualizar Vakinha Premiada de uma campanha
+app.put('/admin/campanhas/:id/premiada', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const dados = req.body || {};
+    if (!dbConectado) {
+      const c = CAMPANHAS_MEM.find(x => x._id === id);
+      if (!c) return res.status(404).json({ error: 'Não encontrada' });
+      if (req.adminRole !== 'master' && c.owner !== req.adminUser) return res.status(403).json({ error: 'Sem permissão' });
+      c.vakinhaPremiada = { ...(c.vakinhaPremiada || {}), ...dados };
+      return res.json({ ok: true });
+    }
+    if (req.adminRole !== 'master') {
+      const ex = await CampanhaModel.findById(id);
+      if (!ex) return res.status(404).json({ error: 'Não encontrada' });
+      if (ex.owner !== req.adminUser) return res.status(403).json({ error: 'Sem permissão' });
+    }
+    // Monta $set com prefixo vakinhaPremiada.*
+    const setObj = {};
+    for (const [k, v] of Object.entries(dados)) {
+      setObj[`vakinhaPremiada.${k}`] = v;
+    }
+    await CampanhaModel.findByIdAndUpdate(id, { $set: setObj }, { runValidators: false });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao salvar premiada' });
   }
 });
 

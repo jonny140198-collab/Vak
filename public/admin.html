@@ -569,6 +569,7 @@ tr:hover td{background:var(--card2)}
             <button class="tab-btn" onclick="showEditorTab('perguntas',this)">❓ Q&amp;A</button>
             <button class="tab-btn" onclick="showEditorTab('valores',this)">💲 Valores</button>
             <button class="tab-btn" onclick="showEditorTab('extras',this)">⭐ Extras</button>
+            <button class="tab-btn" onclick="showEditorTab('premiada',this)">🏆 Premiada</button>
           </div>
 
           <!-- ABA: INFO -->
@@ -671,10 +672,7 @@ tr:hover td{background:var(--card2)}
                 <textarea id="ce-descricao" rows="18" placeholder="Texto completo da campanha.&#10;&#10;Use linha em branco para separar parágrafos." oninput="updateCharCount(this,'desc-count')"></textarea>
                 <div class="char-count" id="desc-count">0 caracteres</div>
               </div>
-              <div class="form-group">
-                <label>Texto — Aba "Vakinha Premiada"</label>
-                <textarea id="ce-vakinhaPremiada" rows="5" placeholder="Ex: Esta vaquinha concorre ao prêmio de R$ 10.000..."></textarea>
-              </div>
+              <!-- vakinhaPremiada gerenciada pela aba 🏆 Premiada -->
             </div></div>
           </div>
 
@@ -840,6 +838,54 @@ tr:hover td{background:var(--card2)}
                   <input type="text" id="new-selo" placeholder="Ex: ✅ Campanha Verificada" onkeydown="if(event.key==='Enter')adicionarSelo()">
                 </div>
                 <button class="btn btn-ghost btn-sm" onclick="adicionarSelo()">+ Adicionar</button>
+              </div>
+            </div></div>
+          </div>
+
+          <!-- TAB PREMIADA -->
+          <div class="tab-pane" id="ceditor-premiada">
+            <div class="panel"><div class="panel-body">
+              <div style="font-size:14px;font-weight:600;margin-bottom:4px">🏆 Vakinha Premiada</div>
+              <div style="font-size:12px;color:var(--fg3);margin-bottom:16px">Dados exibidos nos cards da aba "Vakinha Premiada" na página pública</div>
+
+              <div class="form-group">
+                <label>Descrição (texto de abertura)</label>
+                <input type="text" id="vp-descricao" placeholder="Cada ação pode garantir números da sorte…">
+              </div>
+              <div class="form-group">
+                <label>Valor do prêmio mensal</label>
+                <input type="text" id="vp-premioValor" placeholder="Ex: R$ 15 MIL">
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
+                <div class="form-group" style="margin:0">
+                  <label>Doadores com números da sorte</label>
+                  <input type="number" id="vp-doadoresNumeroso" min="0" placeholder="0">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label>Doadores turbinados</label>
+                  <input type="number" id="vp-doadoresTurbinado" min="0" placeholder="0">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label>Compradores de corações</label>
+                  <input type="number" id="vp-compradoresCoracao" min="0" placeholder="0">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label>Doadores sem resgate</label>
+                  <input type="number" id="vp-doadoresSemResgate" min="0" placeholder="0">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label>Doadores com números extra (criador)</label>
+                  <input type="number" id="vp-doadoresExtra" min="0" placeholder="0">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label>Pessoas que já ganharam</label>
+                  <input type="number" id="vp-ganhadores" min="0" placeholder="0">
+                </div>
+              </div>
+
+              <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-primary btn-sm" onclick="salvarPremiada()">💾 Salvar Premiada</button>
               </div>
             </div></div>
           </div>
@@ -1283,7 +1329,17 @@ function popularEditor(c){
   onVideoUrlChange();
   document.getElementById('ce-descricao').value=c.descricao||'';
   updateCharCount(document.getElementById('ce-descricao'),'desc-count');
-  document.getElementById('ce-vakinhaPremiada').value=c.vakinhaPremiada||'';
+  // Premiada
+  var vp = (c.vakinhaPremiada && typeof c.vakinhaPremiada==='object') ? c.vakinhaPremiada : {};
+  function setVPInput(id,val){ var el=document.getElementById(id); if(el) el.value=val!=null?val:''; }
+  setVPInput('vp-descricao',          vp.descricao);
+  setVPInput('vp-premioValor',        vp.premioValor);
+  setVPInput('vp-doadoresNumeroso',   vp.doadoresNumeroso);
+  setVPInput('vp-doadoresTurbinado',  vp.doadoresTurbinado);
+  setVPInput('vp-compradoresCoracao', vp.compradoresCoracao);
+  setVPInput('vp-doadoresSemResgate', vp.doadoresSemResgate);
+  setVPInput('vp-doadoresExtra',      vp.doadoresExtra);
+  setVPInput('vp-ganhadores',         vp.ganhadores);
   document.getElementById('ce-upsell').value=c.upsell?'true':'false';
   document.getElementById('ce-upsellTexto').value=c.upsellTexto||'';
   document.getElementById('ce-arrecadadoBase').value=c.arrecadadoBase!=null?c.arrecadadoBase:'';
@@ -1410,6 +1466,33 @@ function previewFoto(input){
   reader.readAsDataURL(file);
 }
 
+// SALVAR PREMIADA
+async function salvarPremiada(){
+  if(!campanhaAtual) return toast('Campanha não carregada',true);
+  function getN(id){ var v=parseInt(document.getElementById(id)&&document.getElementById(id).value||0,10); return isNaN(v)?0:v; }
+  function getS(id){ return (document.getElementById(id)&&document.getElementById(id).value)||''; }
+  var dados = {
+    descricao:          getS('vp-descricao'),
+    premioValor:        getS('vp-premioValor'),
+    doadoresNumeroso:   getN('vp-doadoresNumeroso'),
+    doadoresTurbinado:  getN('vp-doadoresTurbinado'),
+    compradoresCoracao: getN('vp-compradoresCoracao'),
+    doadoresSemResgate: getN('vp-doadoresSemResgate'),
+    doadoresExtra:      getN('vp-doadoresExtra'),
+    ganhadores:         getN('vp-ganhadores')
+  };
+  try {
+    var r = await fetch(BASE+'/admin/campanhas/'+campanhaAtual._id+'/premiada',{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','x-admin-token':TOKEN},
+      body:JSON.stringify(dados)
+    });
+    var d = await r.json();
+    if(d.ok) toast('✅ Vakinha Premiada salva!');
+    else toast(d.error||'Erro ao salvar',true);
+  } catch(e){ toast('Erro de conexão',true); }
+}
+
 // SALVAR CAMPANHA
 async function salvarCampanha(){
   if(!campanhaAtual) return toast('Campanha não carregada',true);
@@ -1435,7 +1518,7 @@ async function salvarCampanha(){
       slug:slugVal,
       status:document.getElementById('ce-status').value,
       descricao:document.getElementById('ce-descricao').value,
-      vakinhaPremiada:document.getElementById('ce-vakinhaPremiada').value.trim(),
+      // vakinhaPremiada salvo separadamente pela aba Premiada
       chavePix:document.getElementById('ce-chavePix').value.trim(),
       videoUrl:(document.getElementById('ce-videoUrl').value||'').trim(),
       checkoutNome:document.getElementById('ce-checkoutNome').value.trim(),
