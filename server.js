@@ -146,9 +146,12 @@ const campanhaSchema = new mongoose.Schema({
     autor:     { type: String, default: '' }
   }],
   atualizacoes: [{
-    titulo: { type: String, default: '' },
-    texto:  { type: String, default: '' },
-    data:   { type: String, default: '' }
+    titulo:    { type: String, default: '' },
+    texto:     { type: String, default: '' },
+    data:      { type: String, default: '' },
+    midiaBase64: { type: String, default: '' },  // imagem em base64
+    midiaMime:   { type: String, default: '' },  // image/jpeg, image/png…
+    midiaUrl:    { type: String, default: '' }   // URL de vídeo (YouTube/etc)
   }]
 }, { timestamps: true, versionKey: false, strict: false });
 

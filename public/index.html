@@ -679,7 +679,19 @@ function renderUpdates(){
   var el=document.getElementById('updates-list');
   var html='';
   updatesData.forEach(function(u){
-    html+='<div class="update-item"><div class="update-date">'+u.date+'</div><div class="update-name" style="font-size:14px;color:#282828;">'+u.title+'</div><div class="update-amount" style="font-size:13px;font-weight:400;color:#4a4a4a;margin-top:6px;">'+u.text+'</div></div>';
+    var mediaHtml='';
+    if(u.midiaBase64 && u.midiaMime){
+      mediaHtml='<img src="data:'+u.midiaMime+';base64,'+u.midiaBase64+'" style="width:100%;max-height:260px;object-fit:cover;border-radius:8px;margin-top:10px;display:block">';
+    } else if(u.midiaUrl){
+      var vurl=u.midiaUrl.trim();
+      var ytMatch=vurl.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+      if(ytMatch){
+        mediaHtml='<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;margin-top:10px"><iframe src="https://www.youtube.com/embed/'+ytMatch[1]+'" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px"></iframe></div>';
+      } else {
+        mediaHtml='<div style="margin-top:10px"><a href="'+vurl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:#f0f4ff;color:#2d6be4;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">▶ Ver vídeo</a></div>';
+      }
+    }
+    html+='<div class="update-item"><div class="update-date">'+u.date+'</div><div class="update-name" style="font-size:14px;color:#282828;">'+u.title+'</div><div class="update-amount" style="font-size:13px;font-weight:400;color:#4a4a4a;margin-top:6px;">'+u.text+'</div>'+mediaHtml+'</div>';
   });
   el.innerHTML=html;
 }
@@ -1318,7 +1330,7 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
       // Atualizações
       if(c.atualizacoes && c.atualizacoes.length > 0){
         updatesData = c.atualizacoes.map(function(u){
-          return { date: u.data, title: u.titulo, text: u.texto };
+          return { date: u.data, title: u.titulo, text: u.texto, midiaBase64: u.midiaBase64||'', midiaMime: u.midiaMime||'', midiaUrl: u.midiaUrl||'' };
         });
         renderUpdates();
       }

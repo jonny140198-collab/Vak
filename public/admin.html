@@ -746,7 +746,34 @@ tr:hover td{background:var(--card2)}
                 <div class="form-group"><label>Título</label><input type="text" id="new-atu-titulo" placeholder="Ex: Resultado do exame desta semana"></div>
                 <div class="form-group"><label>Data</label><input type="text" id="new-atu-data" placeholder="Ex: 24/11/2026"></div>
                 <div class="form-group"><label>Texto</label><textarea id="new-atu-texto" rows="4" placeholder="Descreva a atualização…"></textarea></div>
-                <div style="display:flex;gap:8px;margin-top:8px">
+
+                <!-- MÍDIA -->
+                <div style="border:1px solid var(--border2);border-radius:8px;padding:12px;margin-bottom:4px">
+                  <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px">📎 Mídia (opcional)</div>
+
+                  <!-- Imagem -->
+                  <div class="form-group" style="margin-bottom:10px">
+                    <label>Imagem (JPG/PNG/GIF — máx 3MB)</label>
+                    <input type="file" id="new-atu-img" accept="image/*" onchange="previewAtuImg(this)" style="display:none">
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('new-atu-img').click()" type="button">📷 Escolher imagem</button>
+                      <button class="btn btn-ghost btn-sm" id="new-atu-img-clear" onclick="limparAtuImg()" type="button" style="display:none;color:var(--danger)">✕ Remover</button>
+                    </div>
+                    <img id="new-atu-img-preview" src="" style="display:none;max-width:100%;max-height:200px;border-radius:8px;margin-top:8px;object-fit:cover">
+                  </div>
+
+                  <!-- Vídeo URL -->
+                  <div class="form-group" style="margin:0">
+                    <label>URL de vídeo (YouTube, Instagram, etc.)</label>
+                    <input type="text" id="new-atu-video" placeholder="https://youtube.com/watch?v=...">
+                    <div style="font-size:11px;color:var(--fg3);margin-top:4px">Cole a URL do YouTube, Instagram Reels, TikTok ou qualquer link de vídeo</div>
+                  </div>
+                </div>
+
+                <input type="hidden" id="new-atu-imgbase64" value="">
+                <input type="hidden" id="new-atu-imgmime" value="">
+
+                <div style="display:flex;gap:8px;margin-top:10px">
                   <button class="btn btn-primary btn-sm" onclick="adicionarAtualizacao()">✅ Adicionar</button>
                   <button class="btn btn-ghost btn-sm" onclick="toggleAddAtualizacao()">Cancelar</button>
                 </div>
@@ -1443,14 +1470,86 @@ function renderAtualizacoes(){
   vazio.style.display='none';
   atualizacoesData.forEach(function(a,i){
     var div=document.createElement('div'); div.className='list-row'; div.style.flexDirection='column'; div.style.alignItems='flex-start'; div.style.gap='4px';
-    div.innerHTML='<div style="display:flex;width:100%;align-items:center;gap:8px">'+'<span style="flex:1;font-weight:600;font-size:13px">'+esc(a.titulo||'Sem título')+'</span>'+'<span style="font-size:11px;color:var(--fg3)">'+esc(a.data||'')+'</span>'+'<button class="list-row-btn" onclick="editarAtualizacao('+i+')">✏️</button>'+'<button class="list-row-btn" onclick="removerAtualizacao('+i+')">🗑️</button>'+'</div>'+'<div style="font-size:12px;color:var(--fg3);line-height:1.4">'+esc((a.texto||'').slice(0,100)+(a.texto&&a.texto.length>100?'…':''))+'</div>';
+    var mediaBadge='';
+    if(a.midiaBase64) mediaBadge+='<span style="font-size:10px;background:var(--accent);color:#fff;border-radius:4px;padding:1px 6px;margin-left:4px">📷 IMG</span>';
+    if(a.midiaUrl) mediaBadge+='<span style="font-size:10px;background:#e53e3e;color:#fff;border-radius:4px;padding:1px 6px;margin-left:4px">▶ VÍD</span>';
+    var preview='';
+    if(a.midiaBase64 && a.midiaMime) preview='<img src="data:'+a.midiaMime+';base64,'+a.midiaBase64+'" style="max-height:60px;max-width:120px;border-radius:4px;object-fit:cover;margin-top:4px">';
+    div.innerHTML='<div style="display:flex;width:100%;align-items:center;gap:8px">'+'<span style="flex:1;font-weight:600;font-size:13px">'+esc(a.titulo||'Sem título')+mediaBadge+'</span>'+'<span style="font-size:11px;color:var(--fg3)">'+esc(a.data||'')+'</span>'+'<button class="list-row-btn" onclick="editarAtualizacao('+i+')">✏️</button>'+'<button class="list-row-btn" onclick="removerAtualizacao('+i+')">🗑️</button>'+'</div>'+'<div style="font-size:12px;color:var(--fg3);line-height:1.4">'+esc((a.texto||'').slice(0,100)+(a.texto&&a.texto.length>100?'…':''))+'</div>'+preview;
     list.appendChild(div);
   });
 }
-function toggleAddAtualizacao(){ var box=document.getElementById('add-atualizacao-box'); box.style.display=box.style.display==='none'?'block':'none'; if(box.style.display==='block'){ document.getElementById('new-atu-titulo').value=''; document.getElementById('new-atu-data').value=''; document.getElementById('new-atu-texto').value=''; document.getElementById('new-atu-titulo').focus(); } }
-function adicionarAtualizacao(){ var t=document.getElementById('new-atu-titulo').value.trim(), d=document.getElementById('new-atu-data').value.trim(), tx=document.getElementById('new-atu-texto').value.trim(); if(!t) return toast('Informe o título',true); atualizacoesData.unshift({titulo:t,data:d,texto:tx}); toggleAddAtualizacao(); renderAtualizacoes(); toast('Atualização adicionada — salve para confirmar'); }
+function toggleAddAtualizacao(){
+  var box=document.getElementById('add-atualizacao-box');
+  box.style.display=box.style.display==='none'?'block':'none';
+  if(box.style.display==='block'){
+    document.getElementById('new-atu-titulo').value='';
+    document.getElementById('new-atu-data').value='';
+    document.getElementById('new-atu-texto').value='';
+    document.getElementById('new-atu-video').value='';
+    limparAtuImg();
+    document.getElementById('new-atu-titulo').focus();
+  }
+}
+function previewAtuImg(input){
+  var file=input.files[0]; if(!file) return;
+  if(file.size>3*1024*1024){ toast('Imagem muito grande (máx 3MB)',true); input.value=''; return; }
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var b64=e.target.result; // data:image/jpeg;base64,...
+    var mime=file.type;
+    var pureB64=b64.split(',')[1];
+    document.getElementById('new-atu-imgbase64').value=pureB64;
+    document.getElementById('new-atu-imgmime').value=mime;
+    var prev=document.getElementById('new-atu-img-preview');
+    prev.src=b64; prev.style.display='block';
+    document.getElementById('new-atu-img-clear').style.display='inline-flex';
+  };
+  reader.readAsDataURL(file);
+}
+function limparAtuImg(){
+  document.getElementById('new-atu-img').value='';
+  document.getElementById('new-atu-imgbase64').value='';
+  document.getElementById('new-atu-imgmime').value='';
+  var prev=document.getElementById('new-atu-img-preview');
+  prev.src=''; prev.style.display='none';
+  document.getElementById('new-atu-img-clear').style.display='none';
+}
+function adicionarAtualizacao(){
+  var t=document.getElementById('new-atu-titulo').value.trim();
+  var d=document.getElementById('new-atu-data').value.trim();
+  var tx=document.getElementById('new-atu-texto').value.trim();
+  var b64=document.getElementById('new-atu-imgbase64').value;
+  var mime=document.getElementById('new-atu-imgmime').value;
+  var videoUrl=document.getElementById('new-atu-video').value.trim();
+  if(!t) return toast('Informe o título',true);
+  atualizacoesData.unshift({titulo:t,data:d,texto:tx,midiaBase64:b64,midiaMime:mime,midiaUrl:videoUrl});
+  toggleAddAtualizacao();
+  renderAtualizacoes();
+  toast('Atualização adicionada — salve para confirmar');
+}
 function removerAtualizacao(i){ if(!confirm('Remover esta atualização?')) return; atualizacoesData.splice(i,1); renderAtualizacoes(); }
-function editarAtualizacao(i){ var a=atualizacoesData[i]; document.getElementById('new-atu-titulo').value=a.titulo||''; document.getElementById('new-atu-data').value=a.data||''; document.getElementById('new-atu-texto').value=a.texto||''; document.getElementById('add-atualizacao-box').style.display='block'; atualizacoesData.splice(i,1); renderAtualizacoes(); document.getElementById('new-atu-titulo').focus(); }
+function editarAtualizacao(i){
+  var a=atualizacoesData[i];
+  document.getElementById('new-atu-titulo').value=a.titulo||'';
+  document.getElementById('new-atu-data').value=a.data||'';
+  document.getElementById('new-atu-texto').value=a.texto||'';
+  document.getElementById('new-atu-video').value=a.midiaUrl||'';
+  // restore image preview if exists
+  limparAtuImg();
+  if(a.midiaBase64 && a.midiaMime){
+    document.getElementById('new-atu-imgbase64').value=a.midiaBase64;
+    document.getElementById('new-atu-imgmime').value=a.midiaMime;
+    var prev=document.getElementById('new-atu-img-preview');
+    prev.src='data:'+a.midiaMime+';base64,'+a.midiaBase64;
+    prev.style.display='block';
+    document.getElementById('new-atu-img-clear').style.display='inline-flex';
+  }
+  document.getElementById('add-atualizacao-box').style.display='block';
+  atualizacoesData.splice(i,1);
+  renderAtualizacoes();
+  document.getElementById('new-atu-titulo').focus();
+}
 
 // PERGUNTAS
 function renderPerguntas(){
