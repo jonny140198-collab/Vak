@@ -138,6 +138,7 @@ const campanhaSchema = new mongoose.Schema({
   coracoesBase:      { type: Number, default: 0 },   // corações base de exibição
   ordemExibicao: { type: Number, default: 0 },
   vakinhaPremiada: { type: mongoose.Schema.Types.Mixed, default: {} },
+  quemAjudou:      { type: mongoose.Schema.Types.Mixed, default: {} },
   selos:        { type: [String], default: [] },
   perguntas: [{
     pergunta: { type: String, default: '' },
@@ -600,6 +601,35 @@ app.put('/admin/campanhas/:id/premiada', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error('Erro ao salvar premiada:', err.message);
     res.status(500).json({ error: 'Erro ao salvar premiada: ' + err.message });
+  }
+});
+
+// Atualizar Quem Ajudou de uma campanha
+app.put('/admin/campanhas/:id/quem-ajudou', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const dados = req.body || {};
+    if (!dbConectado) {
+      const c = CAMPANHAS_MEM.find(x => x._id === id);
+      if (!c) return res.status(404).json({ error: 'Não encontrada' });
+      if (req.adminRole !== 'master' && c.owner !== req.adminUser) return res.status(403).json({ error: 'Sem permissão' });
+      c.quemAjudou = { ...(c.quemAjudou || {}), ...dados };
+      return res.json({ ok: true });
+    }
+    if (req.adminRole !== 'master') {
+      const ex = await CampanhaModel.findById(id);
+      if (!ex) return res.status(404).json({ error: 'Não encontrada' });
+      if (ex.owner !== req.adminUser) return res.status(403).json({ error: 'Sem permissão' });
+    }
+    const doc = await CampanhaModel.findById(id);
+    if (!doc) return res.status(404).json({ error: 'Não encontrada' });
+    doc.quemAjudou = { ...(doc.quemAjudou || {}), ...dados };
+    doc.markModified('quemAjudou');
+    await doc.save();
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Erro ao salvar quemAjudou:', err.message);
+    res.status(500).json({ error: 'Erro ao salvar: ' + err.message });
   }
 });
 

@@ -230,7 +230,58 @@
   </div>
 
   <!-- TAB 2: QUEM AJUDOU -->
+  <!-- TAB 2: QUEM AJUDOU -->
   <div class="tab-content" id="tab2">
+    <!-- Cards de stats -->
+    <div style="background:#fff;border:1px solid #f1f0f0;border-radius:12px;padding:0 4px;margin-bottom:18px;">
+
+      <!-- Contribuições -->
+      <div style="display:flex;align-items:center;gap:14px;padding:16px 12px;border-bottom:1px solid #f5f5f5;">
+        <div style="width:48px;height:48px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="#24ca68"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/><path d="M11 8h2v8h-2zM7 8h2v5H7zM15 8h2v5h-2z" fill="none"/><path d="M6.5 10h11v1.5H6.5z" fill="none"/><circle cx="12" cy="12" r="10" fill="none" stroke="#24ca68" stroke-width="0"/><path d="M17 12l-5 5-5-5 1.41-1.41L11 14.17V6h2v8.17l2.59-2.58L17 12z" fill="#24ca68"/></svg>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:15px;color:#282828;">Contribuições</div>
+          <div style="font-size:14px;color:#4a4a4a;"><span id="qa-contribuicoes">—</span> pessoas doaram</div>
+        </div>
+      </div>
+
+      <!-- Adotantes -->
+      <div style="display:flex;align-items:center;gap:14px;padding:16px 12px;border-bottom:1px solid #f5f5f5;">
+        <div style="width:48px;height:48px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="#24ca68"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:15px;color:#282828;">Adotantes</div>
+          <div style="font-size:14px;color:#4a4a4a;" id="qa-adotantes-texto">Quer adotar essa campanha? <a href="#" onclick="document.querySelector('.btn-donate').click();return false;" style="color:#24ca68;font-weight:700;">Clique aqui!</a></div>
+        </div>
+      </div>
+
+      <!-- Promotores do Bem -->
+      <div style="display:flex;align-items:center;gap:14px;padding:16px 12px;border-bottom:1px solid #f5f5f5;">
+        <div style="width:48px;height:48px;border-radius:50%;background:#1877F2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:15px;color:#282828;">Promotores do Bem</div>
+          <div style="font-size:14px;color:#4a4a4a;" id="qa-promotores-texto">Compartilhe a campanha, traga doações e se torne Promotor do Bem</div>
+        </div>
+      </div>
+
+      <!-- Corações -->
+      <div style="display:flex;align-items:center;gap:14px;padding:16px 12px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:15px;color:#282828;">Corações</div>
+          <div style="font-size:14px;color:#4a4a4a;">Esta campanha recebeu <span id="qa-coracoes">—</span> corações no total</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de apoios -->
+    <div style="font-weight:900;font-size:16px;text-align:center;margin-bottom:16px;color:#282828;">Todos os apoios</div>
     <div id="donors-list"></div>
   </div>
 
@@ -372,7 +423,7 @@
   </div>
   <div class="mb-btns">
     <button class="btn-donate" onclick="openPayment()">Quero Ajudar</button>
-    <button class="btn-share" onclick="abrirCompartilhar()">Se não consegue doar, compartilhe. Salve vidas</button>
+    <button class="btn-share" onclick="abrirCompartilhar()">Compartilhar</button>
   </div>
 </div>
 
@@ -1201,6 +1252,17 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
       document.getElementById('progressFill').style.width = Math.min(100,(totalCollected/totalGoal*100))+'%';
       document.getElementById('supporterCount').textContent = supportersCount;
       document.getElementById('heartCount').textContent     = heartsCount;
+      // Quem ajudou — sincroniza cards com dados reais
+      var qaContrib = document.getElementById('qa-contribuicoes');
+      if(qaContrib) qaContrib.textContent = supportersCount;
+      var qaCorac = document.getElementById('qa-coracoes');
+      if(qaCorac) qaCorac.textContent = heartsCount;
+      // Textos editáveis do bloco Quem Ajudou
+      if(c.quemAjudou && typeof c.quemAjudou === 'object'){
+        var qa = c.quemAjudou;
+        if(qa.textoAdotantes){ var el=document.getElementById('qa-adotantes-texto'); if(el) el.innerHTML=qa.textoAdotantes; }
+        if(qa.textoPromotores){ var el2=document.getElementById('qa-promotores-texto'); if(el2) el2.textContent=qa.textoPromotores; }
+      }
       // Inicia auto-incremento visual: +R$0,01 a R$0,04 a cada 8-20s
       if(window._autoIncrTimer) clearInterval(window._autoIncrTimer);
       window._autoIncrTimer = setInterval(function(){
