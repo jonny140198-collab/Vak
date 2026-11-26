@@ -1643,7 +1643,13 @@ function gerarQRCoracao(){
     document.getElementById('coracaoQRValorLabel').textContent='R$ '+(data.valorReais||_coracaoValor).toFixed(2).replace('.',',');
 
     if(data.qrCodeBase64){
-      document.getElementById('coracaoQRImg').src='data:image/png;base64,'+data.qrCodeBase64;
+      var b64=data.qrCodeBase64;
+      var imgSrc=b64.startsWith('data:')?b64:'data:image/png;base64,'+b64;
+      document.getElementById('coracaoQRImg').src=imgSrc;
+      document.getElementById('coracaoQRImg').style.display='block';
+    } else {
+      // Sem QR base64: esconde box de imagem
+      document.getElementById('coracaoQRImgBox').style.display='none';
     }
     if(data.copyPaste){
       document.getElementById('coracaoCopyPaste').textContent=data.copyPaste;

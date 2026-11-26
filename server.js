@@ -1031,6 +1031,7 @@ app.post('/dar-coracao', async (req, res) => {
       console.error('XFlow /dar-coracao erro:', JSON.stringify(data));
       return res.status(502).json({ error: 'Erro ao criar cobrança' });
     }
+    console.log('XFlow /dar-coracao resposta:', JSON.stringify(data).slice(0, 500));
 
     // Salvar no histórico com tipo='coracao'
     if (dbConectado) {
@@ -1043,7 +1044,10 @@ app.post('/dar-coracao', async (req, res) => {
       });
     }
 
-    res.json({ id: data.id, qrCodeBase64: data.pix?.qrCodeBase64, copyPaste: data.pix?.copyPaste, amountCents, valorReais });
+    // Extrai QR de qualquer estrutura que a XFlow retorne
+    const qrRaw = data.pix?.qrCodeBase64 || data.pix?.qr_code_base64 || data.qrCodeBase64 || data.qr_code_base64 || data.qrCode || '';
+    const copyPasteRaw = data.pix?.copyPaste || data.pix?.copy_paste || data.copyPaste || data.copy_paste || data.pix?.qrCode || '';
+    res.json({ id: data.id, qrCodeBase64: qrRaw, copyPaste: copyPasteRaw, amountCents, valorReais });
   } catch (err) {
     console.error('Erro /dar-coracao:', err);
     res.status(500).json({ error: 'Erro interno do servidor' });
