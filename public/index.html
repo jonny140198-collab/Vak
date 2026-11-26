@@ -257,27 +257,25 @@
     </span>
   </div>
 
-  <h1 class="campaign-title">Ajude o Robson a cuidar da pequena Ester durante o tratamento contra a leucemia</h1>
-  <p class="campaign-id">ID: 5333124</p>
+  <h1 class="campaign-title"></h1>
+  <p class="campaign-id"></p>
 
   <div class="mobile-stats-panel">
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    <div class="collected-value" id="collectedVal">R$ 2.977,02 <span class="collected-goal">de R$ 140.000,00</span></div>
+    <div class="collected-value" id="collectedVal">R$ 0,00 <span class="collected-goal">de R$ 0,00</span></div>
     <div class="stats-box">
       <div class="stat-row">
         <span class="stat-label">❤️ Corações Recebidos</span>
-        <span class="stat-value" id="heartCount">1755</span>
+        <span class="stat-value" id="heartCount">0</span>
       </div>
       <div class="stat-row">
         <span class="stat-label">👥 Apoiadores</span>
-        <span class="stat-value" id="supporterCount">421</span>
+        <span class="stat-value" id="supporterCount">0</span>
       </div>
     </div>
   </div>
 
   <div class="short-desc">
-    Olá, meu nome é Robson e sou pai da pequena Ester.
-    É com o coração apertado e muita esperança que venho pedir a ajuda de vocês. Minha filha Ester está enfrentando uma batalha muito difícil: ela está passando por um tratamento contra a leucemia.
     <span>ver tudo</span>
   </div>
 
@@ -292,20 +290,8 @@
   <!-- TAB 0: SOBRE -->
   <div class="tab-content active" id="tab0">
     <div class="divider"></div>
-    <p class="created-date"><strong>Vaquinha criada em:</strong> 20/08/2026</p>
-    <div class="description">
-      <h3>Ajude o Robson a cuidar da pequena Ester durante o tratamento contra a leucemia</h3>
-      <p>Olá, meu nome é Robson e sou pai da pequena Ester.</p>
-      <p>É com o coração apertado e muita esperança que venho pedir a ajuda de vocês. Minha filha Ester está enfrentando uma batalha muito difícil: ela está passando por um tratamento contra a leucemia.</p>
-      <p>Ester é uma menina meiga, doce e cheia de vida. Como pai, tudo o que mais desejo neste momento é poder estar ao lado dela, dando todo o amor, apoio e força que ela precisa para enfrentar essa fase tão delicada.</p>
-      <p>Nós moramos em Barcarena, no Pará, e diariamente preciso me deslocar até Belém para acompanhar minha filha durante o tratamento. São viagens, alimentação, transporte e outras despesas que acabam pesando muito no orçamento da nossa família.</p>
-      <p>Infelizmente, essa não é a primeira vez que o câncer entra na nossa família. Minha esposa, mãe da Ester, também enfrentou essa doença e, infelizmente, acabou falecendo por causa dela. Desde então, tenho seguido em frente tentando ser forte pela minha filha e fazer tudo o que estiver ao meu alcance para protegê-la.</p>
-      <p>Hoje, estou aqui deixando de lado qualquer orgulho e pedindo ajuda. Não estou fazendo isso por mim, mas pela minha pequena Ester. Quero poder continuar acompanhando seu tratamento e proporcionar a ela tudo o que estiver ao meu alcance durante essa caminhada.</p>
-      <p>Qualquer contribuição, independentemente do valor, será muito importante para nós. E se você não puder contribuir financeiramente, compartilhar esta vakinha com outras pessoas já será uma enorme ajuda.</p>
-      <p>Peço, de coração, que você inclua a Ester em suas orações e torça pela recuperação dela.</p>
-      <p><strong>Por favor, nos ajude a dar à pequena Ester a chance de continuar lutando e, um dia, poder voltar a viver sua infância com toda a alegria que ela merece.</strong></p>
-      <p>Que Deus abençoe cada pessoa que puder nos ajudar, seja com uma contribuição, uma oração ou simplesmente compartilhando nossa história.</p>
-    </div>
+    <p class="created-date" id="createdDateEl"></p>
+    <div class="description"></div>
     <p class="aviso">AVISO LEGAL: O texto e as imagens incluídos nessa página são de única e exclusiva responsabilidade do criador da vaquinha e não representam a opinião ou endosso da plataforma Vakinha.</p>
   </div>
 
@@ -491,16 +477,16 @@
   <div class="right-panel">
     <div class="right-panel-inner">
       <div class="rp-label">Arrecadado</div>
-      <div class="rp-value" id="rpCollectedVal">R$ 2.977,02</div>
-      <div class="rp-goal" id="rpGoalVal">de R$ 140.000,00</div>
+      <div class="rp-value" id="rpCollectedVal">R$ 0,00</div>
+      <div class="rp-goal" id="rpGoalVal">de R$ 0,00</div>
       <div class="progress-bar" style="margin-bottom:16px;"><div class="progress-fill" id="progressFillRp"></div></div>
       <div class="rp-stats-row">
         <span>❤️ Corações recebidos</span>
-        <span style="font-weight:700;" id="rpHeartCount">1755</span>
+        <span style="font-weight:700;" id="rpHeartCount">0</span>
       </div>
       <div class="rp-stats-row">
         <span>👥 Apoiadores</span>
-        <span style="font-weight:700;" id="rpSupporterCount">421</span>
+        <span style="font-weight:700;" id="rpSupporterCount">0</span>
       </div>
     </div>
     <div class="rp-protected">
@@ -769,11 +755,11 @@
 </div>
 
 <script>
-// ---- DADOS FICTÍCIOS ----
-var totalCollected = 297702; // centavos
-var totalGoal = 14000000;
-var heartsCount = 1755;
-var supportersCount = 421;
+// ---- DADOS BASE (sobrescritos pela campanha ativa) ----
+var totalCollected = 0;
+var totalGoal = 1000000; // R$10.000 padrão enquanto carrega
+var heartsCount = 0;
+var supportersCount = 0;
 
 var donorNames = [
   'Maria Aparecida','João da Silva','Ana Carolina','Pedro Henrique','Fernanda Lima',
@@ -853,13 +839,8 @@ function renderDonors(){
 }
 renderDonors();
 
-// Preencher atualizações
-var updatesData = [
-  {date:'19/11/2026',title:'Hoje foi dia de quimioterapia',text:'Ester passou pela 8ª sessão de quimio hoje em Belém. Ela estava cansada, mas sorriu para os enfermeiros que já a conhecem pelo nome. Cada sessão é um passo mais perto da cura! Obrigado a todos que tornaram essa viagem possível. 🙏'},
-  {date:'12/11/2026',title:'Atualização médica — boas notícias!',text:'Os exames desta semana mostraram resposta positiva ao tratamento. A médica responsável ficou animada com os resultados. Ainda temos um caminho longo, mas cada resultado bom renova nossas forças. Graças a Deus e a vocês!'},
-  {date:'01/11/2026',title:'Como o dinheiro foi usado em outubro',text:'Com as doações de outubro, conseguimos pagar: 14 passagens de ônibus Barcarena-Belém (R$ 420), hospedagem por 6 noites (R$ 480), alimentação durante o tratamento (R$ 310) e um medicamento específico não fornecido pelo SUS (R$ 180). Total: R$ 1.390.'},
-  {date:'15/10/2026',title:'A Ester quer ser médica! 🩺',text:'Durante uma das internações, a Ester olhou para a médica dela e disse: "Papai, quando eu crescer quero ser médica para cuidar de outras crianças como a doutora cuida de mim." Esse momento me deu forças que nem sei descrever. Precisamos que ela chegue lá!'},
-];
+// Atualizações — populadas pelo fetch da campanha ativa
+var updatesData = [];
 
 function renderUpdates(){
   var el=document.getElementById('updates-list');
@@ -1156,7 +1137,8 @@ function mostrarStatusPolling(msg){
 
 // ─── Compartilhar direto da tela de QR (antes de confirmar)
 function compartilharWhatsAppQR(){
-  var txt=encodeURIComponent('💚 Ajude a Pequena Ester! Ela tem leucemia e precisa de tratamento urgente. Cada doação salva uma vida! '+window.location.href);
+  var _titulo=document.querySelector('.campaign-title'); var _nomeCamp=_titulo?_titulo.textContent:'esta campanha';
+  var txt=encodeURIComponent('💚 Ajude: '+_nomeCamp+'! Cada doação faz a diferença. '+window.location.href);
   window.open('https://wa.me/?text='+txt,'_blank');
 }
 function compartilharFacebookQR(){
@@ -1309,7 +1291,8 @@ function copiarLinkSucesso(){
 
 function iniciarLinksCompartilharSucesso(){
   var url=window.location.href;
-  var txt='Ajudei a Pequena Ester! Você também pode ajudar: ';
+  var _tituloEl=document.querySelector('.campaign-title'); var _nomeCamp2=_tituloEl?_tituloEl.textContent:'esta campanha';
+  var txt='Acabei de apoiar: '+_nomeCamp2+'! Você também pode ajudar: ';
   document.getElementById('successWhatsApp').href='https://wa.me/?text='+encodeURIComponent(txt+url);
   document.getElementById('successFacebook').href='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url);
 }
@@ -1381,20 +1364,23 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
       if(!c) return;
       window._campanhaId = c._id || null;
 
-      // Título (cabeçalho)
-      if(c.nome){
-        document.querySelectorAll('.campaign-title').forEach(function(el){ el.textContent = c.nome; });
-        document.title = c.nome;
+      // Título (cabeçalho) — sempre atualiza
+      var nomeExibir = c.nome || c.slug || '';
+      if(nomeExibir){
+        document.querySelectorAll('.campaign-title').forEach(function(el){ el.textContent = nomeExibir; });
+        document.title = nomeExibir;
       }
 
-      // Resumo curto
-      if(c.resumoCurto){
-        var sd = document.querySelector('.short-desc');
-        if(sd){
-          var span = sd.querySelector('span');
-          sd.textContent = c.resumoCurto+' ';
-          if(span){ sd.appendChild(span); }
-        }
+      // ID público — sempre atualiza
+      var idEl = document.querySelector('.campaign-id');
+      if(idEl) idEl.textContent = 'ID: '+(c.idPublico || c._id || '—');
+
+      // Resumo curto — sempre atualiza (limpa se vazio)
+      var sd = document.querySelector('.short-desc');
+      if(sd){
+        var span = sd.querySelector('span');
+        sd.textContent = (c.resumoCurto || '') + ' ';
+        if(span){ sd.appendChild(span); }
       }
 
       // Localização
@@ -1413,24 +1399,27 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
         if(tagEl) tagEl.textContent = c.categoria;
       }
 
-      // Data de criação
-      if(c.dataCriacao){
-        var dateEl = document.querySelector('.created-date');
-        if(dateEl) dateEl.innerHTML = '<strong>Vaquinha criada em:</strong> '+c.dataCriacao;
+      // Data de criação — sempre atualiza
+      var dateEl = document.getElementById('createdDateEl') || document.querySelector('.created-date');
+      if(dateEl){
+        if(c.dataCriacao) dateEl.innerHTML = '<strong>Vaquinha criada em:</strong> '+c.dataCriacao;
+        else dateEl.innerHTML = '';
       }
 
-      // Descrição completa (aba Sobre)
-      if(c.descricao){
-        var descEl = document.querySelector('.description');
-        if(descEl){
+      // Descrição completa (aba Sobre) — sempre substitui
+      var descEl = document.querySelector('.description');
+      if(descEl){
+        if(c.descricao && c.descricao.trim()){
           var paragrafos = c.descricao.split(/\n{2,}/).filter(function(p){ return p.trim(); });
           if(paragrafos.length > 1){
             descEl.innerHTML = paragrafos.map(function(p){
               return '<p>'+p.trim().replace(/\n/g,'<br>')+'</p>';
             }).join('');
-          } else if(c.descricao.length > 100){
+          } else {
             descEl.innerHTML = '<p>'+c.descricao.replace(/\n/g,'<br>')+'</p>';
           }
+        } else {
+          descEl.innerHTML = '';
         }
       }
 
@@ -1441,13 +1430,10 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
       // totalCollected = base configurável + arrecadado real pelo sistema
       var base = Math.round((c.arrecadadoBase || 0) * 100);
       var real = Math.round((c.arrecadado   || 0) * 100);
-      var computed = base + real;
-      // Só atualiza se o valor calculado for MAIOR que o estático já exibido
-      // (evita que R$1,00 real substitua R$2.977,02 estático quando base não foi configurada)
-      if(computed > totalCollected || base > 0) totalCollected = computed;
-      // Atualiza contadores de apoiadores e corações com base
-      if(c.apoiadoresBase && c.apoiadoresBase > 0) supportersCount = c.apoiadoresBase;
-      if(c.coracoesBase   && c.coracoesBase   > 0) heartsCount     = c.coracoesBase;
+      totalCollected = base + real;
+      // Atualiza contadores de apoiadores e corações (sempre — base ou zero)
+      supportersCount = c.apoiadoresBase || 0;
+      heartsCount     = c.coracoesBase   || 0;
       var metaFmt = 'de '+fmtBRL(totalGoal)+' meta';
       document.getElementById('collectedVal').innerHTML =
         fmtBRL(totalCollected)+' <span class="collected-goal">'+metaFmt+'</span>';
@@ -1495,11 +1481,15 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
         syncRightPanel();
       }, (Math.random() * 12000) + 8000); // intervalo entre 8s e 20s
 
-      // Foto
-      if(c.fotoBase64 || c.fotoUrl){
-        var src = c.fotoBase64 || c.fotoUrl;
-        var mainImg = document.getElementById('mainCampaignImg');
-        if(mainImg) mainImg.src = src;
+      // Foto — sempre atualiza (limpa se campanha não tem foto)
+      var mainImg = document.getElementById('mainCampaignImg');
+      if(mainImg){
+        if(c.fotoBase64 || c.fotoUrl){
+          mainImg.src = c.fotoBase64 || c.fotoUrl;
+        } else {
+          // Sem foto configurada: mostra placeholder cinza, sem foto de outra campanha
+          mainImg.src = 'data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%22800%22 height%3D%22450%22%3E%3Crect width%3D%22800%22 height%3D%22450%22 fill%3D%22%23e8e8e8%22%2F%3E%3Ctext x%3D%22400%22 y%3D%22225%22 font-family%3D%22sans-serif%22 font-size%3D%2240%22 fill%3D%22%23aaa%22 text-anchor%3D%22middle%22 dominant-baseline%3D%22middle%22%3E📷%3C%2Ftext%3E%3C%2Fsvg%3E';
+        }
       }
 
       // Botões de valor
@@ -1519,10 +1509,10 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
         }
       }
 
-      // Q&A
-      if(c.perguntas && c.perguntas.length > 0){
-        var qaWrap = document.getElementById('tab4');
-        if(qaWrap){
+      // Q&A — sempre substitui (limpa perguntas estáticas da Ester)
+      var qaWrap = document.getElementById('tab4');
+      if(qaWrap){
+        if(c.perguntas && c.perguntas.length > 0){
           var html = '';
           c.perguntas.forEach(function(q){
             html += '<div class="qa-item">'
@@ -1532,16 +1522,18 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
               +'</div>';
           });
           qaWrap.innerHTML = html;
+        } else {
+          qaWrap.innerHTML = '<p style="color:#aaa;font-size:13px;text-align:center;padding:24px 0;">Nenhuma pergunta cadastrada ainda.</p>';
         }
       }
 
-      // Atualizações
-      if(c.atualizacoes && c.atualizacoes.length > 0){
-        updatesData = c.atualizacoes.map(function(u){
-          return { date: u.data, title: u.titulo, text: u.texto, midiaBase64: u.midiaBase64||'', midiaMime: u.midiaMime||'', midiaUrl: u.midiaUrl||'' };
-        });
-        renderUpdates();
-      }
+      // Atualizações — sempre substitui (limpa dados estáticos da Ester)
+      updatesData = (c.atualizacoes && c.atualizacoes.length > 0)
+        ? c.atualizacoes.map(function(u){
+            return { date: u.data, title: u.titulo, text: u.texto, midiaBase64: u.midiaBase64||'', midiaMime: u.midiaMime||'', midiaUrl: u.midiaUrl||'' };
+          })
+        : [];
+      renderUpdates();
 
       // Vakinha premiada
       if(c.vakinhaPremiada && typeof c.vakinhaPremiada === 'object'){
@@ -1606,9 +1598,12 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
       if(miniNome) miniNome.textContent = c.checkoutNome || c.nome || miniNome.textContent;
       if(miniLoc)  miniLoc.textContent  = c.localizacao  || miniLoc.textContent;
 
-      // Mini-foto do checkout
+      // Mini-foto do checkout — sempre atualiza
       var miniImg = document.querySelector('.pay-campaign-mini img');
-      if(miniImg && (c.fotoBase64 || c.fotoUrl)) miniImg.src = c.fotoBase64 || c.fotoUrl;
+      if(miniImg){
+        if(c.fotoBase64 || c.fotoUrl) miniImg.src = c.fotoBase64 || c.fotoUrl;
+        else miniImg.style.display = 'none';
+      }
 
       // Upsell: título, subtexto e valor
       if(c.upsell){
