@@ -136,6 +136,9 @@ const campanhaSchema = new mongoose.Schema({
   arrecadadoBase:    { type: Number, default: 0 },   // valor base de exibição (histórico externo)
   apoiadoresBase:    { type: Number, default: 0 },   // apoiadores base de exibição
   coracoesBase:      { type: Number, default: 0 },   // corações base de exibição
+  coracaoAtivo:      { type: Boolean, default: false },
+  coracaoValor:      { type: Number, default: 2 },   // valor em R$ por coração
+  coracaoTexto:      { type: String, default: 'Envie um ❤️ e ajude a impulsionar esta campanha!' },
   ordemExibicao: { type: Number, default: 0 },
   vakinhaPremiada: { type: mongoose.Schema.Types.Mixed, default: {} },
   quemAjudou:      { type: mongoose.Schema.Types.Mixed, default: {} },
@@ -162,6 +165,7 @@ const pagamentoSchema = new mongoose.Schema({
   campanhaId:  { type: mongoose.Schema.Types.ObjectId, ref: 'Campanha' },
   chargeId:    { type: String },
   amountCents: { type: Number },
+  tipo:        { type: String, default: 'doacao' }, // 'doacao' | 'coracao'
   donorName:   { type: String, default: 'Anônimo' },
   status:      { type: String, default: 'pending' }
 }, { timestamps: true, versionKey: false });
@@ -730,7 +734,9 @@ app.post('/webhook/xflow', async (req, res) => {
         await PagamentoModel.findOneAndUpdate({ chargeId }, { $set: { status: statusNormalizado } });
         // Incrementar arrecadado apenas se for nova confirmação de pagamento
         if (pago && statusAnterior !== 'paid' && statusAnterior !== 'completed' && statusAnterior !== 'approved') {
-          if (pag.campanhaId) {
+          if (pag.tipo === 'coracao' && pag.campanhaId) {
+            await CampanhaModel.findByIdAndUpdate(pag.campanhaId, { $inc: { coracoesBase: 1 } });
+          } else if (pag.campanhaId) {
             await CampanhaModel.findByIdAndUpdate(pag.campanhaId, { $inc: { arrecadado: pag.amountCents / 100 } });
           }
         }
@@ -962,7 +968,12 @@ app.get('/status-cobranca/:id', async (req, res) => {
         await PagamentoModel.findOneAndUpdate({ chargeId: id }, { $set: { status: data.status } });
         // Incrementa arrecadado APENAS se ainda não estava pago antes
         if (pago && !jaFoiPago && pag.campanhaId) {
-          await CampanhaModel.findByIdAndUpdate(pag.campanhaId, { $inc: { arrecadado: pag.amountCents / 100 } });
+          if (pag.tipo === 'coracao') {
+            // Corações: incrementa só o contador de corações (não o arrecadado)
+            await CampanhaModel.findByIdAndUpdate(pag.campanhaId, { $inc: { coracoesBase: 1 } });
+          } else {
+            await CampanhaModel.findByIdAndUpdate(pag.campanhaId, { $inc: { arrecadado: pag.amountCents / 100 } });
+          }
         }
       }
     }
@@ -973,6 +984,73 @@ app.get('/status-cobranca/:id', async (req, res) => {
     res.status(500).json({ error: 'Erro interno' });
   }
 });
+
+// ─── Rota: Dar coração (cobrança PIX dedicada) ────────────────────
+app.post('/dar-coracao', async (req, res) => {
+  try {
+    const { campanhaId, donorName } = req.body;
+    if (!campanhaId) return res.status(400).json({ error: 'campanhaId obrigatório' });
+
+    // Busca campanha e valida feature ativa
+    const campanha = await CampanhaModel.findById(campanhaId).lean();
+    if (!campanha) return res.status(404).json({ error: 'Campanha não encontrada' });
+    if (!campanha.coracaoAtivo) return res.status(403).json({ error: 'Corações não estão ativos nesta campanha' });
+
+    const valorReais = campanha.coracaoValor || 2;
+    const amountCents = Math.round(valorReais * 100);
+    if (amountCents < 100) return res.status(400).json({ error: 'Valor mínimo de R$1,00' });
+
+    // Busca credenciais do admin dono da campanha
+    let PK = CONFIG.pagamento.pk;
+    let SK = CONFIG.pagamento.sk;
+    if (dbConectado && campanha.owner) {
+      const adminDoc = await AdminUserModel.findOne({ usuario: campanha.owner });
+      if (adminDoc?.paymentPk) PK = adminDoc.paymentPk;
+      if (adminDoc?.paymentSk) SK = adminDoc.paymentSk;
+    }
+    if (!PK || !SK) return res.status(500).json({ error: 'Credenciais de pagamento não configuradas' });
+
+    const nome = (donorName || 'Apoiador').slice(0, 60);
+    const creds = Buffer.from(`${PK}:${SK}`).toString('base64');
+    const response = await fetch('https://app.xflowpayments.com/api/v1/charges', {
+      method: 'POST',
+      headers: { 'Authorization': `Basic ${creds}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: amountCents,
+        description: `Coração para campanha ${campanha.slug || campanha._id}`,
+        customer: { name: nome },
+        payment_method: 'pix',
+        expires_in: 3600
+      })
+    });
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('XFlow /dar-coracao erro:', errText);
+      return res.status(502).json({ error: 'Erro ao criar cobrança' });
+    }
+    const data = await response.json();
+
+    // Salvar no histórico com tipo='coracao'
+    if (dbConectado) {
+      await PagamentoModel.create({
+        campanhaId: campanha._id,
+        chargeId: data.id,
+        amountCents,
+        tipo: 'coracao',
+        status: 'pending'
+      });
+    }
+
+    res.json({ id: data.id, qrCodeBase64: data.pix?.qrCodeBase64, copyPaste: data.pix?.copyPaste, amountCents, valorReais });
+  } catch (err) {
+    console.error('Erro /dar-coracao:', err);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// ─── Rota: Status cobrança coração (incrementa coracoesBase ao confirmar) ─
+// Reutiliza /status-cobranca mas incrementa coracoesBase quando tipo='coracao'
+// (já tratado no polling do frontend via /status-cobranca)
 
 // ─── Static ───────────────────────────────────────────────────────
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
