@@ -877,6 +877,34 @@ tr:hover td{background:var(--card2)}
             </div></div>
           </div>
 
+          <!-- CRIADOR DA CAMPANHA -->
+          <div class="section-card">
+            <div class="section-header" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+              <span>👤 Criador da Campanha</span><span class="toggle-icon">▾</span>
+            </div>
+            <div class="section-body">
+              <p style="font-size:13px;color:var(--fg3);margin:0 0 16px">Nome e foto exibidos no painel lateral do site (coluna direita no desktop).</p>
+              <div class="form-group">
+                <label>Nome do organizador</label>
+                <input type="text" id="ce-criadorNome" placeholder="Ex: Maria Silva">
+              </div>
+              <div class="form-group">
+                <label>Foto do organizador</label>
+                <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;">
+                  <div id="ce-criadorFotoPreviewWrap" style="display:none;">
+                    <img id="ce-criadorFotoPreview" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--border);" draggable="false">
+                    <button type="button" onclick="limparCriadorFoto()" style="display:block;margin:6px auto 0;font-size:11px;color:var(--danger);background:none;border:none;cursor:pointer;">✕ Remover</button>
+                  </div>
+                  <div>
+                    <input type="file" id="ce-criadorFotoFile" accept="image/*" onchange="previewCriadorFoto(this)" style="font-size:13px;">
+                    <p style="font-size:12px;color:var(--fg3);margin:6px 0 0">Ou cole uma URL:</p>
+                    <input type="text" id="ce-criadorFotoUrl" placeholder="https://..." oninput="onCriadorFotoUrlChange()" style="margin-top:4px;">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- ABA: EXTRAS -->
           <div class="tab-pane" id="ceditor-extras">
             <div class="panel"><div class="panel-body">
@@ -1435,6 +1463,20 @@ function popularEditor(c){
   document.getElementById('ce-coracaoAtivo').value=c.coracaoAtivo?'true':'false';
   document.getElementById('ce-coracaoValor').value=c.coracaoValor!=null?c.coracaoValor:'2';
   document.getElementById('ce-coracaoTexto').value=c.coracaoTexto||'';
+  // Criador da Campanha
+  var criadorNomeEl = document.getElementById('ce-criadorNome');
+  if(criadorNomeEl) criadorNomeEl.value = c.criadorNome||c.organizador||'';
+  var criadorFotoFileEl = document.getElementById('ce-criadorFotoFile');
+  if(criadorFotoFileEl) criadorFotoFileEl.value='';
+  var criadorFotoUrlEl = document.getElementById('ce-criadorFotoUrl');
+  if(criadorFotoUrlEl) criadorFotoUrlEl.value = c.criadorFotoUrl||'';
+  var criadorFotoPrev = document.getElementById('ce-criadorFotoPreview');
+  var criadorFotoWrap = document.getElementById('ce-criadorFotoPreviewWrap');
+  var fotoSrc = c.criadorFoto||c.criadorFotoUrl||'';
+  if(criadorFotoPrev && criadorFotoWrap){
+    if(fotoSrc){ criadorFotoPrev.src=fotoSrc; criadorFotoWrap.style.display='block'; }
+    else { criadorFotoPrev.src=''; criadorFotoWrap.style.display='none'; }
+  }
   atualizacoesData=(c.atualizacoes||[]).slice();
   perguntasData=(c.perguntas||[]).slice();
   valoresData=(c.valores||[10,25,50,100,200]).slice();
@@ -1455,6 +1497,34 @@ function atualizarPreviewSlug(){
   if(slug&&preview){ var val=slug.value.trim(); preview.innerHTML=val?'Link: <a href="/c/'+val+'" target="_blank" style="color:var(--accent)">/c/'+val+'</a>':'Link: —'; }
   var ns=document.getElementById('nova-slug'), nsp=document.getElementById('nova-slug-preview');
   if(ns&&nsp){ var v2=ns.value.trim(); nsp.innerHTML=v2?'Link: <a href="/c/'+v2+'" target="_blank" style="color:var(--accent)">/c/'+v2+'</a>':'Link: /c/<em>seu-slug</em>'; }
+}
+
+function previewCriadorFoto(input){
+  var file=input.files[0]; if(!file) return;
+  if(file.size>3*1024*1024){ toast('Imagem muito grande (máx 3MB)',true); input.value=''; return; }
+  var r=new FileReader(); r.onload=function(e){
+    var prev=document.getElementById('ce-criadorFotoPreview');
+    var wrap=document.getElementById('ce-criadorFotoPreviewWrap');
+    if(prev){ prev.src=e.target.result; }
+    if(wrap){ wrap.style.display='block'; }
+    // limpa URL se usou arquivo
+    var urlEl=document.getElementById('ce-criadorFotoUrl'); if(urlEl) urlEl.value='';
+  }; r.readAsDataURL(file);
+}
+function limparCriadorFoto(){
+  var prev=document.getElementById('ce-criadorFotoPreview');
+  var wrap=document.getElementById('ce-criadorFotoPreviewWrap');
+  var file=document.getElementById('ce-criadorFotoFile');
+  var url=document.getElementById('ce-criadorFotoUrl');
+  if(prev) prev.src=''; if(wrap) wrap.style.display='none';
+  if(file) file.value=''; if(url) url.value='';
+}
+function onCriadorFotoUrlChange(){
+  var url=(document.getElementById('ce-criadorFotoUrl')||{}).value||'';
+  var prev=document.getElementById('ce-criadorFotoPreview');
+  var wrap=document.getElementById('ce-criadorFotoPreviewWrap');
+  if(url.trim()){ if(prev) prev.src=url.trim(); if(wrap) wrap.style.display='block'; }
+  else { if(prev) prev.src=''; if(wrap) wrap.style.display='none'; }
 }
 
 function onFotoUrlChange(){
@@ -1718,8 +1788,20 @@ async function salvarCampanha(){
       coracaoAtivo:document.getElementById('ce-coracaoAtivo').value==='true',
       coracaoValor:parseFloat(document.getElementById('ce-coracaoValor').value)||2,
       coracaoTexto:document.getElementById('ce-coracaoTexto').value.trim(),
+      criadorNome:(document.getElementById('ce-criadorNome')||{}).value||'',
       valores:valoresData, atualizacoes:atualizacoesData, perguntas:perguntasData, selos:selosData
     };
+    // Foto do criador
+    var criadorFotoFileInput = document.getElementById('ce-criadorFotoFile');
+    if(criadorFotoFileInput && criadorFotoFileInput.files && criadorFotoFileInput.files[0]){
+      body.criadorFoto = await new Promise(function(res){ var r=new FileReader(); r.onload=function(e){ res(e.target.result); }; r.readAsDataURL(criadorFotoFileInput.files[0]); });
+    } else {
+      var criadorFotoUrlVal = (document.getElementById('ce-criadorFotoUrl')||{}).value||'';
+      if(criadorFotoUrlVal) body.criadorFotoUrl = criadorFotoUrlVal;
+      // Se o preview estiver oculto (removida), limpa
+      var wrap = document.getElementById('ce-criadorFotoPreviewWrap');
+      if(wrap && wrap.style.display==='none'){ body.criadorFoto=''; body.criadorFotoUrl=''; }
+    }
     if(fotoBase64){ body.fotoBase64=fotoBase64; body.fotoMime=fotoMime; }
     else if(fotoUrl!==null){ body.fotoUrl=fotoUrl; }
     var r=await fetch(BASE+'/admin/campanhas/'+campanhaAtual._id,{method:'PUT',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify(body)});

@@ -212,17 +212,8 @@
       </svg>
     </a>
 
-    <!-- Links centrais (desktop) -->
-    <nav class="nav-links">
-      <a href="#">Doar ▾</a>
-      <a href="#">Arrecadar ▾</a>
-      <a href="#">Sobre ▾</a>
-    </nav>
-
     <!-- Ações direitas (desktop) -->
     <div class="nav-actions">
-      <span class="nav-buscar">Buscar 🔍</span>
-      <button class="nav-entrar">Entrar</button>
       <button class="nav-criar">Criar vaquinha</button>
     </div>
 
@@ -518,8 +509,11 @@
       <button class="btn-share-rp" onclick="abrirCompartilhar()">Compartilhar</button>
     </div>
     <div class="rp-creator">
-      <div class="rp-creator-avatar" id="rpCreatorAvatar">C</div>
-      <div class="rp-creator-name" id="rpCreatorName">Criador da Campanha</div>
+      <div class="rp-creator-avatar" id="rpCreatorAvatar" style="overflow:hidden;">C</div>
+      <div>
+        <div style="font-size:11px;color:#8a8a8a;margin-bottom:2px;">Organizador</div>
+        <div class="rp-creator-name" id="rpCreatorName">Criador da Campanha</div>
+      </div>
     </div>
   </div>
 </div><!-- /page-right -->
@@ -1446,11 +1440,16 @@ window.__campanhaIdInternal__ = null; // ID da campanha ativa (usado no /criar-c
         if(qa.textoPromotores){ var el2=document.getElementById('qa-promotores-texto'); if(el2) el2.textContent=qa.textoPromotores; }
       }
       // Criador da campanha no painel direito
-      if(c.organizador){
-        var rpAvatar = document.getElementById('rpCreatorAvatar');
-        var rpName   = document.getElementById('rpCreatorName');
-        if(rpAvatar) rpAvatar.textContent = c.organizador.charAt(0).toUpperCase();
-        if(rpName)   rpName.textContent   = c.organizador;
+      var rpAvatar = document.getElementById('rpCreatorAvatar');
+      var rpName   = document.getElementById('rpCreatorName');
+      if(rpName)   rpName.textContent = c.criadorNome || c.organizador || 'Criador da Campanha';
+      if(rpAvatar){
+        if(c.criadorFoto){
+          rpAvatar.innerHTML = '<img src="'+c.criadorFoto+'" style="width:100%;height:100%;object-fit:cover;" draggable="false">';
+        } else {
+          var inicial = (c.criadorNome||c.organizador||'C').charAt(0).toUpperCase();
+          rpAvatar.textContent = inicial;
+        }
       }
       // Carrega outras campanhas
       carregarOutrasCampanhas(c._id || c.slug);
