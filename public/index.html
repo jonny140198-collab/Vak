@@ -13,14 +13,28 @@
 
   /* ── NAV ── */
   .nav{position:fixed;top:0;left:0;right:0;height:60px;background:#fff;z-index:300;border-bottom:1px solid #f1f0f0;display:flex;align-items:center;}
-  .nav-inner{width:100%;max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
-  .nav-links{display:none;gap:4px;}
-  .nav-links a{font-size:14px;font-weight:600;color:#282828;padding:6px 10px;border-radius:6px;white-space:nowrap;}
-  .nav-links a:hover{background:#f5f5f5;}
+  .nav-inner{width:100%;max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  /* links dropdown desktop */
+  .nav-links{display:none;gap:2px;align-items:center;}
+  .nav-drop{position:relative;}
+  .nav-drop-btn{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;color:#282828;padding:6px 10px;border-radius:6px;cursor:pointer;background:none;border:none;white-space:nowrap;}
+  .nav-drop-btn:hover,.nav-drop-btn.open{background:#f5f5f5;}
+  .nav-drop-btn .caret{font-size:10px;color:#8a8a8a;transition:transform 0.2s;}
+  .nav-drop-btn.open .caret{transform:rotate(180deg);}
+  .nav-drop-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid #e8e8e8;border-radius:10px;min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:400;overflow:hidden;}
+  .nav-drop-menu.open{display:block;}
+  .nav-drop-menu a{display:block;padding:11px 16px;font-size:14px;font-weight:600;color:#282828;}
+  .nav-drop-menu a:hover{background:#f5f5f5;}
+  /* ações direitas desktop */
   .nav-actions{display:none;align-items:center;gap:10px;}
-  .nav-actions .nav-buscar{font-size:14px;font-weight:600;color:#282828;cursor:pointer;}
-  .nav-actions .nav-entrar{padding:8px 18px;border:2px solid #24ca68;border-radius:8px;font-size:14px;font-weight:700;color:#24ca68;background:none;cursor:pointer;}
-  .nav-actions .nav-criar{padding:8px 18px;border:none;border-radius:8px;font-size:14px;font-weight:700;color:#fff;background:#24ca68;cursor:pointer;}
+  .nav-buscar{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:600;color:#282828;cursor:pointer;padding:6px 8px;border-radius:6px;background:none;border:none;}
+  .nav-buscar:hover{background:#f5f5f5;}
+  .nav-buscar svg{width:18px;height:18px;fill:#282828;}
+  .nav-sep{width:1px;height:20px;background:#e0e0e0;}
+  .nav-entrar{padding:8px 18px;border:2px solid #24ca68;border-radius:8px;font-size:14px;font-weight:700;color:#24ca68;background:none;cursor:pointer;}
+  .nav-entrar:hover{background:#e8f5e9;}
+  .nav-criar{padding:8px 18px;border:none;border-radius:8px;font-size:14px;font-weight:700;color:#fff;background:#24ca68;cursor:pointer;}
+  .nav-criar:hover{background:#1aaa50;}
   .nav-mobile{display:flex;align-items:center;gap:16px;}
   .nav-mobile svg{width:24px;height:24px;fill:#282828;}
   .spacer{height:60px;}
@@ -69,6 +83,7 @@
     .nav-links{display:flex;}
     .nav-actions{display:flex;}
     .nav-mobile{display:none;}
+    #payment-page{padding:32px 24px;}
     .mobile-bottom{display:none!important;}
     .page-wrap{padding:32px 24px 60px;}
     .page-grid{display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start;}
@@ -130,12 +145,16 @@
   .popup-amount{font-size:15px;font-weight:900;color:#24ca68;white-space:nowrap;}
   .popup-time{font-size:11px;color:#aaa;}
 
-  /* PAYMENT PAGE */
-  #payment-page{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#f9f9f9;z-index:400;overflow-y:auto;}
-  .pay-header{background:#fff;border-bottom:1px solid #f1f0f0;padding:16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;}
-  .pay-back{background:none;border:none;cursor:pointer;padding:4px;}
-  .pay-back svg{width:24px;height:24px;fill:#282828;}
+  /* PAYMENT MODAL */
+  #payment-page{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;overflow-y:auto;align-items:flex-start;justify-content:center;padding:16px 16px 32px;}
+  #payment-page.open{display:flex;}
+  .pay-modal-wrap{background:#fff;border-radius:20px;width:100%;max-width:500px;margin:auto;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.25);position:relative;}
+  .pay-header{background:#fff;padding:18px 20px 14px;text-align:center;border-bottom:1px solid #f1f0f0;position:relative;}
   .pay-header h2{font-size:17px;font-weight:900;}
+  .pay-header p.pay-subtitle{font-size:13px;color:#8a8a8a;margin-top:4px;}
+  .pay-close-btn{position:absolute;top:14px;right:16px;background:none;border:none;cursor:pointer;font-size:22px;color:#aaa;line-height:1;padding:4px 8px;}
+  .pay-close-btn:hover{color:#282828;}
+  .pay-back{display:none;}
   .pay-body{padding:16px;}
   .pay-campaign-mini{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:12px;margin-bottom:20px;border:1px solid #f1f0f0;}
   .pay-campaign-mini img{width:56px;height:56px;object-fit:cover;border-radius:8px;}
@@ -217,8 +236,42 @@
       </svg>
     </a>
 
+    <!-- Links dropdown desktop -->
+    <div class="nav-links">
+      <div class="nav-drop">
+        <button class="nav-drop-btn" onclick="navDrop(this)">Doar <span class="caret">▼</span></button>
+        <div class="nav-drop-menu">
+          <a href="#">Como funciona</a>
+          <a href="#">Campanhas</a>
+          <a href="#">Busca por recibo</a>
+        </div>
+      </div>
+      <div class="nav-drop">
+        <button class="nav-drop-btn" onclick="navDrop(this)">Arrecadar <span class="caret">▼</span></button>
+        <div class="nav-drop-menu">
+          <a href="#">Criar vaquinha</a>
+          <a href="#">Loja de corações</a>
+          <a href="#">Taxas e prazos</a>
+        </div>
+      </div>
+      <div class="nav-drop">
+        <button class="nav-drop-btn" onclick="navDrop(this)">Sobre <span class="caret">▼</span></button>
+        <div class="nav-drop-menu">
+          <a href="#">Quem somos</a>
+          <a href="#">Segurança e transparência</a>
+          <a href="#">Blog do Vakinha</a>
+        </div>
+      </div>
+    </div>
+
     <!-- Ações direitas (desktop) -->
     <div class="nav-actions">
+      <button class="nav-buscar">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        Buscar
+      </button>
+      <div class="nav-sep"></div>
+      <button class="nav-entrar">Entrar</button>
       <button class="nav-criar">Criar vaquinha</button>
     </div>
 
@@ -555,11 +608,11 @@
 
 <!-- PÁGINA DE PAGAMENTO -->
 <div id="payment-page">
+<div class="pay-modal-wrap">
   <div class="pay-header">
-    <button class="pay-back" onclick="closePayment()">
-      <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-    </button>
-    <h2>Fazer uma doação</h2>
+    <h2>Fazer uma doação 💚</h2>
+    <p class="pay-subtitle">100% seguro · Doação protegida</p>
+    <button class="pay-close-btn" onclick="closePayment()">×</button>
   </div>
 
   <div id="pay-form-screen">
@@ -697,6 +750,7 @@
     </div>
 
   </div><!-- /pay-form-screen -->
+</div><!-- /pay-modal-wrap -->
 </div><!-- /payment-page -->
 
 <!-- TELA DE SUCESSO — fora do payment-page para não ser escondida -->
@@ -771,6 +825,26 @@ var donorNames = [
 ];
 var donorValues = [10,15,20,25,30,50,75,100,150,200,250,300,500];
 var avatarColors = ['#24ca68','#2196F3','#FF5722','#9C27B0','#FF9800','#E91E63','#00BCD4','#4CAF50'];
+
+// Nav dropdowns
+function navDrop(btn){
+  var menu = btn.nextElementSibling;
+  var isOpen = menu.classList.contains('open');
+  document.querySelectorAll('.nav-drop-menu.open').forEach(function(m){m.classList.remove('open');});
+  document.querySelectorAll('.nav-drop-btn.open').forEach(function(b){b.classList.remove('open');});
+  if(!isOpen){ menu.classList.add('open'); btn.classList.add('open'); }
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.nav-drop')){
+    document.querySelectorAll('.nav-drop-menu.open').forEach(function(m){m.classList.remove('open');});
+    document.querySelectorAll('.nav-drop-btn.open').forEach(function(b){b.classList.remove('open');});
+  }
+});
+// Fechar modal clicando no backdrop
+document.addEventListener('DOMContentLoaded', function(){
+  var pp = document.getElementById('payment-page');
+  if(pp){ pp.addEventListener('click', function(e){ if(e.target===pp) closePayment(); }); }
+});
 
 function randomItem(arr){return arr[Math.floor(Math.random()*arr.length)];}
 function fmtBRL(cents){return 'R$ '+(cents/100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
@@ -935,7 +1009,12 @@ Object.defineProperty(window, '_campanhaId', {
 });
 
 function openPayment(){
-  document.getElementById('payment-page').style.display='block';
+  var pp = document.getElementById('payment-page');
+  pp.style.display='flex';
+  // Garantir classe open para o backdrop
+  pp.classList.add('open');
+  // Bloquear scroll do body
+  document.body.style.overflow='hidden';
   document.getElementById('pay-form-screen').style.display='block';
   // Resetar todos os steps — mostrar só seleção de valor
   ['payStepConfirm','payStepUpsell','payStepQR'].forEach(function(id){
@@ -950,7 +1029,10 @@ function openPayment(){
   updatePayBtn();
 }
 function closePayment(){
-  document.getElementById('payment-page').style.display='none';
+  var pp = document.getElementById('payment-page');
+  pp.style.display='none';
+  pp.classList.remove('open');
+  document.body.style.overflow='';
 }
 
 function selectValue(v){
