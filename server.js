@@ -187,8 +187,8 @@ let CONFIG = {
 // Campanha em memória (fallback quando não tem MongoDB)
 let CAMPANHAS_MEM = [{
   _id: 'default',
-  nome: process.env.CAMP_NOME || 'Ajude a Pequena Ester',
-  descricao: process.env.CAMP_DESC || 'Ester tem leucemia e precisa de tratamento urgente.',
+  nome: process.env.CAMP_NOME || 'Tupanciretã: ajude quem perdeu tudo',
+  descricao: process.env.CAMP_DESC || '🆘 Tupanciretã e o Rio Grande do Sul precisam de você. Doe ag...',
   meta: parseFloat(process.env.CAMP_META) || 140000,
   status: 'ativa',
   chavePix: process.env.CAMP_PIX || '',
@@ -229,26 +229,34 @@ async function conectarMongo() {
     const count = await CampanhaModel.countDocuments();
     if (count === 0) {
       await CampanhaModel.create({
-        nome: process.env.CAMP_NOME || 'Ajude a Pequena Ester',
-        resumoCurto: 'Olá, meu nome é Robson e sou pai da pequena Ester. É com o coração apertado e muita esperança que venho pedir a ajuda de vocês. Minha filha está enfrentando uma batalha muito difícil contra a leucemia.',
-        descricao: process.env.CAMP_DESC || `Olá, meu nome é Robson e sou pai da pequena Ester.
+        nome: process.env.CAMP_NOME || 'Tupanciretã: ajude quem perdeu tudo',
+        idPublico: '554896',
+        resumoCurto: '🆘 Tupanciretã (RS) precisa de nós! Uma tempestade com ventos de 114 km/h destruiu 7.796 casas e afetou mais de 20 mil pessoas. Estado de Calamidade Pública decretado. Sua doação vira lona, telha, colchão, água e comida para quem perdeu tudo. 🚨 Doe agora e compartilhe!',
+        descricao: process.env.CAMP_DESC || `🆘 Tupanciretã e o Rio Grande do Sul precisam de você. Doe agora!
 
-É com o coração apertado e muita esperança que venho pedir a ajuda de vocês. Minha filha Ester está enfrentando uma batalha muito difícil: ela está passando por um tratamento contra a leucemia.
+Uma tempestade severa, com ventos de até 114 km/h (supercélula e microexplosão atmosférica) e chuva de granizo, atingiu Tupanciretã, e o Rio Grande do Sul volta a se mobilizar em modo de emergência.
 
-Ester é uma menina meiga, doce e cheia de vida. Como pai, tudo o que mais desejo neste momento é poder estar ao lado dela, dando todo o amor, apoio e força que ela precisa para enfrentar essa fase tão delicada.
+Num município de cerca de 20 mil habitantes, praticamente todos foram afetados de alguma forma. Os números oficiais já somam 5 óbitos, 265 feridos, 40 desabrigados e 19.780 desalojados. São 7.796 casas destelhadas, mais de mil árvores caídas e redes de energia, água e infraestrutura pública destruídas, incluindo o Hospital de Caridade e escolas da cidade. O governo decretou Estado de Calamidade Pública, e o socorro imediato é uma questão de sobrevivência.
 
-Nós moramos em Barcarena, no Pará, e diariamente preciso me deslocar até Belém para acompanhar minha filha durante o tratamento. São viagens, alimentação, transporte e outras despesas que acabam pesando muito no orçamento da nossa família.
+Em 2024, o Instituto Vakinha mobilizou o Brasil, arrecadou R$ 80 milhões e apoiou mais de 600 instituições e milhares de vidas no Rio Grande do Sul. Agora, em novembro de 2026, a emergência bate à porta outra vez, e a ajuda precisa chegar depressa a quem perdeu tudo em poucas horas.
 
-Infelizmente, essa não é a primeira vez que o câncer entra na nossa família. Minha esposa, mãe da Ester, também enfrentou essa doença e, infelizmente, acabou falecendo por causa dela. Desde então, tenho seguido em frente tentando ser forte pela minha filha e fazer tudo o que estiver ao meu alcance para protegê-la.
+🤝 Uma rede unida, atuando na ponta
+Nesta frente emergencial, o Instituto Vakinha se une a parceiros que já estão em campo para levar uma resposta rápida e organizada às áreas atingidas: Bonanza, OIM (Agência da ONU para as Migrações), GRAD (Resgate Animal e Saúde Única), Humus e outras instituições parceiras.
 
-Hoje, estou aqui deixando de lado qualquer orgulho e pedindo ajuda. Não estou fazendo isso por mim, mas pela minha pequena Ester. Quero poder continuar acompanhando seu tratamento e proporcionar a ela tudo o que estiver ao meu alcance durante essa caminhada.
+Todo o valor arrecadado nesta campanha oficial será repassado com agilidade e transparência para:
 
-Qualquer contribuição, independentemente do valor, será muito importante para nós. E se você não puder contribuir financeiramente, compartilhar esta vakinha com outras pessoas já será uma enorme ajuda.
+Sobrevivência e abrigo: lonas, telhas, colchões, cobertores, kits de higiene, água potável e alimentos para quem teve a casa atingida e ficou desalojado ou desabrigado;
+Apoio a feridos e emergências: suporte às equipes de atendimento, resgate e acolhimento no local;
+Fortalecimento de quem está na linha de frente: repasse direto a organizações parceiras, entidades locais e frentes humanitárias que atuam em Tupanciretã e região.
+O que os dados oficiais mostram:
 
-Peço, de coração, que você inclua a Ester em suas orações e torça pela recuperação dela.
+5 óbitos e 265 feridos
+19.780 desalojados e 40 desabrigados
+7.796 casas destelhadas
+Hospital de Caridade, escolas, energia e água atingidos
 
-Por favor, nos ajude a dar à pequena Ester a chance de continuar lutando e, um dia, poder voltar a viver sua infância com toda a alegria que ela merece.`,
-        localizacao: 'Barcarena / PA',
+🚨 Doe AGORA: cada contribuição faz diferença imediata para reerguer telhados, aquecer famílias e manter de pé o atendimento de emergência.`,
+        localizacao: 'Tupanciretã / RS',
         categoria: 'Solidariedade / Saúde',
         dataCriacao: '20/08/2026',
         meta: parseFloat(process.env.CAMP_META) || 140000,
@@ -270,14 +278,39 @@ Por favor, nos ajude a dar à pequena Ester a chance de continuar lutando e, um 
       });
       console.log('📄 Campanha padrão migrada para MongoDB');
     } else {
-      // Atualizar campos vazios na campanha existente
+      // Sempre atualizar campos principais da campanha existente
       const campExistente = await CampanhaModel.findOne({ status: 'ativa' });
-      if (campExistente && !campExistente.descricao) {
+      if (campExistente) {
         await CampanhaModel.findByIdAndUpdate(campExistente._id, { $set: {
-          resumoCurto: 'Olá, meu nome é Robson e sou pai da pequena Ester. É com o coração apertado e muita esperança que venho pedir a ajuda de vocês. Minha filha está enfrentando uma batalha muito difícil contra a leucemia.',
-          descricao: `Olá, meu nome é Robson e sou pai da pequena Ester.\n\nÉ com o coração apertado e muita esperança que venho pedir a ajuda de vocês. Minha filha Ester está enfrentando uma batalha muito difícil: ela está passando por um tratamento contra a leucemia.\n\nEster é uma menina meiga, doce e cheia de vida. Como pai, tudo o que mais desejo neste momento é poder estar ao lado dela, dando todo o amor, apoio e força que ela precisa para enfrentar essa fase tão delicada.\n\nNós moramos em Barcarena, no Pará, e diariamente preciso me deslocar até Belém para acompanhar minha filha durante o tratamento. São viagens, alimentação, transporte e outras despesas que acabam pesando muito no orçamento da nossa família.\n\nHoje, estou aqui deixando de lado qualquer orgulho e pedindo ajuda. Não estou fazendo isso por mim, mas pela minha pequena Ester. Quero poder continuar acompanhando seu tratamento e proporcionar a ela tudo o que estiver ao meu alcance durante essa caminhada.\n\nQualquer contribuição, independentemente do valor, será muito importante para nós.\n\nPeço, de coração, que você inclua a Ester em suas orações e torça pela recuperação dela.`,
-          localizacao: campExistente.localizacao || 'Barcarena / PA',
-          categoria: campExistente.categoria || 'Solidariedade / Saúde',
+          nome: 'Tupanciretã: ajude quem perdeu tudo',
+          idPublico: campExistente.idPublico || '554896',
+          resumoCurto: '🆘 Tupanciretã (RS) precisa de nós! Uma tempestade com ventos de 114 km/h destruiu 7.796 casas e afetou mais de 20 mil pessoas. Estado de Calamidade Pública decretado. Sua doação vira lona, telha, colchão, água e comida para quem perdeu tudo. 🚨 Doe agora e compartilhe!',
+          descricao: `🆘 Tupanciretã e o Rio Grande do Sul precisam de você. Doe agora!
+
+Uma tempestade severa, com ventos de até 114 km/h (supercélula e microexplosão atmosférica) e chuva de granizo, atingiu Tupanciretã, e o Rio Grande do Sul volta a se mobilizar em modo de emergência.
+
+Num município de cerca de 20 mil habitantes, praticamente todos foram afetados de alguma forma. Os números oficiais já somam 5 óbitos, 265 feridos, 40 desabrigados e 19.780 desalojados. São 7.796 casas destelhadas, mais de mil árvores caídas e redes de energia, água e infraestrutura pública destruídas, incluindo o Hospital de Caridade e escolas da cidade. O governo decretou Estado de Calamidade Pública, e o socorro imediato é uma questão de sobrevivência.
+
+Em 2024, o Instituto Vakinha mobilizou o Brasil, arrecadou R$ 80 milhões e apoiou mais de 600 instituições e milhares de vidas no Rio Grande do Sul. Agora, em novembro de 2026, a emergência bate à porta outra vez, e a ajuda precisa chegar depressa a quem perdeu tudo em poucas horas.
+
+🤝 Uma rede unida, atuando na ponta
+Nesta frente emergencial, o Instituto Vakinha se une a parceiros que já estão em campo para levar uma resposta rápida e organizada às áreas atingidas: Bonanza, OIM (Agência da ONU para as Migrações), GRAD (Resgate Animal e Saúde Única), Humus e outras instituições parceiras.
+
+Todo o valor arrecadado nesta campanha oficial será repassado com agilidade e transparência para:
+
+Sobrevivência e abrigo: lonas, telhas, colchões, cobertores, kits de higiene, água potável e alimentos para quem teve a casa atingida e ficou desalojado ou desabrigado;
+Apoio a feridos e emergências: suporte às equipes de atendimento, resgate e acolhimento no local;
+Fortalecimento de quem está na linha de frente: repasse direto a organizações parceiras, entidades locais e frentes humanitárias que atuam em Tupanciretã e região.
+O que os dados oficiais mostram:
+
+5 óbitos e 265 feridos
+19.780 desalojados e 40 desabrigados
+7.796 casas destelhadas
+Hospital de Caridade, escolas, energia e água atingidos
+
+🚨 Doe AGORA: cada contribuição faz diferença imediata para reerguer telhados, aquecer famílias e manter de pé o atendimento de emergência.`,
+          localizacao: 'Tupanciretã / RS',
+          categoria: 'Solidariedade / Emergência',
           dataCriacao: campExistente.dataCriacao || '20/08/2026',
           perguntas: campExistente.perguntas && campExistente.perguntas.length ? campExistente.perguntas : [
             { pergunta: 'O dinheiro arrecadado vai realmente para o tratamento?', resposta: 'Sim! Todas as doações são destinadas diretamente ao custeio do tratamento, incluindo transporte, hospedagem e medicamentos.', autor: '' },
