@@ -19,7 +19,7 @@ app.use((req, res, next) => {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "font-src 'self' https://fonts.gstatic.com data:; " +
     "img-src 'self' data: blob: https:; " +
-    "connect-src 'self' https://vak-led3.onrender.com https://app.xflowpayments.com; " +
+    "connect-src 'self' https://vak-led3.onrender.com https://ajudetupancireta.com https://www.ajudetupancireta.com https://app.xflowpayments.com; " +
     "frame-ancestors 'none';"
   );
   next();
@@ -28,6 +28,8 @@ app.use((req, res, next) => {
 // ─── CORS restrito ao próprio domínio ────────────────────────────
 const ALLOWED_ORIGINS = [
   'https://vak-led3.onrender.com',
+  'https://ajudetupancireta.com',
+  'https://www.ajudetupancireta.com',
   'http://localhost:3000',
   'http://127.0.0.1:3000'
 ];
